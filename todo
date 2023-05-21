@@ -1,0 +1,3 @@
+- Functions should have their own bodies
+- Functions should be able to get executed in attribute fields, to make things more dynamic
+- PAPI Function

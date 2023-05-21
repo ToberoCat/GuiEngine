@@ -1,0 +1,10 @@
+name: 'GuiEngine'
+version: '${project.version}'
+main: io.github.toberocat.guiengine.api.GuiEngineApiPlugin
+depend:
+  - ToberoCore
+api-version: 1.16
+authors: [ Tobero ]
+commands:
+  guiengine:
+    description: View your guis
