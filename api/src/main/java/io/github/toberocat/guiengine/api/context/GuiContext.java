@@ -74,6 +74,13 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
         return StreamUtils.find(components, x -> x.getId().equals(id));
     }
 
+    public @Nullable <T extends GuiComponent> T findComponentById(@NotNull String id, @NotNull Class<T> clazz) {
+        GuiComponent component = StreamUtils.find(components, x -> x.getId().equals(id));
+        if (component.getClass() != clazz)
+            return null;
+        return clazz.cast(component);
+    }
+
     public void removeById(@NotNull String id) {
         components.remove(findComponentById(id));
     }
@@ -109,6 +116,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
 
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
+        interpreter().clickedComponent(event);
         componentsDescending()
                 .filter(x -> x.isInComponent(event.getSlot()))
                 .findFirst()
@@ -120,7 +128,6 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
                         () -> {
                             Bukkit.getPluginManager()
                                     .callEvent(new GuiComponentClickEvent(this, event, null));
-                            interpreter().clickedComponent(event);
                         });
     }
 
@@ -145,9 +152,9 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
 
     @Override
     public void closedComponent(@NotNull InventoryCloseEvent event) {
+        componentsDescending().forEachOrdered(x -> x.closedComponent(event));
         Bukkit.getPluginManager()
                 .callEvent(new GuiCloseEvent(this, event));
-        componentsDescending().forEachOrdered(x -> x.closedComponent(event));
     }
 
     public @NotNull GuiInterpreter interpreter() {

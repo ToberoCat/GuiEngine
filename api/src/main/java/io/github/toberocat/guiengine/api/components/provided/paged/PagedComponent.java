@@ -1,11 +1,14 @@
 package io.github.toberocat.guiengine.api.components.provided.paged;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.api.action.NextPageAction;
 import io.github.toberocat.guiengine.api.action.PreviousPageAction;
 import io.github.toberocat.guiengine.api.components.GuiComponent;
 import io.github.toberocat.guiengine.api.components.provided.embedded.EmbeddedGuiComponent;
+import io.github.toberocat.guiengine.api.function.GuiFunction;
 import io.github.toberocat.guiengine.api.utils.CoordinatePair;
 import io.github.toberocat.guiengine.api.utils.JsonUtils;
 import io.github.toberocat.guiengine.api.utils.Utils;
@@ -18,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,22 +43,36 @@ public class PagedComponent extends EmbeddedGuiComponent {
     protected int showingPage;
     private int currentPatternIndex;
 
-    public PagedComponent(@NotNull String id,
-                          int offsetX,
+
+    public PagedComponent(int offsetX,
                           int offsetY,
                           int width,
                           int height,
-                          int[] pattern,
                           @NotNull RenderPriority priority,
-                          @NotNull JsonNode parent,
-                          int showingPage,
+                          @NotNull String id,
+                          @NotNull List<GuiFunction> clickFunctions,
+                          @NotNull List<GuiFunction> dragFunctions,
+                          @NotNull List<GuiFunction> closeFunctions,
+                          boolean hidden,
+                          @NotNull String targetGui,
                           boolean copyAir,
-                          boolean interactions) {
-        super(id, offsetX, offsetY, width, height, priority, "", copyAir, interactions);
-        this.showingPage = showingPage;
-        this.pattern = pattern;
+                          boolean interactions,
+                          @NotNull JsonNode parent,
+                          int[] pattern,
+                          int showingPage) {
+        super(offsetX, offsetY, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden, targetGui, copyAir, interactions);
         this.parent = parent;
+        this.pattern = pattern;
+        this.showingPage = showingPage;
         this.pages = new ArrayList<>();
+    }
+
+    @Override
+    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+        super.serialize(gen, serializers);
+        JsonUtils.writeArray(gen, "pattern", pattern);
+        gen.writeNumberField("showing-page", showingPage);
+        gen.writeRaw(parent.toString());
     }
 
     @Override

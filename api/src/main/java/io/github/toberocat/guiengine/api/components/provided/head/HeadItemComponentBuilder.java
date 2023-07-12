@@ -1,96 +1,56 @@
 package io.github.toberocat.guiengine.api.components.provided.head;
 
-import io.github.toberocat.guiengine.api.components.GuiComponent;
-import io.github.toberocat.guiengine.api.function.GuiFunction;
-import io.github.toberocat.guiengine.api.render.RenderPriority;
-import io.github.toberocat.toberocore.util.ItemBuilder;
-import io.github.toberocat.toberocore.util.ItemUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.github.toberocat.guiengine.api.components.provided.item.SimpleItemComponentBuilder;
+import io.github.toberocat.toberocore.item.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.UUID;
 
-public class HeadItemComponentBuilder {
-    private @NotNull RenderPriority priority = RenderPriority.NORMAL;
-    private @NotNull String id = UUID.randomUUID().toString();
-    private @NotNull String name = "";
-    private @Nullable String textureId;
-    private @Nullable UUID owner;
-    private @NotNull String[] lore = new String[0];
-    private @NotNull List<GuiFunction> clickFunctions = new ArrayList<>();
-    private int x = 0;
-    private int y = 0;
-    private boolean hidden = false;
+import static io.github.toberocat.guiengine.api.utils.JsonUtils.*;
 
-    public @NotNull HeadItemComponentBuilder setPriority(@NotNull RenderPriority priority) {
-        this.priority = priority;
-        return this;
-    }
+public class HeadItemComponentBuilder<B extends HeadItemComponentBuilder<B>> extends SimpleItemComponentBuilder<B> {
+    protected @Nullable String textureId;
+    protected @Nullable UUID owner;
 
-    public @NotNull HeadItemComponentBuilder setId(@NotNull String id) {
-        this.id = id;
-        return this;
-    }
 
-    public @NotNull HeadItemComponentBuilder setName(@NotNull String name) {
-        this.name = name;
-        return this;
-    }
-
-    public @NotNull HeadItemComponentBuilder setTextureId(@Nullable String textureId) {
+    public @NotNull B setTextureId(@Nullable String textureId) {
         this.textureId = textureId;
-        return this;
+        return self();
     }
 
-    public @NotNull HeadItemComponentBuilder setOwner(@Nullable UUID owner) {
+    public @NotNull B setOwner(@Nullable UUID owner) {
         this.owner = owner;
-        return this;
+        return self();
     }
 
-    public @NotNull HeadItemComponentBuilder setLore(@NotNull String[] lore) {
-        this.lore = lore;
-        return this;
-    }
-
-    public @NotNull HeadItemComponentBuilder setClickFunctions(@NotNull List<GuiFunction> clickFunctions) {
-        this.clickFunctions = clickFunctions;
-        return this;
-    }
-
-    public @NotNull HeadItemComponentBuilder addClickFunction(@NotNull GuiFunction clickFunction) {
-        clickFunctions.add(clickFunction);
-        return this;
-    }
-
-    public @NotNull HeadItemComponentBuilder setX(int x) {
-        this.x = x;
-        return this;
-    }
-
-    public @NotNull HeadItemComponentBuilder setY(int y) {
-        this.y = y;
-        return this;
-    }
-
-    public @NotNull HeadItemComponentBuilder setHidden(boolean hidden) {
-        this.hidden = hidden;
-        return this;
-    }
-
-    public HeadItemComponent createHeadItemComponent() {
+    @Override
+    public @NotNull HeadItemComponent createComponent() {
         ItemStack item = textureId != null
-                ? new ItemStack(Material.AIR) // ItemUtils.createHead(textureId, name, 1, lore)
+                ? ItemUtils.createHead(textureId, name, 1, lore)
                 : owner != null ?
                 ItemUtils.createSkull(Bukkit.getOfflinePlayer(owner), 1, name, lore)
                 : ItemUtils.createItem(Material.PLAYER_HEAD, name, 1, lore);
 
-        HeadItemComponent component = new HeadItemComponent(priority, id, item, clickFunctions, x, y);
-        component.setHidden(hidden);
-        return component;
+        return new HeadItemComponent(x, y, priority, id, clickFunctions, dragFunctions, closeFunctions, item, hidden);
+    }
+
+    public static class Factory<B extends HeadItemComponentBuilder<B>> extends SimpleItemComponentBuilder.Factory<B> {
+        @Override
+        public @NotNull B createBuilder() {
+            return (B) new HeadItemComponentBuilder<B>();
+        }
+
+        @Override
+        public void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException {
+            super.deserialize(node, builder);
+            builder.setTextureId(getOptionalString(node, "head-texture").orElse(null))
+                    .setOwner(getOptionalUUID(node, "head-owner").orElse(null));
+        }
     }
 }

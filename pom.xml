@@ -10,19 +10,17 @@
     <packaging>pom</packaging>
     <modules>
         <module>api</module>
-        <module>paper</module>
     </modules>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <server.location>C:\Users\Tobias\Desktop\Development\Minecraft\Spigot\Server1.19\plugins</server.location>
+        <server.location>H:\Development\Minecraft\Spigot\Server1.18\plugins</server.location>
     </properties>
 
     <repositories>
-
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
@@ -52,6 +50,5 @@
             <artifactId>commons-text</artifactId>
             <version>1.10.0</version>
         </dependency>
-
     </dependencies>
 </project>

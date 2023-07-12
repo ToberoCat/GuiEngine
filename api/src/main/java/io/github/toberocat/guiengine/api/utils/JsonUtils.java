@@ -3,6 +3,7 @@ package io.github.toberocat.guiengine.api.utils;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.github.toberocat.guiengine.api.exception.InvalidGuiComponentException;
 import io.github.toberocat.guiengine.api.function.FunctionProcessor;
 import io.github.toberocat.guiengine.api.function.GuiFunction;
 import io.github.toberocat.guiengine.api.render.RenderPriority;
@@ -95,7 +96,13 @@ public class JsonUtils {
 
     public static @NotNull Optional<Material> getOptionalMaterial(@NotNull JsonNode node,
                                                                   @NotNull String field) {
-        return getOptionalNode(node, field).map(x -> Material.valueOf(x.asText()));
+        return getOptionalNode(node, field).map(x -> {
+            try {
+                return Material.valueOf(x.asText().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new InvalidGuiComponentException(String.format("The provided material '%s' doesn't match any materials", x.asText()));
+            }
+        });
     }
 
     public static @NotNull Optional<RenderPriority> getOptionalRenderPriority(@NotNull JsonNode node,

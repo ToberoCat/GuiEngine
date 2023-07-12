@@ -1,85 +1,73 @@
 package io.github.toberocat.guiengine.api.components.provided.embedded;
 
-import io.github.toberocat.guiengine.api.render.RenderPriority;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.github.toberocat.guiengine.api.components.AbstractGuiComponentBuilder;
+import io.github.toberocat.guiengine.api.exception.InvalidGuiComponentException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
+import java.io.IOException;
 
-public class EmbeddedGuiComponentBuilder {
-    private @NotNull String id = UUID.randomUUID().toString();
-    private int x = 0;
-    private int y = 0;
-    private int width = 1;
-    private int height = 1;
-    private @NotNull RenderPriority priority = RenderPriority.NORMAL;
-    private @Nullable String targetGui;
-    private boolean copyAir = true;
-    private boolean interactions = true;
-    private boolean hidden = false;
+import static io.github.toberocat.guiengine.api.utils.JsonUtils.*;
+import static io.github.toberocat.guiengine.api.utils.JsonUtils.getOptionalBoolean;
 
-    public @NotNull EmbeddedGuiComponentBuilder setId(@NotNull String id) {
-        this.id = id;
-        return this;
-    }
+public class EmbeddedGuiComponentBuilder<B extends EmbeddedGuiComponentBuilder<B>> extends AbstractGuiComponentBuilder<B> {
+    protected int width = 1;
+    protected int height = 1;
+    protected @Nullable String targetGui;
+    protected boolean copyAir = true;
+    protected boolean interactions = true;
 
-    public @NotNull EmbeddedGuiComponentBuilder setX(int x) {
-        this.x = x;
-        return this;
-    }
-
-    public @NotNull EmbeddedGuiComponentBuilder setY(int y) {
-        this.y = y;
-        return this;
-    }
-
-    public @NotNull EmbeddedGuiComponentBuilder setWidth(int width) {
+    public @NotNull B setWidth(int width) {
         this.width = width;
-        return this;
+        return self();
     }
 
-    public @NotNull EmbeddedGuiComponentBuilder setHeight(int height) {
+    public @NotNull B setHeight(int height) {
         this.height = height;
-        return this;
+        return self();
     }
 
-    public @NotNull EmbeddedGuiComponentBuilder setPriority(@NotNull RenderPriority priority) {
-        this.priority = priority;
-        return this;
-    }
 
-    public @NotNull EmbeddedGuiComponentBuilder setTargetGui(@NotNull String targetGui) {
+    public @NotNull B setTargetGui(@NotNull String targetGui) {
         this.targetGui = targetGui;
-        return this;
+        return self();
     }
 
-    public @NotNull EmbeddedGuiComponentBuilder setCopyAir(boolean copyAir) {
+    public @NotNull B setCopyAir(boolean copyAir) {
         this.copyAir = copyAir;
-        return this;
+        return self();
     }
 
-    public @NotNull EmbeddedGuiComponentBuilder setInteractions(boolean interactions) {
+    public @NotNull B setInteractions(boolean interactions) {
         this.interactions = interactions;
-        return this;
+        return self();
     }
 
-    public @NotNull EmbeddedGuiComponentBuilder setHidden(boolean hidden) {
-        this.hidden = hidden;
-        return this;
-    }
-
-    public @NotNull EmbeddedGuiComponent createEmbeddedGuiComponent() {
+    @Override
+    public @NotNull EmbeddedGuiComponent createComponent() {
         assert targetGui != null;
-        EmbeddedGuiComponent component = new EmbeddedGuiComponent(id,
-                x,
-                y,
-                width,
-                height,
-                priority,
-                targetGui,
-                copyAir,
-                interactions);
-        component.setHidden(hidden);
-        return component;
+        return new EmbeddedGuiComponent(x, y, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden, targetGui, copyAir, interactions);
+    }
+
+    public static class Factory<B extends EmbeddedGuiComponentBuilder<B>> extends AbstractGuiComponentBuilder.Factory<B> {
+
+        @Override
+        public @NotNull B createBuilder() {
+            return (B) new EmbeddedGuiComponentBuilder<B>();
+        }
+
+        @Override
+        public void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException {
+            super.deserialize(node, builder);
+            builder.setWidth(getOptionalInt(node, "width").orElseThrow(() ->
+                            new InvalidGuiComponentException("The component is missing a required argument 'width'")))
+                    .setHeight(getOptionalInt(node, "height").orElseThrow(() ->
+                            new InvalidGuiComponentException("The component is missing a required argument 'height'")))
+                    .setTargetGui(getOptionalString(node, "target-gui").orElseThrow(() ->
+                            new InvalidGuiComponentException("The component is missing a required argument 'target-gui'")))
+                    .setCopyAir(getOptionalBoolean(node, "copy-air").orElse(true))
+                    .setInteractions(getOptionalBoolean(node, "interactions").orElse(true));
+        }
     }
 }

@@ -34,7 +34,9 @@ public class FunctionProcessor {
     }
 
     public static @Nullable GuiFunction createFunction(@NotNull JsonNode node) throws JsonProcessingException {
-        String id = JsonUtils.getOptionalString(node, "type").orElseThrow();
+        String id = JsonUtils.getOptionalString(node, "type").orElse(null);
+        if (id == null)
+            return null;
         return OBJECT_MAPPER.treeToValue(node, FUNCTIONS.get(id));
     }
 

@@ -1,35 +1,21 @@
 package io.github.toberocat.guiengine.api.components.provided.toggle;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.github.toberocat.guiengine.api.render.RenderPriority;
+import io.github.toberocat.guiengine.api.components.AbstractGuiComponentBuilder;
+import io.github.toberocat.guiengine.api.exception.InvalidGuiComponentException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
+import java.io.IOException;
 
-public class ToggleItemComponentBuilder {
-    private @NotNull RenderPriority priority = RenderPriority.NORMAL;
-    private @NotNull String id = UUID.randomUUID().toString();
+import static io.github.toberocat.guiengine.api.utils.JsonUtils.getOptionalInt;
+import static io.github.toberocat.guiengine.api.utils.JsonUtils.getOptionalNode;
+
+
+public class ToggleItemComponentBuilder extends AbstractGuiComponentBuilder<ToggleItemComponentBuilder> {
+
     private @Nullable JsonNode options;
     private int selected;
-    private int x;
-    private int y;
-    private boolean hidden;
-
-    public @NotNull ToggleItemComponentBuilder setHidden(boolean hidden) {
-        this.hidden = hidden;
-        return this;
-    }
-
-    public @NotNull ToggleItemComponentBuilder setPriority(@NotNull RenderPriority priority) {
-        this.priority = priority;
-        return this;
-    }
-
-    public @NotNull ToggleItemComponentBuilder setId(@NotNull String id) {
-        this.id = id;
-        return this;
-    }
 
     public @NotNull ToggleItemComponentBuilder setOptions(@NotNull JsonNode options) {
         this.options = options;
@@ -41,20 +27,37 @@ public class ToggleItemComponentBuilder {
         return this;
     }
 
-    public @NotNull ToggleItemComponentBuilder setX(int x) {
-        this.x = x;
-        return this;
-    }
-
-    public @NotNull ToggleItemComponentBuilder setY(int y) {
-        this.y = y;
-        return this;
-    }
-
-    public @NotNull ToggleItemComponent createToggleItemComponent() {
+    @Override
+    public @NotNull ToggleItemComponent createComponent() {
         assert options != null;
-        ToggleItemComponent component = new ToggleItemComponent(priority, id, options, selected, x, y);
-        component.setHidden(hidden);
-        return component;
+        return new ToggleItemComponent(x,
+                y,
+                1,
+                1,
+                priority,
+                id,
+                clickFunctions,
+                dragFunctions,
+                closeFunctions,
+                hidden,
+                options,
+                selected);
+    }
+
+    public static class Factory extends AbstractGuiComponentBuilder.Factory<ToggleItemComponentBuilder> {
+
+        @Override
+        public @NotNull ToggleItemComponentBuilder createBuilder() {
+            return new ToggleItemComponentBuilder();
+        }
+
+        @Override
+        public void deserialize(@NotNull JsonNode node, @NotNull ToggleItemComponentBuilder builder) throws IOException {
+            super.deserialize(node, builder);
+            builder.setOptions(getOptionalNode(node, "option").orElseThrow(() ->
+                            new InvalidGuiComponentException("The component is missing a required argument 'option'")))
+                    .setSelected(getOptionalInt(node, "selected").orElseThrow(() ->
+                            new InvalidGuiComponentException("The component is missing a required argument 'selected'")));
+        }
     }
 }

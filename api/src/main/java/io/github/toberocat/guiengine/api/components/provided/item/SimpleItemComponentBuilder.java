@@ -1,77 +1,57 @@
 package io.github.toberocat.guiengine.api.components.provided.item;
 
-import io.github.toberocat.guiengine.api.function.GuiFunction;
-import io.github.toberocat.guiengine.api.render.RenderPriority;
-import io.github.toberocat.toberocore.util.ItemUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.github.toberocat.guiengine.api.components.AbstractGuiComponentBuilder;
+import io.github.toberocat.guiengine.api.exception.InvalidGuiComponentException;
+import io.github.toberocat.toberocore.item.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
 
-public class SimpleItemComponentBuilder {
-    private @NotNull RenderPriority priority = RenderPriority.NORMAL;
-    private @NotNull String id = UUID.randomUUID().toString();
-    private @NotNull String name = "";
-    private @NotNull Material material = Material.AIR;
-    private @NotNull String[] lore = new String[0];
-    private @NotNull List<GuiFunction> clickFunctions = new ArrayList<>();
-    private int x = 0;
-    private int y = 0;
-    private boolean hidden = false;
+import static io.github.toberocat.guiengine.api.utils.JsonUtils.*;
 
-    public @NotNull SimpleItemComponentBuilder setPriority(@NotNull RenderPriority priority) {
-        this.priority = priority;
-        return this;
-    }
+public class SimpleItemComponentBuilder<B extends SimpleItemComponentBuilder<B>> extends AbstractGuiComponentBuilder<B> {
+    protected @NotNull String name = "";
+    protected @NotNull Material material = Material.AIR;
+    protected @NotNull String[] lore = new String[0];
 
-    public @NotNull SimpleItemComponentBuilder setId(@NotNull String id) {
-        this.id = id;
-        return this;
-    }
-
-    public @NotNull SimpleItemComponentBuilder setName(@NotNull String name) {
+    public @NotNull B setName(@NotNull String name) {
         this.name = name;
-        return this;
+        return self();
     }
 
-    public @NotNull SimpleItemComponentBuilder setMaterial(@NotNull Material material) {
+    public @NotNull B setMaterial(@NotNull Material material) {
         this.material = material;
-        return this;
+        return self();
     }
 
-    public @NotNull SimpleItemComponentBuilder setLore(@NotNull String[] lore) {
+    public @NotNull B setLore(@NotNull String[] lore) {
         this.lore = lore;
-        return this;
+        return self();
     }
 
-    public @NotNull SimpleItemComponentBuilder setClickFunctions(@NotNull List<GuiFunction> clickFunctions) {
-        this.clickFunctions = clickFunctions;
-        return this;
-    }
-
-    public @NotNull SimpleItemComponentBuilder setX(int x) {
-        this.x = x;
-        return this;
-    }
-
-    public @NotNull SimpleItemComponentBuilder setY(int y) {
-        this.y = y;
-        return this;
-    }
-
-    public @NotNull SimpleItemComponentBuilder setHidden(boolean hidden) {
-        this.hidden = hidden;
-        return this;
-    }
-
-    public @NotNull SimpleItemComponent createSimpleItemComponent() {
+    @Override
+    public @NotNull SimpleItemComponent createComponent() {
         ItemStack stack = ItemUtils.createItem(material, name, 1, lore);
-        SimpleItemComponent component = new SimpleItemComponent(priority, id, stack, clickFunctions, x, y);
-        component.setHidden(hidden);
-        return component;
+        return new SimpleItemComponent(x, y, priority, id, clickFunctions, dragFunctions, closeFunctions, stack, hidden);
+    }
+
+    public static class Factory<B extends SimpleItemComponentBuilder<B>> extends AbstractGuiComponentBuilder.Factory<B> {
+
+        @Override
+        public @NotNull B createBuilder() {
+            return (B) new SimpleItemComponentBuilder<B>();
+        }
+
+        @Override
+        public void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException {
+            super.deserialize(node, builder);
+            builder.setName(getOptionalString(node, "name").orElse(" "))
+                    .setMaterial(getOptionalMaterial(node, "material")
+                            .orElseThrow(() -> new InvalidGuiComponentException("The component is missing the required argument 'material'")))
+                    .setLore(getOptionalStringArray(node, "lore").orElse(new String[0]));
+        }
     }
 }

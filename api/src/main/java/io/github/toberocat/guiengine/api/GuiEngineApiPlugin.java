@@ -2,21 +2,17 @@ package io.github.toberocat.guiengine.api;
 
 import io.github.toberocat.guiengine.api.action.OpenGuiAction;
 import io.github.toberocat.guiengine.api.commands.GuiCommands;
-import io.github.toberocat.guiengine.api.components.provided.embedded.EmbeddedDeserializer;
+import io.github.toberocat.guiengine.api.components.GuiComponentBuilder;
 import io.github.toberocat.guiengine.api.components.provided.embedded.EmbeddedGuiComponent;
-import io.github.toberocat.guiengine.api.components.provided.embedded.EmbeddedSerializer;
+import io.github.toberocat.guiengine.api.components.provided.embedded.EmbeddedGuiComponentBuilder;
 import io.github.toberocat.guiengine.api.components.provided.head.HeadItemComponent;
-import io.github.toberocat.guiengine.api.components.provided.head.HeadItemDeserializer;
-import io.github.toberocat.guiengine.api.components.provided.head.HeadItemSerializer;
+import io.github.toberocat.guiengine.api.components.provided.head.HeadItemComponentBuilder;
 import io.github.toberocat.guiengine.api.components.provided.item.SimpleItemComponent;
-import io.github.toberocat.guiengine.api.components.provided.item.SimpleItemDeserializer;
-import io.github.toberocat.guiengine.api.components.provided.item.SimpleItemSerializer;
+import io.github.toberocat.guiengine.api.components.provided.item.SimpleItemComponentBuilder;
 import io.github.toberocat.guiengine.api.components.provided.paged.PagedComponent;
-import io.github.toberocat.guiengine.api.components.provided.paged.PagedDeserializer;
-import io.github.toberocat.guiengine.api.components.provided.paged.PagedSerializer;
+import io.github.toberocat.guiengine.api.components.provided.paged.PagedComponentBuilder;
 import io.github.toberocat.guiengine.api.components.provided.toggle.ToggleItemComponent;
-import io.github.toberocat.guiengine.api.components.provided.toggle.ToggleItemDeserializer;
-import io.github.toberocat.guiengine.api.components.provided.toggle.ToggleItemSerializer;
+import io.github.toberocat.guiengine.api.components.provided.toggle.ToggleItemComponentBuilder;
 import io.github.toberocat.guiengine.api.exception.GuiIORuntimeException;
 import io.github.toberocat.guiengine.api.function.*;
 import io.github.toberocat.guiengine.api.function.call.ActionFunction;
@@ -77,36 +73,31 @@ public class GuiEngineApiPlugin extends JavaPlugin {
         GuiEngineApi.registerSharedFactory(
                 SimpleItemComponent.TYPE,
                 SimpleItemComponent.class,
-                new SimpleItemSerializer(),
-                new SimpleItemDeserializer()
+                new SimpleItemComponentBuilder.Factory<>()
         );
 
         GuiEngineApi.registerSharedFactory(
                 HeadItemComponent.TYPE,
                 HeadItemComponent.class,
-                new HeadItemSerializer(),
-                new HeadItemDeserializer()
+                new HeadItemComponentBuilder.Factory<>()
         );
 
         GuiEngineApi.registerSharedFactory(
                 EmbeddedGuiComponent.TYPE,
                 EmbeddedGuiComponent.class,
-                new EmbeddedSerializer(),
-                new EmbeddedDeserializer()
+                new EmbeddedGuiComponentBuilder.Factory<>()
         );
 
         GuiEngineApi.registerSharedFactory(
                 ToggleItemComponent.TYPE,
                 ToggleItemComponent.class,
-                new ToggleItemSerializer(),
-                new ToggleItemDeserializer()
+                new ToggleItemComponentBuilder.Factory()
         );
 
         GuiEngineApi.registerSharedFactory(
                 PagedComponent.TYPE,
                 PagedComponent.class,
-                new PagedSerializer(),
-                new PagedDeserializer()
+                new PagedComponentBuilder.Factory()
         );
     }
 

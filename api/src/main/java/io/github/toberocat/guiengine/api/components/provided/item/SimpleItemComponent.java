@@ -1,15 +1,18 @@
 package io.github.toberocat.guiengine.api.components.provided.item;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.api.components.AbstractGuiComponent;
-import io.github.toberocat.guiengine.api.function.FunctionProcessor;
 import io.github.toberocat.guiengine.api.function.GuiFunction;
 import io.github.toberocat.guiengine.api.render.RenderPriority;
+import io.github.toberocat.guiengine.api.utils.JsonUtils;
 import io.github.toberocat.guiengine.api.utils.Utils;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -19,18 +22,36 @@ import java.util.List;
  */
 public class SimpleItemComponent extends AbstractGuiComponent {
     public static final @NotNull String TYPE = "item";
-    protected final ItemStack itemStack;
-    protected final List<GuiFunction> clickFunctions;
+    protected final ItemStack stack;
 
-    public SimpleItemComponent(@NotNull RenderPriority priority,
+    public SimpleItemComponent(int offsetX,
+                               int offsetY,
+                               @NotNull RenderPriority priority,
                                @NotNull String id,
-                               @NotNull ItemStack stack,
                                @NotNull List<GuiFunction> clickFunctions,
-                               int x,
-                               int y) {
-        super(id, x, y, 1, 1, priority);
-        this.itemStack = stack;
-        this.clickFunctions = clickFunctions;
+                               @NotNull List<GuiFunction> dragFunctions,
+                               @NotNull List<GuiFunction> closeFunctions,
+                               @NotNull ItemStack stack,
+                               boolean hidden) {
+        super(offsetX, offsetY, 1, 1, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden);
+        this.stack = stack;
+    }
+
+
+    @Override
+    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+        super.serialize(gen, serializers);
+        gen.writeStringField("material", stack.getType().name());
+
+        ItemMeta meta = stack.getItemMeta();
+        if (meta == null)
+            return;
+
+        gen.writeStringField("name", meta.getDisplayName());
+        if (meta.getLore() == null)
+            return;
+
+        JsonUtils.writeArray(gen, "lore", meta.getLore().toArray());
     }
 
     @Override
@@ -39,33 +60,10 @@ public class SimpleItemComponent extends AbstractGuiComponent {
     }
 
     @Override
-    public void clickedComponent(@NotNull InventoryClickEvent event) {
-        event.setCancelled(true);
-        if (context == null || api == null)
-            return;
-
-        FunctionProcessor.callFunctions(clickFunctions, api, context);
-        context.render();
-    }
-
-    @Override
     public void render(@NotNull Player viewer,
                        @NotNull ItemStack[][] inventory) {
         if (context == null || api == null)
             return;
-        inventory[offsetY][offsetX] = Utils.processItemStack(itemStack, api, context);
-    }
-
-    public ItemStack getItemStack() {
-        return itemStack;
-    }
-
-    public List<GuiFunction> getClickFunctions() {
-        return clickFunctions;
-    }
-
-    @Override
-    public boolean isInComponent(int slot) {
-        return super.isInComponent(slot);
+        inventory[offsetY][offsetX] = Utils.processItemStack(stack, api, context);
     }
 }

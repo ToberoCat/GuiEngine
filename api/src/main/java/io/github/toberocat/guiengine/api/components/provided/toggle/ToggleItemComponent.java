@@ -1,9 +1,13 @@
 package io.github.toberocat.guiengine.api.components.provided.toggle;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.api.components.AbstractGuiComponent;
 import io.github.toberocat.guiengine.api.components.GuiComponent;
+import io.github.toberocat.guiengine.api.components.Selectable;
+import io.github.toberocat.guiengine.api.function.GuiFunction;
 import io.github.toberocat.guiengine.api.render.RenderPriority;
 import io.github.toberocat.guiengine.api.utils.JsonUtils;
 import io.github.toberocat.guiengine.api.xml.XmlComponent;
@@ -13,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,22 +27,36 @@ import java.util.Map;
  *
  * @author Tobias Madlberger (Tobias)
  */
-public class ToggleItemComponent extends AbstractGuiComponent {
+public class ToggleItemComponent extends AbstractGuiComponent implements Selectable {
 
     public static final String TYPE = "toggle";
     private final JsonNode options;
     private @Nullable GuiComponent[] selectionModel;
+    private @NotNull String[] valueSelectionModel;
     private int selected;
 
-    public ToggleItemComponent(@NotNull RenderPriority priority,
+    public ToggleItemComponent(int offsetX,
+                               int offsetY,
+                               int width,
+                               int height,
+                               @NotNull RenderPriority priority,
                                @NotNull String id,
-                               @NotNull JsonNode options,
-                               int selected,
-                               int x,
-                               int y) {
-        super(id, x, y, 1, 1, priority);
+                               @NotNull List<GuiFunction> clickFunctions,
+                               @NotNull List<GuiFunction> dragFunctions,
+                               @NotNull List<GuiFunction> closeFunctions,
+                               boolean hidden,
+                               JsonNode options,
+                               int selected) {
+        super(offsetX, offsetY, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden);
         this.options = options;
         this.selected = selected;
+    }
+
+    @Override
+    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+        super.serialize(gen, serializers);
+        gen.writePOJOField("option", getOptions());
+        gen.writeNumberField("selected", getSelected());
     }
 
     @Override
@@ -51,8 +70,10 @@ public class ToggleItemComponent extends AbstractGuiComponent {
 
         List<JsonNode> nodes = JsonUtils.getFieldList(options);
         List<GuiComponent> components = new ArrayList<>();
+        List<String> selectionModel = new ArrayList<>();
         try {
             for (JsonNode node : nodes) {
+                selectionModel.add(node.get("value").textValue());
                 XmlComponent xmlComponent = context.interpreter().xmlComponent(node, api);
                 GuiComponent component = context.interpreter().createComponent(xmlComponent, api, context);
                 components.add(component);
@@ -61,6 +82,7 @@ public class ToggleItemComponent extends AbstractGuiComponent {
             throw new RuntimeException(e);
         }
 
+        valueSelectionModel = selectionModel.toArray(String[]::new);
         return components.toArray(GuiComponent[]::new);
     }
 
@@ -91,7 +113,17 @@ public class ToggleItemComponent extends AbstractGuiComponent {
         return options;
     }
 
+    @Override
+    public String[] getSelectionModel() {
+        return valueSelectionModel;
+    }
+
     public int getSelected() {
         return selected;
+    }
+
+    @Override
+    public void setSelected(int selected) {
+        this.selected = selected;
     }
 }

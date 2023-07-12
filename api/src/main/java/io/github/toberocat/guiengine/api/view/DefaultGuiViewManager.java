@@ -4,6 +4,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +41,6 @@ public class DefaultGuiViewManager implements Listener, GuiViewManager {
     public @Nullable GuiView getGuiView(@NotNull UUID player) {
         return openedInventories.get(player);
     }
-
 
     @EventHandler
     private void click(@NotNull InventoryClickEvent event) {

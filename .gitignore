@@ -1,0 +1,3 @@
+# Project exclude paths
+/api/target/
+/paper/target/

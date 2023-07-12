@@ -1,16 +1,16 @@
 package io.github.toberocat.guiengine.api;
 
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.github.toberocat.guiengine.api.components.GuiComponent;
+import io.github.toberocat.guiengine.api.components.GuiComponentBuilder;
 import io.github.toberocat.guiengine.api.context.GuiContext;
-import io.github.toberocat.guiengine.api.event.GuiEvents;
 import io.github.toberocat.guiengine.api.interpreter.GuiInterpreter;
 import io.github.toberocat.guiengine.api.utils.VirtualInventory;
 import io.github.toberocat.guiengine.api.utils.VirtualPlayer;
+import io.github.toberocat.guiengine.api.xml.GuiComponentDeserializer;
+import io.github.toberocat.guiengine.api.xml.GuiComponentSerializer;
 import io.github.toberocat.guiengine.api.xml.XmlGui;
 import io.github.toberocat.guiengine.api.exception.GuiIORuntimeException;
 import io.github.toberocat.guiengine.api.exception.GuiNotFoundRuntimeException;
@@ -20,7 +20,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -75,24 +74,22 @@ public final class GuiEngineApi {
     }
 
     public static <T extends GuiComponent> void registerSharedFactory(@NotNull String id,
-                                                                      @NotNull Class<T> clazz,
-                                                                      @NotNull StdSerializer<T> serializer,
-                                                                      @NotNull JsonDeserializer<T> deserializer) {
+                                                                              @NotNull Class<T> clazz,
+                                                                              @NotNull GuiComponentBuilder.Factory<? extends GuiComponentBuilder> factory) {
         SHARED_COMPONENT_ID_MAPS.put(id, clazz);
         SimpleModule module = new SimpleModule();
-        module.addSerializer(clazz, serializer);
-        module.addDeserializer(clazz, deserializer);
+        module.addSerializer(clazz, new GuiComponentSerializer<>(clazz));
+        module.addDeserializer(clazz, new GuiComponentDeserializer<>((GuiComponentBuilder.Factory<GuiComponentBuilder>) factory));
         SHARED_MODULES.add(module);
     }
 
-    public void registerFactory(@NotNull String id,
-                                @NotNull Class<GuiComponent> clazz,
-                                @NotNull StdSerializer<GuiComponent> serializer,
-                                @NotNull JsonDeserializer<GuiComponent> deserializer) {
+    public <T extends GuiComponent> void registerFactory(@NotNull String id,
+                                                         @NotNull Class<T> clazz,
+                                                         @NotNull GuiComponentBuilder.Factory<GuiComponentBuilder> factory) {
         componentIdMap.put(id, clazz);
         SimpleModule module = new SimpleModule();
-        module.addSerializer(clazz, serializer);
-        module.addDeserializer(clazz, deserializer);
+        module.addSerializer(clazz, new GuiComponentSerializer<>(clazz));
+        module.addDeserializer(clazz, new GuiComponentDeserializer<>(factory));
         xmlMapper.registerModules(module);
     }
 
@@ -227,7 +224,8 @@ public final class GuiEngineApi {
             CompletableFuture<Void> renderTask = CompletableFuture.runAsync(() -> {
                 ItemStack[][] virtualInventory = new ItemStack[xmlGui.getHeight()][xmlGui.getWidth()];
                 context.setViewer(virtualPlayer);
-                context.setInventory(new VirtualInventory(6, () -> {}));
+                context.setInventory(new VirtualInventory(6, () -> {
+                }));
                 context.componentsDescending().forEach(event -> event.onViewInit(new HashMap<>()));
                 interpreter.getRenderEngine().renderGui(virtualInventory, context, virtualPlayer);
             });

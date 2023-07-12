@@ -1,7 +1,10 @@
 package io.github.toberocat.guiengine.api.components.provided.embedded;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.api.components.AbstractGuiComponent;
 import io.github.toberocat.guiengine.api.context.GuiContext;
+import io.github.toberocat.guiengine.api.function.GuiFunction;
 import io.github.toberocat.guiengine.api.render.RenderPriority;
 import io.github.toberocat.guiengine.api.utils.VirtualInventory;
 import org.bukkit.Material;
@@ -13,6 +16,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 
@@ -28,19 +33,31 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     protected @Nullable GuiContext embedded;
 
-    public EmbeddedGuiComponent(@NotNull String id,
-                                int x,
-                                int y,
+    public EmbeddedGuiComponent(int offsetX,
+                                int offsetY,
                                 int width,
                                 int height,
                                 @NotNull RenderPriority priority,
+                                @NotNull String id,
+                                @NotNull List<GuiFunction> clickFunctions,
+                                @NotNull List<GuiFunction> dragFunctions,
+                                @NotNull List<GuiFunction> closeFunctions,
+                                boolean hidden,
                                 @NotNull String targetGui,
                                 boolean copyAir,
                                 boolean interactions) {
-        super(id, x, y, width, height, priority);
+        super(offsetX, offsetY, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden);
         this.targetGui = targetGui;
         this.copyAir = copyAir;
         this.interactions = interactions;
+    }
+
+    @Override
+    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+        super.serialize(gen, serializers);
+        gen.writeStringField("target-gui", targetGui);
+        gen.writeBooleanField("copy-air", copyAir);
+        gen.writeBooleanField("interactions", interactions);
     }
 
     @Override
@@ -56,6 +73,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
+        super.clickedComponent(event);
         if (!interactions || embedded == null)
             return;
         embedded.clickedComponent(event);
@@ -63,6 +81,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     @Override
     public void draggedComponent(@NotNull InventoryDragEvent event) {
+        super.draggedComponent(event);
         if (!interactions || embedded == null)
             return;
         embedded.draggedComponent(event);
@@ -70,6 +89,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     @Override
     public void closedComponent(@NotNull InventoryCloseEvent event) {
+        super.closedComponent(event);
         if (!interactions || embedded == null)
             return;
         embedded.closedComponent(event);

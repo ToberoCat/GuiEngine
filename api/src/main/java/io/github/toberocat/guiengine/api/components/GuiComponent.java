@@ -1,5 +1,7 @@
 package io.github.toberocat.guiengine.api.components;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.api.GuiEngineApi;
 import io.github.toberocat.guiengine.api.context.GuiContext;
 import io.github.toberocat.guiengine.api.event.GuiEvents;
@@ -11,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -48,8 +51,9 @@ public interface GuiComponent extends GuiEvents {
 
     void setOffsetY(int y);
 
-    default void addActions(@NotNull Set<Action> actions) {
+    void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException;
 
+    default void addActions(@NotNull Set<Action> actions) {
     }
 
     default boolean isInComponent(int slot) {

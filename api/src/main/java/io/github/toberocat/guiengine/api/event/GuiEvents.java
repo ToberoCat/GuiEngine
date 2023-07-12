@@ -1,5 +1,6 @@
 package io.github.toberocat.guiengine.api.event;
 
+import org.bukkit.event.Event;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -15,6 +16,9 @@ import java.util.Map;
 public interface GuiEvents {
     default void clickedComponent(@NotNull InventoryClickEvent event) {
         event.setCancelled(true);
+        event.setResult(Event.Result.DENY);
+        if (!event.getAction().name().contains("DROP"))
+            return;
     }
 
     default void draggedComponent(@NotNull InventoryDragEvent event) {

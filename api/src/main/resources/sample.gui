@@ -10,4 +10,21 @@
         <on-click type="remove" target="a-button"/>
     </component>
     <component type="embedded-gui" target-gui="embbedable"/>
+    <component type="item"
+               id="item-comp"
+               x="0"
+               y="0"
+               material="REDSTONE_BLOCK"
+               name="§aMy Item"
+               hidden="false"
+               priority="NORMAL">
+        <lore>First line</lore>
+        <lore>Second</lore>
+        <lore/>
+        <lore>§aAnother one</lore>
+        <on-click type="action">[message] A message for you</on-click>
+        <on-click type="add">
+            <!-- Add properties -->
+        </on-click>
+    </component>
 </gui>
