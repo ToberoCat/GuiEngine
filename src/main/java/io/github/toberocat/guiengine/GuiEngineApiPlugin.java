@@ -34,11 +34,14 @@ import java.io.File;
  * @author Tobias Madlberger (Tobias)
  */
 public class GuiEngineApiPlugin extends JavaPlugin {
+    private static GuiEngineApiPlugin instance;
     private InterpreterManager interpreterManager;
     private DefaultGuiViewManager guiViewManager;
 
     @Override
     public void onEnable() {
+        instance = this;
+
         createManagers();
         registerListeners();
 
@@ -52,7 +55,7 @@ public class GuiEngineApiPlugin extends JavaPlugin {
     }
 
     public static @NotNull GuiEngineApiPlugin getPlugin() {
-        return getPlugin(GuiEngineApiPlugin.class);
+        return instance;
     }
 
     public @NotNull InterpreterManager getInterpreterManager() {
@@ -72,31 +75,31 @@ public class GuiEngineApiPlugin extends JavaPlugin {
         GuiEngineApi.registerSharedFactory(
                 SimpleItemComponent.TYPE,
                 SimpleItemComponent.class,
-                new SimpleItemComponentBuilder.Factory<>()
+                SimpleItemComponentBuilder.class
         );
 
         GuiEngineApi.registerSharedFactory(
                 HeadItemComponent.TYPE,
                 HeadItemComponent.class,
-                new HeadItemComponentBuilder.Factory<>()
+                HeadItemComponentBuilder.class
         );
 
         GuiEngineApi.registerSharedFactory(
                 EmbeddedGuiComponent.TYPE,
                 EmbeddedGuiComponent.class,
-                new EmbeddedGuiComponentBuilder.Factory<>()
+                EmbeddedGuiComponentBuilder.class
         );
 
         GuiEngineApi.registerSharedFactory(
                 ToggleItemComponent.TYPE,
                 ToggleItemComponent.class,
-                new ToggleItemComponentBuilder.Factory()
+                ToggleItemComponentBuilder.class
         );
 
         GuiEngineApi.registerSharedFactory(
                 PagedComponent.TYPE,
                 PagedComponent.class,
-                new PagedComponentBuilder.Factory()
+                PagedComponentBuilder.class
         );
     }
 

@@ -2,14 +2,13 @@ package io.github.toberocat.guiengine.components.provided.embedded;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.components.AbstractGuiComponentBuilder;
-import io.github.toberocat.guiengine.exception.InvalidGuiComponentException;
+import io.github.toberocat.guiengine.exception.MissingRequiredParamException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
 import static io.github.toberocat.guiengine.utils.JsonUtils.*;
-import static io.github.toberocat.guiengine.utils.JsonUtils.getOptionalBoolean;
 
 public class EmbeddedGuiComponentBuilder<B extends EmbeddedGuiComponentBuilder<B>> extends AbstractGuiComponentBuilder<B> {
     protected int width = 1;
@@ -50,24 +49,18 @@ public class EmbeddedGuiComponentBuilder<B extends EmbeddedGuiComponentBuilder<B
         return new EmbeddedGuiComponent(x, y, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden, targetGui, copyAir, interactions);
     }
 
-    public static class Factory<B extends EmbeddedGuiComponentBuilder<B>> extends AbstractGuiComponentBuilder.Factory<B> {
+    @Override
+    public void deserialize(@NotNull JsonNode node) throws IOException {
+        super.deserialize(node);
 
-        @Override
-        public @NotNull B createBuilder() {
-            return (B) new EmbeddedGuiComponentBuilder<B>();
-        }
+        setCopyAir(getOptionalBoolean(node, "copy-air").orElse(true));
+        setInteractions(getOptionalBoolean(node, "interactions").orElse(true));
 
-        @Override
-        public void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException {
-            super.deserialize(node, builder);
-            builder.setWidth(getOptionalInt(node, "width").orElseThrow(() ->
-                            new InvalidGuiComponentException("The component is missing a required argument 'width'")))
-                    .setHeight(getOptionalInt(node, "height").orElseThrow(() ->
-                            new InvalidGuiComponentException("The component is missing a required argument 'height'")))
-                    .setTargetGui(getOptionalString(node, "target-gui").orElseThrow(() ->
-                            new InvalidGuiComponentException("The component is missing a required argument 'target-gui'")))
-                    .setCopyAir(getOptionalBoolean(node, "copy-air").orElse(true))
-                    .setInteractions(getOptionalBoolean(node, "interactions").orElse(true));
-        }
+        setWidth(getOptionalInt(node, "width").orElseThrow(() ->
+                new MissingRequiredParamException(this, "width")));
+        setHeight(getOptionalInt(node, "height").orElseThrow(() ->
+                new MissingRequiredParamException(this, "height")));
+        setTargetGui(getOptionalString(node, "target-gui").orElseThrow(() ->
+                new MissingRequiredParamException(this, "target-gui")));
     }
 }

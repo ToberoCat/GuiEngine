@@ -69,22 +69,24 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
         return self();
     }
 
+    public @NotNull String getId() {
+        return id;
+    }
+
+    @Override
+    public void deserialize(@NotNull JsonNode node) throws IOException {
+        setPriority(getOptionalRenderPriority(node, "priority").orElse(RenderPriority.NORMAL));
+        setId(getOptionalString(node, "id").orElseThrow());
+        setClickFunctions(getFunctions(node, "on-click").orElse(new ArrayList<>()));
+        setDragFunctions(getFunctions(node, "on-drag").orElse(new ArrayList<>()));
+        setCloseFunctions(getFunctions(node, "on-close").orElse(new ArrayList<>()));
+        setX(getOptionalInt(node, "x").orElse(0));
+        setY(getOptionalInt(node, "y").orElse(0));
+        setHidden(getOptionalBoolean(node, "hidden").orElse(false));
+    }
+
     @SuppressWarnings("unchecked")
     protected final B self() {
         return (B) this;
-    }
-
-    public static abstract class Factory<B extends AbstractGuiComponentBuilder<B>> implements GuiComponentBuilder.Factory<B> {
-        @Override
-        public void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException {
-            builder.setPriority(getOptionalRenderPriority(node, "priority").orElse(RenderPriority.NORMAL))
-                    .setId(getOptionalString(node, "id").orElseThrow())
-                    .setClickFunctions(getFunctions(node, "on-click").orElse(new ArrayList<>()))
-                    .setDragFunctions(getFunctions(node, "on-drag").orElse(new ArrayList<>()))
-                    .setCloseFunctions(getFunctions(node, "on-close").orElse(new ArrayList<>()))
-                    .setX(getOptionalInt(node, "x").orElse(0))
-                    .setY(getOptionalInt(node, "y").orElse(0))
-                    .setHidden(getOptionalBoolean(node, "hidden").orElse(false));
-        }
     }
 }

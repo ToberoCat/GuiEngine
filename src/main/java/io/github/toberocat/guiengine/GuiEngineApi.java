@@ -6,16 +6,16 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.github.toberocat.guiengine.components.GuiComponent;
 import io.github.toberocat.guiengine.components.GuiComponentBuilder;
 import io.github.toberocat.guiengine.context.GuiContext;
+import io.github.toberocat.guiengine.exception.GuiIORuntimeException;
+import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException;
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter;
+import io.github.toberocat.guiengine.interpreter.InterpreterManager;
 import io.github.toberocat.guiengine.utils.VirtualInventory;
 import io.github.toberocat.guiengine.utils.VirtualPlayer;
+import io.github.toberocat.guiengine.view.DefaultGuiViewManager;
 import io.github.toberocat.guiengine.xml.GuiComponentDeserializer;
 import io.github.toberocat.guiengine.xml.GuiComponentSerializer;
 import io.github.toberocat.guiengine.xml.XmlGui;
-import io.github.toberocat.guiengine.exception.GuiIORuntimeException;
-import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException;
-import io.github.toberocat.guiengine.interpreter.InterpreterManager;
-import io.github.toberocat.guiengine.view.DefaultGuiViewManager;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -73,23 +73,23 @@ public final class GuiEngineApi {
         APIS.put(id, this);
     }
 
-    public static <T extends GuiComponent> void registerSharedFactory(@NotNull String id,
-                                                                              @NotNull Class<T> clazz,
-                                                                              @NotNull GuiComponentBuilder.Factory<? extends GuiComponentBuilder> factory) {
+    public static <T extends GuiComponent, B extends GuiComponentBuilder> void registerSharedFactory(@NotNull String id,
+                                                                                                     @NotNull Class<T> clazz,
+                                                                                                     @NotNull Class<B> builderClazz) {
         SHARED_COMPONENT_ID_MAPS.put(id, clazz);
         SimpleModule module = new SimpleModule();
         module.addSerializer(clazz, new GuiComponentSerializer<>(clazz));
-        module.addDeserializer(clazz, new GuiComponentDeserializer<>((GuiComponentBuilder.Factory<GuiComponentBuilder>) factory));
+        module.addDeserializer(clazz, new GuiComponentDeserializer<>(builderClazz));
         SHARED_MODULES.add(module);
     }
 
-    public <T extends GuiComponent> void registerFactory(@NotNull String id,
-                                                         @NotNull Class<T> clazz,
-                                                         @NotNull GuiComponentBuilder.Factory<GuiComponentBuilder> factory) {
+    public <T extends GuiComponent, B extends GuiComponentBuilder> void registerFactory(@NotNull String id,
+                                                                                        @NotNull Class<T> clazz,
+                                                                                        @NotNull Class<B> builderClazz) {
         componentIdMap.put(id, clazz);
         SimpleModule module = new SimpleModule();
         module.addSerializer(clazz, new GuiComponentSerializer<>(clazz));
-        module.addDeserializer(clazz, new GuiComponentDeserializer<>(factory));
+        module.addDeserializer(clazz, new GuiComponentDeserializer<>(builderClazz));
         xmlMapper.registerModules(module);
     }
 

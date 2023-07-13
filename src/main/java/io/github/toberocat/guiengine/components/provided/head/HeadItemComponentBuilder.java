@@ -12,7 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.UUID;
 
-import static io.github.toberocat.guiengine.utils.JsonUtils.*;
+import static io.github.toberocat.guiengine.utils.JsonUtils.getOptionalString;
+import static io.github.toberocat.guiengine.utils.JsonUtils.getOptionalUUID;
 
 public class HeadItemComponentBuilder<B extends HeadItemComponentBuilder<B>> extends SimpleItemComponentBuilder<B> {
     protected @Nullable String textureId;
@@ -40,17 +41,10 @@ public class HeadItemComponentBuilder<B extends HeadItemComponentBuilder<B>> ext
         return new HeadItemComponent(x, y, priority, id, clickFunctions, dragFunctions, closeFunctions, item, hidden);
     }
 
-    public static class Factory<B extends HeadItemComponentBuilder<B>> extends SimpleItemComponentBuilder.Factory<B> {
-        @Override
-        public @NotNull B createBuilder() {
-            return (B) new HeadItemComponentBuilder<B>();
-        }
-
-        @Override
-        public void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException {
-            super.deserialize(node, builder);
-            builder.setTextureId(getOptionalString(node, "head-texture").orElse(null))
-                    .setOwner(getOptionalUUID(node, "head-owner").orElse(null));
-        }
+    @Override
+    public void deserialize(@NotNull JsonNode node) throws IOException {
+        super.deserialize(node);
+        setTextureId(getOptionalString(node, "head-texture").orElse(null));
+        setOwner(getOptionalUUID(node, "head-owner").orElse(null));
     }
 }

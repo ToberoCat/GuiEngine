@@ -54,22 +54,15 @@ public class PagedComponentBuilder extends EmbeddedGuiComponentBuilder<PagedComp
                 showingPage);
     }
 
-    public static class Factory extends EmbeddedGuiComponentBuilder.Factory<PagedComponentBuilder> {
-        @Override
-        public @NotNull PagedComponentBuilder createBuilder() {
-            return new PagedComponentBuilder();
-        }
-
-        @Override
-        public void deserialize(@NotNull JsonNode node, @NotNull PagedComponentBuilder builder) throws IOException {
-            super.deserialize(node, builder);
-            builder.setShowingPage(getOptionalInt(node, "showing-page").orElse(0))
-                    .setParent(node)
-                    .setPattern(getOptionalString(node, "pattern")
-                            .map(x -> Arrays.stream(x.split(","))
-                                    .mapToInt(Integer::parseInt)
-                                    .toArray())
-                            .orElse(new int[0]));
-        }
+    @Override
+    public void deserialize(@NotNull JsonNode node) throws IOException {
+        super.deserialize(node);
+        setShowingPage(getOptionalInt(node, "showing-page").orElse(0));
+        setParent(node);
+        setPattern(getOptionalString(node, "pattern")
+                .map(x -> Arrays.stream(x.split(","))
+                        .mapToInt(Integer::parseInt)
+                        .toArray())
+                .orElse(new int[0]));
     }
 }

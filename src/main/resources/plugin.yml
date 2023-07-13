@@ -1,6 +1,6 @@
 name: 'GuiEngine'
 version: '${project.version}'
-main: io.github.toberocat.guiengine.api.GuiEngineApiPlugin
+main: io.github.toberocat.guiengine.GuiEngineApiPlugin
 depend:
   - ToberoCore
 api-version: 1.16

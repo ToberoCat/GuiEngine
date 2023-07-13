@@ -7,14 +7,15 @@ import java.io.IOException;
 
 /**
  * Created: 10.07.2023
+ * <p>
+ * This class should make it easier to create inheritable builder patterns.
+ * It also tries to NOT merge the create & deserialize function, so you're forced to use variables, making it easier to
+ * create a builder pattern (As intended for easier use without requiring an interpreter)
  *
  * @author Tobias Madlberger (Tobias)
  */
 public interface GuiComponentBuilder {
     @NotNull GuiComponent createComponent();
 
-    interface Factory<B extends GuiComponentBuilder> {
-        @NotNull B createBuilder();
-        void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException;
-    }
+    void deserialize(@NotNull JsonNode node) throws IOException;
 }

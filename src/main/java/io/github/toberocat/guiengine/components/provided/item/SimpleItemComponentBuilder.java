@@ -2,7 +2,7 @@ package io.github.toberocat.guiengine.components.provided.item;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.components.AbstractGuiComponentBuilder;
-import io.github.toberocat.guiengine.exception.InvalidGuiComponentException;
+import io.github.toberocat.guiengine.exception.MissingRequiredParamException;
 import io.github.toberocat.toberocore.item.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -38,20 +38,11 @@ public class SimpleItemComponentBuilder<B extends SimpleItemComponentBuilder<B>>
         return new SimpleItemComponent(x, y, priority, id, clickFunctions, dragFunctions, closeFunctions, stack, hidden);
     }
 
-    public static class Factory<B extends SimpleItemComponentBuilder<B>> extends AbstractGuiComponentBuilder.Factory<B> {
-
-        @Override
-        public @NotNull B createBuilder() {
-            return (B) new SimpleItemComponentBuilder<B>();
-        }
-
-        @Override
-        public void deserialize(@NotNull JsonNode node, @NotNull B builder) throws IOException {
-            super.deserialize(node, builder);
-            builder.setName(getOptionalString(node, "name").orElse(" "))
-                    .setMaterial(getOptionalMaterial(node, "material")
-                            .orElseThrow(() -> new InvalidGuiComponentException("The component is missing the required argument 'material'")))
-                    .setLore(getOptionalStringArray(node, "lore").orElse(new String[0]));
-        }
+    @Override
+    public void deserialize(@NotNull JsonNode node) throws IOException {
+        super.deserialize(node);
+        setName(getOptionalString(node, "name").orElse(" "));
+        setMaterial(getOptionalMaterial(node, "material").orElseThrow(() -> new MissingRequiredParamException(this, "material")));
+        setLore(getOptionalStringArray(node, "lore").orElse(new String[0]));
     }
 }
