@@ -1,0 +1,27 @@
+[
+  {
+    "type": "action",
+    "": "[message] You clicked on a item"
+  },
+  {
+    "type": "function",
+    "edit": {
+      "target-element": "a-button",
+      "target-value": "material",
+      "new-value": "OAK_LOG"
+    },
+    "add": {
+      "component": {
+        "type": "simple-item",
+        "x": 0,
+        "y": 0,
+        "material": "DIRT",
+        "name": "A sample item",
+        "lore": []
+      }
+    },
+    "remove": {
+      "target-element": "a-button"
+    }
+  }
+]

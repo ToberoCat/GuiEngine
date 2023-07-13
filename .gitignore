@@ -1,3 +1,4 @@
 # Project exclude paths
-/plugin/target/
+target/
 .idea
+GuiEngine.iml
