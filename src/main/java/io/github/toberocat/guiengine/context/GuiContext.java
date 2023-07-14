@@ -123,6 +123,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
         interpreter().clickedComponent(event);
         componentsDescending()
                 .filter(x -> x.isInComponent(event.getSlot()))
+                .filter(x -> !x.hidden())
                 .findFirst()
                 .ifPresentOrElse(component -> {
                             Bukkit.getPluginManager()
@@ -141,6 +142,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
                 .filter(x -> event.getInventorySlots()
                         .stream()
                         .anyMatch(x::isInComponent))
+                .filter(x -> !x.hidden())
                 .findFirst()
                 .ifPresentOrElse(component -> {
                             Bukkit.getPluginManager()
@@ -156,7 +158,9 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
 
     @Override
     public void closedComponent(@NotNull InventoryCloseEvent event) {
-        componentsDescending().forEachOrdered(x -> x.closedComponent(event));
+        componentsDescending()
+                .filter(x -> !x.hidden())
+                .forEachOrdered(x -> x.closedComponent(event));
         Bukkit.getPluginManager()
                 .callEvent(new GuiCloseEvent(this, event));
         GuiEngineApi.LOADED_CONTEXTS.remove(contextId);
@@ -256,9 +260,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
                     .add("title='" + title + "'")
                     .add("width=" + width)
                     .add("height=" + height)
-                    .add("components=" + mapper
-                            .writerWithDefaultPrettyPrinter()
-                            .writeValueAsString(components))
+                    .add("components=" + mapper.writeValueAsString(components))
                     .add("localActions=" + localActions)
                     .add("inventory=" + inventory.getSize())
                     .add("viewerName=" + viewer.getDisplayName())

@@ -68,7 +68,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
         super.serialize(gen, serializers);
         JsonUtils.writeArray(gen, "pattern", pattern);
         gen.writeNumberField("showing-page", showingPage);
-        gen.writeRaw(parent.toString());
+        gen.writeRaw(parent.node().toString());
     }
 
     @Override

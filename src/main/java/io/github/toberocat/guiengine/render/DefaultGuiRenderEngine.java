@@ -30,6 +30,7 @@ public class DefaultGuiRenderEngine implements GuiRenderEngine {
                           @NotNull GuiContext context,
                           @NotNull Player viewer) {
         context.componentsAscending()
+                .filter(x -> !x.hidden())
                 .forEachOrdered(x -> x.render(viewer, renderBuffer));
     }
 }

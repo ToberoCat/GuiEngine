@@ -23,21 +23,4 @@ public final class Utils {
     public static @NotNull CoordinatePair translateFromSlot(int slot) {
         return new CoordinatePair(slot % 9, slot / 9);
     }
-
-    public static @NotNull ItemStack processItemStack(@NotNull ItemStack itemStack,
-                                                      @NotNull GuiEngineApi api,
-                                                      @NotNull GuiContext context) {
-        ItemMeta meta = itemStack.getItemMeta();
-        if (meta == null)
-            return itemStack;
-
-        meta.setDisplayName(FunctionProcessor.applyFunctions(api, context, meta.getDisplayName()));
-        List<String> lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
-        meta.setLore(lore.stream()
-                .map(x -> FunctionProcessor.applyFunctions(api, context, x))
-                .toList());
-        ItemStack copy = itemStack.clone();
-        copy.setItemMeta(meta);
-        return copy;
-    }
 }

@@ -65,6 +65,6 @@ public class SimpleItemComponent extends AbstractGuiComponent {
                        @NotNull ItemStack[][] inventory) {
         if (context == null || api == null)
             return;
-        inventory[offsetY][offsetX] = Utils.processItemStack(stack, api, context);
+        inventory[offsetY][offsetX] = stack;
     }
 }
