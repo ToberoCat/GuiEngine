@@ -18,6 +18,8 @@ import io.github.toberocat.guiengine.function.call.AddComponentsFunction;
 import io.github.toberocat.guiengine.function.call.EditComponentFunction;
 import io.github.toberocat.guiengine.function.call.RemoveComponentFunction;
 import io.github.toberocat.guiengine.function.compute.GuiComponentPropertyFunction;
+import io.github.toberocat.guiengine.function.compute.HasNotPermissionFunction;
+import io.github.toberocat.guiengine.function.compute.HasPermissionFunction;
 import io.github.toberocat.guiengine.interpreter.InterpreterManager;
 import io.github.toberocat.guiengine.interpreter.DefaultInterpreter;
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager;
@@ -109,6 +111,8 @@ public class GuiEngineApiPlugin extends JavaPlugin {
         FunctionProcessor.registerFunction(RemoveComponentFunction.ID, RemoveComponentFunction.class);
         FunctionProcessor.registerFunction(ActionFunction.ID, ActionFunction.class);
         FunctionProcessor.registerComputeFunction(new GuiComponentPropertyFunction());
+        FunctionProcessor.registerComputeFunction(new HasPermissionFunction());
+        FunctionProcessor.registerComputeFunction(new HasNotPermissionFunction());
     }
 
     private void registerCommands() {

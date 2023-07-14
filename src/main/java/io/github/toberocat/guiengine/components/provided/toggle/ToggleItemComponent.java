@@ -1,6 +1,5 @@
 package io.github.toberocat.guiengine.components.provided.toggle;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -9,7 +8,9 @@ import io.github.toberocat.guiengine.components.GuiComponent;
 import io.github.toberocat.guiengine.components.Selectable;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.render.RenderPriority;
+import io.github.toberocat.guiengine.utils.GeneratorContext;
 import io.github.toberocat.guiengine.utils.JsonUtils;
+import io.github.toberocat.guiengine.utils.ParserContext;
 import io.github.toberocat.guiengine.xml.XmlComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,9 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created: 29.04.2023
@@ -30,7 +29,7 @@ import java.util.Map;
 public class ToggleItemComponent extends AbstractGuiComponent implements Selectable {
 
     public static final String TYPE = "toggle";
-    private final JsonNode options;
+    private final ParserContext options;
     private @Nullable GuiComponent[] selectionModel;
     private @NotNull String[] valueSelectionModel;
     private int selected;
@@ -45,7 +44,7 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
                                @NotNull List<GuiFunction> dragFunctions,
                                @NotNull List<GuiFunction> closeFunctions,
                                boolean hidden,
-                               JsonNode options,
+                               ParserContext options,
                                int selected) {
         super(offsetX, offsetY, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden);
         this.options = options;
@@ -53,7 +52,7 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
     }
 
     @Override
-    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+    public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         super.serialize(gen, serializers);
         gen.writePOJOField("option", getOptions());
         gen.writeNumberField("selected", getSelected());
@@ -68,13 +67,13 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
         if (context == null || api == null)
             return null;
 
-        List<JsonNode> nodes = JsonUtils.getFieldList(options);
+        List<ParserContext> nodes = JsonUtils.getFieldList(options);
         List<GuiComponent> components = new ArrayList<>();
         List<String> selectionModel = new ArrayList<>();
         try {
-            for (JsonNode node : nodes) {
-                selectionModel.add(node.get("value").textValue());
-                XmlComponent xmlComponent = context.interpreter().xmlComponent(node, api);
+            for (ParserContext node : nodes) {
+                selectionModel.add(Objects.requireNonNull(node.get("value")).node().textValue());
+                XmlComponent xmlComponent = context.interpreter().xmlComponent(node.node(), api);
                 GuiComponent component = context.interpreter().createComponent(xmlComponent, api, context);
                 components.add(component);
             }
@@ -109,7 +108,7 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
         inventory[offsetY][offsetX] = virtualInventory[0][0];
     }
 
-    public JsonNode getOptions() {
+    public ParserContext getOptions() {
         return options;
     }
 

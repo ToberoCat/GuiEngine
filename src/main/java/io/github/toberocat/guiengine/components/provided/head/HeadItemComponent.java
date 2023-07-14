@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.components.provided.item.SimpleItemComponent;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.render.RenderPriority;
+import io.github.toberocat.guiengine.utils.GeneratorContext;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public class HeadItemComponent extends SimpleItemComponent {
     }
 
     @Override
-    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+    public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         super.serialize(gen, serializers);
 
         if (!(stack.getItemMeta() instanceof SkullMeta skullMeta))

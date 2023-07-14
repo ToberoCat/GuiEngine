@@ -9,6 +9,7 @@ import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.utils.JsonUtils;
+import io.github.toberocat.guiengine.utils.ParserContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -36,7 +37,8 @@ public record RemoveComponentFunction(@NotNull String target) implements GuiFunc
                 throws IOException {
             JsonNode node = p.getCodec().readTree(p);
             return new RemoveComponentFunction(
-                    JsonUtils.getOptionalString(node, "target").orElseThrow()
+                    JsonUtils.getOptionalString(new ParserContext(node, null, null),
+                            "target").orElseThrow()
             );
         }
     }

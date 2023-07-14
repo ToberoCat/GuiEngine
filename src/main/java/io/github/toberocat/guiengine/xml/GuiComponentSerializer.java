@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import io.github.toberocat.guiengine.components.GuiComponent;
+import io.github.toberocat.guiengine.utils.GeneratorContext;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class GuiComponentSerializer<C extends GuiComponent> extends StdSerialize
                           JsonGenerator jsonGenerator,
                           SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        c.serialize(jsonGenerator, serializerProvider);
+        c.serialize(new GeneratorContext(jsonGenerator), serializerProvider);
         jsonGenerator.writeEndObject();
     }
 }

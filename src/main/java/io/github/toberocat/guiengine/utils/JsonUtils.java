@@ -20,35 +20,38 @@ import java.util.*;
  */
 public class JsonUtils {
 
-    public static void writeArray(@NotNull JsonGenerator gen,
+    public static void writeArray(@NotNull GeneratorContext gen,
                                   @NotNull String field,
                                   @NotNull Object[] array) throws IOException {
-        gen.writeArrayFieldStart(field);
+        JsonGenerator generator = gen.generator();
+        generator.writeArrayFieldStart(field);
         for (Object element : array)
-            gen.writeObject(element);
-        gen.writeEndArray();
+            generator.writeObject(element);
+        generator.writeEndArray();
     }
 
-    public static void writeArray(@NotNull JsonGenerator gen,
+    public static void writeArray(@NotNull GeneratorContext gen,
                                   @NotNull String field,
                                   int[] array) throws IOException {
-        gen.writeArrayFieldStart(field);
+        JsonGenerator generator = gen.generator();
+        generator.writeArrayFieldStart(field);
         for (int element : array)
-            gen.writeNumber(element);
-        gen.writeEndArray();
+            generator.writeNumber(element);
+        generator.writeEndArray();
     }
 
-    public static void writeArray(@NotNull JsonGenerator gen,
+    public static void writeArray(@NotNull GeneratorContext gen,
                                   @NotNull String field,
                                   @NotNull List<Object> array) throws IOException {
-        gen.writeArrayFieldStart(field);
+        JsonGenerator generator = gen.generator();
+        generator.writeArrayFieldStart(field);
         for (Object element : array)
-            gen.writeObject(element);
-        gen.writeEndArray();
+            generator.writeObject(element);
+        generator.writeEndArray();
     }
 
-    public static @NotNull Optional<JsonNode> getOptionalNode(@NotNull JsonNode node,
-                                                              @NotNull String field) {
+    public static @NotNull Optional<ParserContext> getOptionalNode(@NotNull ParserContext node,
+                                                                   @NotNull String field) {
         return Optional.ofNullable(node.get(field));
     }
 
@@ -63,14 +66,14 @@ public class JsonUtils {
      * would get parsed into
      * [{"type":"item"}, {"type":"head"}]
      *
-     * @param node  The parent node
+     * @param node The parent node
      * @return An optional list with the children
      */
-    public static @NotNull List<JsonNode> getFieldList(@NotNull JsonNode node) {
-        List<JsonNode> children = new ArrayList<>();
-        if (node.isArray()) {
-            for (JsonNode n : node)
-                children.add(n);
+    public static @NotNull List<ParserContext> getFieldList(@NotNull ParserContext node) {
+        List<ParserContext> children = new ArrayList<>();
+        if (node.node().isArray()) {
+            for (JsonNode n : node.node())
+                children.add(new ParserContext(n, node.context(), node.api()));
         } else {
             children.add(node);
         }
@@ -78,13 +81,13 @@ public class JsonUtils {
         return children;
     }
 
-    public static @NotNull Optional<List<JsonNode>> getOptionalFieldList(@NotNull JsonNode node,
+    public static @NotNull Optional<List<ParserContext>> getOptionalFieldList(@NotNull ParserContext node,
                                                                          @NotNull String field) {
         return getOptionalNode(node, field).map(x -> {
-            List<JsonNode> children = new ArrayList<>();
-            if (x.isArray()) {
-                for (JsonNode n : x)
-                    children.add(n);
+            List<ParserContext> children = new ArrayList<>();
+            if (x.node().isArray()) {
+                for (JsonNode n : x.node())
+                    children.add(new ParserContext(n, node.context(), node.api()));
             } else {
                 children.add(x);
             }
@@ -93,47 +96,47 @@ public class JsonUtils {
         });
     }
 
-    public static @NotNull Optional<Material> getOptionalMaterial(@NotNull JsonNode node,
+    public static @NotNull Optional<Material> getOptionalMaterial(@NotNull ParserContext node,
                                                                   @NotNull String field) {
-        return getOptionalNode(node, field).map(x -> {
+        return getOptionalString(node, field).map(x -> {
             try {
-                return Material.valueOf(x.asText().toUpperCase());
+                return Material.valueOf(x.toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new InvalidGuiComponentException(String.format("The provided material '%s' doesn't match any materials", x.asText()));
+                throw new InvalidGuiComponentException(String.format("The provided material '%s' doesn't match any materials", x));
             }
         });
     }
 
-    public static @NotNull Optional<RenderPriority> getOptionalRenderPriority(@NotNull JsonNode node,
+    public static @NotNull Optional<RenderPriority> getOptionalRenderPriority(@NotNull ParserContext node,
                                                                               @NotNull String field) {
-        return getOptionalNode(node, field).map(x -> RenderPriority.valueOf(x.asText()));
+        return getOptionalString(node, field).map(RenderPriority::valueOf);
     }
 
-    public static @NotNull Optional<String> getOptionalString(@NotNull JsonNode node,
+    public static @NotNull Optional<String> getOptionalString(@NotNull ParserContext node,
                                                               @NotNull String field) {
-        return getOptionalNode(node, field).map(JsonNode::asText);
+        return getOptionalNode(node, field).map(x -> x.node().asText());
     }
 
-    public static @NotNull Optional<UUID> getOptionalUUID(@NotNull JsonNode node,
+    public static @NotNull Optional<UUID> getOptionalUUID(@NotNull ParserContext node,
                                                           @NotNull String field) {
-        return getOptionalNode(node, field).map(JsonNode::asText).map(UUID::fromString);
+        return getOptionalNode(node, field).map(x -> x.node().asText()).map(UUID::fromString);
     }
 
-    public static @NotNull Optional<Boolean> getOptionalBoolean(@NotNull JsonNode node,
+    public static @NotNull Optional<Boolean> getOptionalBoolean(@NotNull ParserContext node,
                                                                 @NotNull String field) {
-        return getOptionalNode(node, field).map(JsonNode::asBoolean);
+        return getOptionalNode(node, field).map(x -> x.node().asBoolean());
     }
 
-    public static @NotNull Optional<Integer> getOptionalInt(@NotNull JsonNode node,
+    public static @NotNull Optional<Integer> getOptionalInt(@NotNull ParserContext node,
                                                             @NotNull String field) {
-        return getOptionalNode(node, field).map(JsonNode::asInt);
+        return getOptionalNode(node, field).map(x -> x.node().asInt());
     }
 
-    public static @NotNull Optional<String[]> getOptionalStringArray(@NotNull JsonNode node,
+    public static @NotNull Optional<String[]> getOptionalStringArray(@NotNull ParserContext node,
                                                                      @NotNull String field) {
         return getOptionalNode(node, field).map(x -> {
             List<String> array = new LinkedList<>();
-            for (JsonNode elementNode : x) {
+            for (JsonNode elementNode : x.node()) {
                 String elementValue = elementNode.asText();
                 array.add(elementValue);
             }
@@ -141,31 +144,31 @@ public class JsonUtils {
         });
     }
 
-    public static @NotNull Optional<Map<String, JsonNode>> getOptionalNodeMap(@NotNull JsonNode node,
+    public static @NotNull Optional<Map<String, ParserContext>> getOptionalNodeMap(@NotNull ParserContext node,
                                                                               @NotNull String field) {
         return getOptionalNode(node, field).map(root -> {
-            Map<String, JsonNode> map = new HashMap<>();
+            Map<String, ParserContext> map = new HashMap<>();
 
-            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = root.fields();
+            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = root.node().fields();
             while (fieldsIterator.hasNext()) {
                 Map.Entry<String, JsonNode> n = fieldsIterator.next();
-                map.put(n.getKey(), n.getValue());
+                map.put(n.getKey(), new ParserContext(n.getValue(), node.context(), node.api()));
             }
             return map;
         });
     }
 
-    public static @NotNull Optional<List<GuiFunction>> getFunctions(@NotNull JsonNode node,
+    public static @NotNull Optional<List<GuiFunction>> getFunctions(@NotNull ParserContext node,
                                                                     @NotNull String field) {
         return getOptionalNode(node, field).map(x -> {
             try {
                 List<GuiFunction> functions = new LinkedList<>();
-                if (x.isArray()) {
-                    for (JsonNode function : x)
+                if (x.node().isArray()) {
+                    for (JsonNode function : x.node())
                         functions.add(FunctionProcessor.createFunction(function));
 
                 } else {
-                    functions.add(FunctionProcessor.createFunction(x));
+                    functions.add(FunctionProcessor.createFunction(x.node()));
                 }
 
                 return functions;

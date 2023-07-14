@@ -1,16 +1,14 @@
 package io.github.toberocat.guiengine.components;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.render.RenderPriority;
+import io.github.toberocat.guiengine.utils.ParserContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static io.github.toberocat.guiengine.utils.JsonUtils.*;
 
 /**
  * Created: 10.07.2023
@@ -74,15 +72,15 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
     }
 
     @Override
-    public void deserialize(@NotNull JsonNode node) throws IOException {
-        setPriority(getOptionalRenderPriority(node, "priority").orElse(RenderPriority.NORMAL));
-        setId(getOptionalString(node, "id").orElseThrow());
-        setClickFunctions(getFunctions(node, "on-click").orElse(new ArrayList<>()));
-        setDragFunctions(getFunctions(node, "on-drag").orElse(new ArrayList<>()));
-        setCloseFunctions(getFunctions(node, "on-close").orElse(new ArrayList<>()));
-        setX(getOptionalInt(node, "x").orElse(0));
-        setY(getOptionalInt(node, "y").orElse(0));
-        setHidden(getOptionalBoolean(node, "hidden").orElse(false));
+    public void deserialize(@NotNull ParserContext node) throws IOException {
+        setPriority(node.getOptionalRenderPriority("priority").orElse(RenderPriority.NORMAL));
+        setId(node.getOptionalString("id").orElse(id));
+        setClickFunctions(node.getFunctions("on-click").orElse(new ArrayList<>()));
+        setDragFunctions(node.getFunctions("on-drag").orElse(new ArrayList<>()));
+        setCloseFunctions(node.getFunctions("on-close").orElse(new ArrayList<>()));
+        setX(node.getOptionalInt("x").orElse(0));
+        setY(node.getOptionalInt("y").orElse(0));
+        setHidden(node.getOptionalBoolean("hidden").orElse(false));
     }
 
     @SuppressWarnings("unchecked")

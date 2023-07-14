@@ -2,6 +2,7 @@ package io.github.toberocat.guiengine.components.provided.head;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.components.provided.item.SimpleItemComponentBuilder;
+import io.github.toberocat.guiengine.utils.ParserContext;
 import io.github.toberocat.toberocore.item.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -42,9 +43,9 @@ public class HeadItemComponentBuilder<B extends HeadItemComponentBuilder<B>> ext
     }
 
     @Override
-    public void deserialize(@NotNull JsonNode node) throws IOException {
+    public void deserialize(@NotNull ParserContext node) throws IOException {
         super.deserialize(node);
-        setTextureId(getOptionalString(node, "head-texture").orElse(null));
-        setOwner(getOptionalUUID(node, "head-owner").orElse(null));
+        setTextureId(node.getOptionalString("head-texture").orElse(null));
+        setOwner(node.getOptionalUUID("head-owner").orElse(null));
     }
 }

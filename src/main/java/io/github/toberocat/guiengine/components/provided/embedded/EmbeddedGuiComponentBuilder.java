@@ -1,14 +1,12 @@
 package io.github.toberocat.guiengine.components.provided.embedded;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.components.AbstractGuiComponentBuilder;
 import io.github.toberocat.guiengine.exception.MissingRequiredParamException;
+import io.github.toberocat.guiengine.utils.ParserContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-
-import static io.github.toberocat.guiengine.utils.JsonUtils.*;
 
 public class EmbeddedGuiComponentBuilder<B extends EmbeddedGuiComponentBuilder<B>> extends AbstractGuiComponentBuilder<B> {
     protected int width = 1;
@@ -50,17 +48,24 @@ public class EmbeddedGuiComponentBuilder<B extends EmbeddedGuiComponentBuilder<B
     }
 
     @Override
-    public void deserialize(@NotNull JsonNode node) throws IOException {
+    public void deserialize(@NotNull ParserContext node) throws IOException {
+        deserialize(node, true);
+    }
+
+    protected void deserialize(@NotNull ParserContext node, boolean forceTarget) throws IOException {
         super.deserialize(node);
 
-        setCopyAir(getOptionalBoolean(node, "copy-air").orElse(true));
-        setInteractions(getOptionalBoolean(node, "interactions").orElse(true));
+        setCopyAir(node.getOptionalBoolean("copy-air").orElse(true));
+        setInteractions(node.getOptionalBoolean("interactions").orElse(true));
 
-        setWidth(getOptionalInt(node, "width").orElseThrow(() ->
+        setWidth(node.getOptionalInt("width").orElseThrow(() ->
                 new MissingRequiredParamException(this, "width")));
-        setHeight(getOptionalInt(node, "height").orElseThrow(() ->
+        setHeight(node.getOptionalInt("height").orElseThrow(() ->
                 new MissingRequiredParamException(this, "height")));
-        setTargetGui(getOptionalString(node, "target-gui").orElseThrow(() ->
+
+        if (!forceTarget) setTargetGui(node.getOptionalString("target-gui").orElse(""));
+        else setTargetGui(node.getOptionalString("target-gui").orElseThrow(() ->
                 new MissingRequiredParamException(this, "target-gui")));
+
     }
 }

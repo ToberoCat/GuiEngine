@@ -14,6 +14,7 @@ public class GuiCommands {
     public GuiCommands() {
         CommandExecutor executor = CommandExecutor.createExecutor("", "guiengine");
         executor.addChild(new OpenCommand());
+        executor.addChild(new DumpCommand());
         executor.addChild(new QuickSubCommand("reload", (s, a) -> {
             try {
                 for (GuiEngineApi api : GuiEngineApi.APIS.values())

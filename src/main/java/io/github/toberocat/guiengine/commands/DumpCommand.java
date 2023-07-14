@@ -1,10 +1,13 @@
 package io.github.toberocat.guiengine.commands;
 
 import io.github.toberocat.guiengine.GuiEngineApi;
+import io.github.toberocat.guiengine.GuiEngineApiPlugin;
+import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.exception.GuiIORuntimeException;
 import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException;
 import io.github.toberocat.toberocore.command.exceptions.CommandExceptions;
 import io.github.toberocat.toberocore.command.subcommands.PlayerSubCommand;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,17 +16,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created: 07.04.2023
+ * Created: 14.07.2023
  *
  * @author Tobias Madlberger (Tobias)
  */
-public class OpenCommand extends PlayerSubCommand {
-    public OpenCommand() {
-        this("open");
-    }
-
-    public OpenCommand(@NotNull String label) {
-        super(label);
+public class DumpCommand extends OpenCommand {
+    public DumpCommand() {
+        super("dump-open");
     }
 
     @Override
@@ -37,23 +36,11 @@ public class OpenCommand extends PlayerSubCommand {
                 player.sendMessage("§cNo API found with id " + args[0]);
                 return false;
             }
-            api.openGui(player, args[1]);
+            GuiContext context = api.openGui(player, args[1]);
+            GuiEngineApiPlugin.getPlugin().getLogger().info(String.valueOf(context));
         } catch (GuiNotFoundRuntimeException | GuiIORuntimeException e) {
             throw new CommandExceptions(e.getMessage());
         }
         return true;
-    }
-
-    @Override
-    protected @Nullable List<String> runPlayerTab(@NotNull Player player, @NotNull String[] args) {
-        if (args.length <= 1)
-            return GuiEngineApi.APIS.keySet().stream().toList();
-        GuiEngineApi api = GuiEngineApi.APIS.get(args[0]);
-        if (api == null) {
-            player.sendMessage("§cNo API found with id " + args[0]);
-            return Collections.emptyList();
-        }
-
-        return api.getAvailableGuis().stream().toList();
     }
 }

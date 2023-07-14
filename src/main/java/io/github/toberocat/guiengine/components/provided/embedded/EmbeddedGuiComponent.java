@@ -6,6 +6,7 @@ import io.github.toberocat.guiengine.components.AbstractGuiComponent;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.render.RenderPriority;
+import io.github.toberocat.guiengine.utils.GeneratorContext;
 import io.github.toberocat.guiengine.utils.VirtualInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -53,7 +54,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     }
 
     @Override
-    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+    public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         super.serialize(gen, serializers);
         gen.writeStringField("target-gui", targetGui);
         gen.writeBooleanField("copy-air", copyAir);

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.utils.JsonUtils;
+import io.github.toberocat.guiengine.utils.ParserContext;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +36,7 @@ public class FunctionProcessor {
     }
 
     public static @Nullable GuiFunction createFunction(@NotNull JsonNode node) throws JsonProcessingException {
-        String id = JsonUtils.getOptionalString(node, "type").orElse(null);
+        String id = JsonUtils.getOptionalString(new ParserContext(node, null, null), "type").orElse(null);
         if (id == null)
             return null;
         return OBJECT_MAPPER.treeToValue(node, FUNCTIONS.get(id));

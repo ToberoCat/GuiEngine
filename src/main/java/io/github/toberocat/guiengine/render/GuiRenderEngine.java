@@ -37,7 +37,6 @@ public interface GuiRenderEngine {
                                                @NotNull Map<String, String> placeholders) {
         Inventory inventory = Bukkit.createInventory(viewer, context.height() * 9, context.title());
         context.setInventory(inventory);
-        context.setViewer(viewer);
 
         context.componentsDescending().forEach(event -> event.onViewInit(placeholders));
         context.render();

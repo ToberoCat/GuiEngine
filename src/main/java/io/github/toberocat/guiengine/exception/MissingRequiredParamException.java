@@ -13,6 +13,6 @@ public class MissingRequiredParamException extends InvalidGuiComponentException 
     public MissingRequiredParamException(@NotNull AbstractGuiComponentBuilder<?> builder,
                                          @NotNull String parameterName) {
         super(String.format("Component(%s), being generated with %s is missing the required argument '%s'",
-                builder.getId(), builder.getClass().getName(), parameterName));
+                builder.getId(), builder.getClass().getSimpleName(), parameterName));
     }
 }

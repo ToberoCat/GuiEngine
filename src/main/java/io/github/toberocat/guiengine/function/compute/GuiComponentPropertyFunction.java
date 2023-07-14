@@ -37,7 +37,6 @@ public class GuiComponentPropertyFunction implements ComputeFunction {
         } catch (InvocationTargetException e) {
             return "EXCEPTION WHILE EXECUTING";
         }
-
     }
 
     @Override

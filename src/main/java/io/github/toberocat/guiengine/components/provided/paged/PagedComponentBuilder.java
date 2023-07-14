@@ -2,6 +2,7 @@ package io.github.toberocat.guiengine.components.provided.paged;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.components.provided.embedded.EmbeddedGuiComponentBuilder;
+import io.github.toberocat.guiengine.utils.ParserContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ import static io.github.toberocat.guiengine.utils.JsonUtils.getOptionalString;
 public class PagedComponentBuilder extends EmbeddedGuiComponentBuilder<PagedComponentBuilder> {
     private int showingPage = 0;
     private int[] pattern = new int[0];
-    private @Nullable JsonNode parent;
+    private @Nullable ParserContext parent;
 
 
     public @NotNull PagedComponentBuilder setPattern(int[] pattern) {
@@ -22,7 +23,7 @@ public class PagedComponentBuilder extends EmbeddedGuiComponentBuilder<PagedComp
         return this;
     }
 
-    public @NotNull PagedComponentBuilder setParent(@NotNull JsonNode parent) {
+    public @NotNull PagedComponentBuilder setParent(@NotNull ParserContext parent) {
         this.parent = parent;
         return this;
     }
@@ -55,11 +56,11 @@ public class PagedComponentBuilder extends EmbeddedGuiComponentBuilder<PagedComp
     }
 
     @Override
-    public void deserialize(@NotNull JsonNode node) throws IOException {
-        super.deserialize(node);
-        setShowingPage(getOptionalInt(node, "showing-page").orElse(0));
+    public void deserialize(@NotNull ParserContext node) throws IOException {
+        super.deserialize(node, false);
+        setShowingPage(node.getOptionalInt("showing-page").orElse(0));
         setParent(node);
-        setPattern(getOptionalString(node, "pattern")
+        setPattern(node.getOptionalString("pattern")
                 .map(x -> Arrays.stream(x.split(","))
                         .mapToInt(Integer::parseInt)
                         .toArray())

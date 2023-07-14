@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 
 /**
  * Created: 05/02/2023
@@ -38,6 +40,7 @@ public class DefaultInterpreter implements GuiInterpreter {
                 xmlGui.getTitle(),
                 xmlGui.getWidth(),
                 xmlGui.getHeight());
+        context.setViewer(viewer);
 
         for (XmlComponent component : xmlGui.getComponents()) {
             GuiComponent guiComponent = createComponent(component, api, context);
@@ -53,8 +56,12 @@ public class DefaultInterpreter implements GuiInterpreter {
     public @Nullable GuiComponent createComponent(@NotNull XmlComponent xmlComponent,
                                                   @NotNull GuiEngineApi api,
                                                   @NotNull GuiContext context) {
-        return bindComponent(api.getXmlMapper().convertValue(xmlComponent.objectFields(api, node -> node),
-                api.getComponentIdMap().get(xmlComponent.type())), api, context);
+        Map<String, Object> map = xmlComponent.objectFields(api, node -> node);
+        map.put("__:api:__", api.getId());
+        map.put("__:ctx:__", context.getContextId());
+
+        return bindComponent(api.getXmlMapper().convertValue(map, api.getComponentIdMap()
+                .get(xmlComponent.type())), api, context);
     }
 
     @Override

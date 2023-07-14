@@ -8,6 +8,7 @@ import io.github.toberocat.guiengine.components.GuiComponentBuilder;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.exception.GuiIORuntimeException;
 import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException;
+import io.github.toberocat.guiengine.exception.InvalidGuiComponentException;
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter;
 import io.github.toberocat.guiengine.interpreter.InterpreterManager;
 import io.github.toberocat.guiengine.utils.VirtualInventory;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
  */
 public final class GuiEngineApi {
     public static final Map<String, GuiEngineApi> APIS = new HashMap<>();
+    public static final @NotNull Map<UUID, GuiContext> LOADED_CONTEXTS = new HashMap<>();
     public static final @NotNull FileFilter DEFAULT_GUI_FILTER = file -> file.getName().endsWith(".gui");
     public static final List<SimpleModule> SHARED_MODULES = new LinkedList<>();
     public static final Map<String, Class<? extends GuiComponent>> SHARED_COMPONENT_ID_MAPS = new HashMap<>();
@@ -53,6 +55,7 @@ public final class GuiEngineApi {
     private final @NotNull GuiEngineApiPlugin plugin;
     private final @NotNull File guiFolder;
     private @NotNull Set<String> availableGuis;
+    private final @NotNull String id;
 
 
     public GuiEngineApi(@NotNull String id, @NotNull File guiFolder) {
@@ -65,6 +68,7 @@ public final class GuiEngineApi {
         this.plugin = GuiEngineApiPlugin.getPlugin();
         this.availableGuis = new HashSet<>();
         this.xmlMapper.registerModules(SHARED_MODULES);
+        this.id = id;
 
         if (!guiFolder.exists() && !guiFolder.mkdirs()) {
             Bukkit.getLogger().severe("Couldn't create gui folder " + guiFolder.getAbsolutePath());
@@ -247,6 +251,9 @@ public final class GuiEngineApi {
             Bukkit.getConsoleSender().sendMessage(String
                     .format("[GuiEngineAPI] §aTook in total %dms§a to get %s displayed to the virtual player",
                             total, gui));
+        } catch (InvalidGuiComponentException e) {
+            availableGuis.remove(gui);
+            plugin.getLogger().severe(String.format("%s.gui has a invalid component. %s", gui, e.getMessage()));
         } catch (Throwable e) {
             availableGuis.remove(gui);
             e.printStackTrace();
@@ -260,5 +267,9 @@ public final class GuiEngineApi {
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("viewer", viewer.getUniqueId().toString());
         return placeholders;
+    }
+
+    public @NotNull String getId() {
+        return id;
     }
 }

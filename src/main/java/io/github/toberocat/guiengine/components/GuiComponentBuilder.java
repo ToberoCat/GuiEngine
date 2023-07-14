@@ -1,6 +1,9 @@
 package io.github.toberocat.guiengine.components;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.github.toberocat.guiengine.GuiEngineApi;
+import io.github.toberocat.guiengine.context.GuiContext;
+import io.github.toberocat.guiengine.utils.ParserContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -17,5 +20,5 @@ import java.io.IOException;
 public interface GuiComponentBuilder {
     @NotNull GuiComponent createComponent();
 
-    void deserialize(@NotNull JsonNode node) throws IOException;
+    void deserialize(@NotNull ParserContext node) throws IOException;
 }

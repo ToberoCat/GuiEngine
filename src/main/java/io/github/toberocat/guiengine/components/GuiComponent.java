@@ -6,6 +6,7 @@ import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.event.GuiEvents;
 import io.github.toberocat.guiengine.utils.CoordinatePair;
+import io.github.toberocat.guiengine.utils.GeneratorContext;
 import io.github.toberocat.guiengine.utils.Utils;
 import io.github.toberocat.guiengine.render.RenderPriority;
 import io.github.toberocat.toberocore.action.Action;
@@ -51,7 +52,7 @@ public interface GuiComponent extends GuiEvents {
 
     void setOffsetY(int y);
 
-    void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException;
+    void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException;
 
     default void addActions(@NotNull Set<Action> actions) {
     }

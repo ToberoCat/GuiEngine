@@ -2,6 +2,7 @@ package io.github.toberocat.guiengine.function;
 
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.context.GuiContext;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,6 +14,5 @@ public interface ComputeFunction {
     @NotNull String compute(@NotNull GuiEngineApi api,
                             @NotNull GuiContext context,
                             @NotNull String value);
-
     boolean checkForFunction(@NotNull String value);
 }

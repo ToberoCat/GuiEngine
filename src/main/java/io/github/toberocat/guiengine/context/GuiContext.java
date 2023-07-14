@@ -1,19 +1,20 @@
 package io.github.toberocat.guiengine.context;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.toberocat.guiengine.GuiEngineApi;
+import io.github.toberocat.guiengine.components.GuiComponent;
 import io.github.toberocat.guiengine.event.GuiEventListener;
 import io.github.toberocat.guiengine.event.GuiEvents;
 import io.github.toberocat.guiengine.event.spigot.GuiCloseEvent;
 import io.github.toberocat.guiengine.event.spigot.GuiComponentClickEvent;
 import io.github.toberocat.guiengine.event.spigot.GuiComponentDragEvent;
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter;
-import io.github.toberocat.guiengine.components.GuiComponent;
 import io.github.toberocat.guiengine.xml.XmlComponent;
 import io.github.toberocat.toberocore.action.Action;
 import io.github.toberocat.toberocore.util.StreamUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -40,6 +41,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
     private final int height;
     private final @NotNull List<GuiComponent> components;
     private final @NotNull Set<Action> localActions;
+    private final @NotNull UUID contextId;
     private Inventory inventory;
     private Player viewer;
 
@@ -58,6 +60,8 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
         this.height = height;
         this.components = new ArrayList<>();
         this.localActions = new HashSet<>();
+        this.contextId = UUID.randomUUID();
+        GuiEngineApi.LOADED_CONTEXTS.put(contextId, this);
     }
 
     public @NotNull Stream<GuiComponent> componentsAscending() {
@@ -155,6 +159,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
         componentsDescending().forEachOrdered(x -> x.closedComponent(event));
         Bukkit.getPluginManager()
                 .callEvent(new GuiCloseEvent(this, event));
+        GuiEngineApi.LOADED_CONTEXTS.remove(contextId);
     }
 
     public @NotNull GuiInterpreter interpreter() {
@@ -240,18 +245,33 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
                 .toHashCode();
     }
 
-
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
-                .append("interpreter", interpreter)
-                .append("title", title)
-                .append("width", width)
-                .append("height", height)
-                .append("components", components)
-                .append("inventory", inventory)
-                .append("viewer", viewer)
-                .toString();
+        try {
+            ObjectMapper mapper = new ObjectMapper()
+                    .registerModules(GuiEngineApi.SHARED_MODULES);
+            return new StringJoiner(", ", GuiContext.class.getSimpleName() + "[", "]")
+                    .add("contextId=" + contextId)
+                    .add("interpreter=" + interpreter.interpreterId())
+                    .add("title='" + title + "'")
+                    .add("width=" + width)
+                    .add("height=" + height)
+                    .add("components=" + mapper
+                            .writerWithDefaultPrettyPrinter()
+                            .writeValueAsString(components))
+                    .add("localActions=" + localActions)
+                    .add("inventory=" + inventory.getSize())
+                    .add("viewerName=" + viewer.getDisplayName())
+                    .add("viewerID=" + viewer.getUniqueId())
+                    .add("inventoryContent=" + Arrays.toString(inventory.getContents()))
+                    .toString();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public @NotNull UUID getContextId() {
+        return contextId;
     }
 
     @Override

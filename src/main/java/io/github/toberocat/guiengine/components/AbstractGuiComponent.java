@@ -7,6 +7,7 @@ import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.function.FunctionProcessor;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.render.RenderPriority;
+import io.github.toberocat.guiengine.utils.GeneratorContext;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -57,7 +58,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
     }
 
     @Override
-    public void serialize(@NotNull JsonGenerator gen,
+    public void serialize(@NotNull GeneratorContext gen,
                           @NotNull SerializerProvider serializers) throws IOException {
         gen.writeStringField("type", getType());
         gen.writeStringField("id", getId());

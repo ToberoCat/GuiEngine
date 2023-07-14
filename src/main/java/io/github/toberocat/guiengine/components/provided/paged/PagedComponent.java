@@ -1,17 +1,13 @@
 package io.github.toberocat.guiengine.components.provided.paged;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.action.PreviousPageAction;
 import io.github.toberocat.guiengine.action.NextPageAction;
 import io.github.toberocat.guiengine.components.GuiComponent;
 import io.github.toberocat.guiengine.components.provided.embedded.EmbeddedGuiComponent;
 import io.github.toberocat.guiengine.function.GuiFunction;
-import io.github.toberocat.guiengine.utils.CoordinatePair;
-import io.github.toberocat.guiengine.utils.JsonUtils;
-import io.github.toberocat.guiengine.utils.Utils;
+import io.github.toberocat.guiengine.utils.*;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.render.RenderPriority;
 import io.github.toberocat.guiengine.xml.XmlComponent;
@@ -38,7 +34,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
 
     private final @NotNull List<GuiContext> pages;
     private @Nullable GuiComponent emptyFill;
-    protected final @NotNull JsonNode parent;
+    protected final @NotNull ParserContext parent;
     protected final int[] pattern;
     protected int showingPage;
     private int currentPatternIndex;
@@ -57,7 +53,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
                           @NotNull String targetGui,
                           boolean copyAir,
                           boolean interactions,
-                          @NotNull JsonNode parent,
+                          @NotNull ParserContext parent,
                           int[] pattern,
                           int showingPage) {
         super(offsetX, offsetY, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden, targetGui, copyAir, interactions);
@@ -68,7 +64,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
     }
 
     @Override
-    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+    public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         super.serialize(gen, serializers);
         JsonUtils.writeArray(gen, "pattern", pattern);
         gen.writeNumberField("showing-page", showingPage);
@@ -84,8 +80,8 @@ public class PagedComponent extends EmbeddedGuiComponent {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        List<JsonNode> pages = JsonUtils.getOptionalFieldList(parent, "page").orElse(new ArrayList<>());
-        for (JsonNode page : pages) {
+        List<ParserContext> pages = JsonUtils.getOptionalFieldList(parent, "page").orElse(new ArrayList<>());
+        for (ParserContext page : pages) {
             createPage(page);
         }
 
@@ -94,7 +90,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
         emptyFill = JsonUtils.getOptionalNode(parent, "fill-empty").map(x -> {
             try {
                 return context.interpreter().createComponent(
-                        context.interpreter().xmlComponent(x, api), api, context);
+                        context.interpreter().xmlComponent(x.node(), api), api, context);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -186,13 +182,13 @@ public class PagedComponent extends EmbeddedGuiComponent {
         return pages.size();
     }
 
-    private void parseComponents(@NotNull JsonNode parent, @NotNull Consumer<GuiComponent> addToPage) throws JsonProcessingException {
+    private void parseComponents(@NotNull ParserContext parent, @NotNull Consumer<GuiComponent> addToPage) throws JsonProcessingException {
         assert context != null;
         assert api != null;
 
-        List<JsonNode> components = JsonUtils.getOptionalFieldList(parent, "component").orElse(new ArrayList<>());
-        for (JsonNode component : components) {
-            XmlComponent xml = context.interpreter().xmlComponent(component, api);
+        List<ParserContext> components = JsonUtils.getOptionalFieldList(parent, "component").orElse(new ArrayList<>());
+        for (ParserContext component : components) {
+            XmlComponent xml = context.interpreter().xmlComponent(component.node(), api);
             GuiComponent guiComponent = context.interpreter().createComponent(xml, api, context);
 
             if (guiComponent == null)
@@ -201,7 +197,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
         }
     }
 
-    private void createPage(@NotNull JsonNode pageNode) {
+    private void createPage(@NotNull ParserContext pageNode) {
         assert api != null;
 
         int position = JsonUtils.getOptionalInt(pageNode, "position").orElse(pages.size() - 1);

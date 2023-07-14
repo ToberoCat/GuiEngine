@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.components.AbstractGuiComponent;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.render.RenderPriority;
+import io.github.toberocat.guiengine.utils.GeneratorContext;
 import io.github.toberocat.guiengine.utils.JsonUtils;
 import io.github.toberocat.guiengine.utils.Utils;
 import org.bukkit.entity.Player;
@@ -39,7 +40,7 @@ public class SimpleItemComponent extends AbstractGuiComponent {
 
 
     @Override
-    public void serialize(@NotNull JsonGenerator gen, @NotNull SerializerProvider serializers) throws IOException {
+    public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         super.serialize(gen, serializers);
         gen.writeStringField("material", stack.getType().name());
 
