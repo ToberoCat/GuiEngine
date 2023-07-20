@@ -13,44 +13,72 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created: 07.04.2023
+ * The `OpenCommand` class represents a player sub-command that allows a player to open a GUI using the `GuiEngineApi`.
+ * <p>
+ * This class is licensed under the GNU General Public License.
  *
  * @author Tobias Madlberger (Tobias)
+ * @since 07.04.2023
  */
 public class OpenCommand extends PlayerSubCommand {
+    /**
+     * Constructs a new `OpenCommand` with the default label "open".
+     */
     public OpenCommand() {
         this("open");
     }
 
+    /**
+     * Constructs a new `OpenCommand` with the specified label.
+     *
+     * @param label The label for this command.
+     */
     public OpenCommand(@NotNull String label) {
         super(label);
     }
 
+    /**
+     * Executes the `OpenCommand` for the specified player with the provided arguments.
+     *
+     * @param player The player executing the command.
+     * @param args   The arguments passed to the command.
+     * @return `true` if the command execution is successful, `false` otherwise.
+     * @throws CommandExceptions If an error occurs during command execution.
+     */
     @Override
     protected boolean runPlayer(@NotNull Player player, @NotNull String[] args) throws CommandExceptions {
-        if (args.length == 0)
-            throw new CommandExceptions("This command needs a gui provided");
+        if (args.length == 0) throw new CommandExceptions("This command needs a GUI ID provided");
 
         try {
-            GuiEngineApi api = GuiEngineApi.APIS.get(args[0]);
+            String apiId = args[0];
+            String guiId = args[1];
+
+            GuiEngineApi api = GuiEngineApi.APIS.get(apiId);
             if (api == null) {
-                player.sendMessage("§cNo API found with id " + args[0]);
+                player.sendMessage("§cNo API found with ID " + apiId);
                 return false;
             }
-            api.openGui(player, args[1]);
+
+            api.openGui(player, guiId);
         } catch (GuiNotFoundRuntimeException | GuiIORuntimeException e) {
             throw new CommandExceptions(e.getMessage());
         }
         return true;
     }
 
+    /**
+     * Returns a list of available API IDs or GUI IDs for tab completion based on the provided arguments.
+     *
+     * @param player The player executing the command.
+     * @param args   The arguments passed to the command.
+     * @return A list of available API IDs or GUI IDs for tab completion.
+     */
     @Override
     protected @Nullable List<String> runPlayerTab(@NotNull Player player, @NotNull String[] args) {
-        if (args.length <= 1)
-            return GuiEngineApi.APIS.keySet().stream().toList();
+        if (args.length <= 1) return GuiEngineApi.APIS.keySet().stream().toList();
         GuiEngineApi api = GuiEngineApi.APIS.get(args[0]);
         if (api == null) {
-            player.sendMessage("§cNo API found with id " + args[0]);
+            player.sendMessage("§cNo API found with ID " + args[0]);
             return Collections.emptyList();
         }
 

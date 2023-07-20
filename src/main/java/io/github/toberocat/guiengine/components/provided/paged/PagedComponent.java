@@ -182,11 +182,13 @@ public class PagedComponent extends EmbeddedGuiComponent {
         return pages.size();
     }
 
-    private void parseComponents(@NotNull ParserContext parent, @NotNull Consumer<GuiComponent> addToPage) throws JsonProcessingException {
+    private void parseComponents(@NotNull ParserContext parent, @NotNull Consumer<GuiComponent> addToPage)
+            throws JsonProcessingException {
         assert context != null;
         assert api != null;
 
-        List<ParserContext> components = JsonUtils.getOptionalFieldList(parent, "component").orElse(new ArrayList<>());
+        List<ParserContext> components = JsonUtils.getOptionalFieldList(parent, "component")
+                .orElse(new ArrayList<>());
         for (ParserContext component : components) {
             XmlComponent xml = context.interpreter().xmlComponent(component.node(), api);
             GuiComponent guiComponent = context.interpreter().createComponent(xml, api, context);

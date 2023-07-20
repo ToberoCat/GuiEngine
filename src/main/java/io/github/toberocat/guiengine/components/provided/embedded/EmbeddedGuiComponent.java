@@ -7,9 +7,11 @@ import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.function.GuiFunction;
 import io.github.toberocat.guiengine.render.RenderPriority;
 import io.github.toberocat.guiengine.utils.GeneratorContext;
+import io.github.toberocat.guiengine.utils.Utils;
 import io.github.toberocat.guiengine.utils.VirtualInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.DragType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -77,7 +79,13 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
         super.clickedComponent(event);
         if (!interactions || embedded == null)
             return;
-        embedded.clickedComponent(event);
+        InventoryClickEvent fakedEvent = new InventoryClickEvent(event.getView(),
+                event.getSlotType(),
+                event.getSlot() - Utils.translateToSlot(offsetX, offsetY),
+                event.getClick(),
+                event.getAction(),
+                event.getHotbarButton());
+        embedded.clickedComponent(fakedEvent);
     }
 
     @Override
@@ -85,6 +93,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
         super.draggedComponent(event);
         if (!interactions || embedded == null)
             return;
+        // ToDo: Fake the event (offset the slot to be originated at zero)
         embedded.draggedComponent(event);
     }
 

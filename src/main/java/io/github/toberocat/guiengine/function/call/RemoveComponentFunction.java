@@ -15,31 +15,36 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 /**
+ * Custom GUI function to remove a component from the GUI.
+ * <p>
  * Created: 29.04.2023
- *
- * @author Tobias Madlberger (Tobias)
+ * Author: Tobias Madlberger (Tobias)
  */
 @JsonDeserialize(using = RemoveComponentFunction.Deserializer.class)
 public record RemoveComponentFunction(@NotNull String target) implements GuiFunction {
 
     public static final String ID = "remove";
 
+    /**
+     * Calls the `removeById` method using the provided API and context to remove a component from the GUI.
+     *
+     * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
+     * @param context The `GuiContext` instance representing the GUI context from which to remove the component.
+     */
     @Override
-    public void call(@NotNull GuiEngineApi api,
-                     @NotNull GuiContext context) {
+    public void call(@NotNull GuiEngineApi api, @NotNull GuiContext context) {
         context.removeById(target);
     }
 
+    /**
+     * Custom deserializer to convert JSON data into a `RemoveComponentFunction` instance.
+     */
     protected static class Deserializer extends JsonDeserializer<RemoveComponentFunction> {
 
         @Override
-        public RemoveComponentFunction deserialize(JsonParser p, DeserializationContext ctxt)
-                throws IOException {
+        public RemoveComponentFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
-            return new RemoveComponentFunction(
-                    JsonUtils.getOptionalString(new ParserContext(node, null, null),
-                            "target").orElseThrow()
-            );
+            return new RemoveComponentFunction(JsonUtils.getOptionalString(new ParserContext(node, null, null), "target").orElseThrow());
         }
     }
 }

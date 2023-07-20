@@ -11,6 +11,7 @@ import io.github.toberocat.guiengine.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -49,10 +50,17 @@ public class SimpleItemComponent extends AbstractGuiComponent {
             return;
 
         gen.writeStringField("name", meta.getDisplayName());
-        if (meta.getLore() == null)
+        if (meta.getLore() != null)
+            JsonUtils.writeArray(gen, "lore", meta.getLore().toArray());
+
+        if (!(meta instanceof SkullMeta skullMeta))
             return;
 
-        JsonUtils.writeArray(gen, "lore", meta.getLore().toArray());
+        if (skullMeta.getOwningPlayer() == null)
+            return;
+
+        gen.writeStringField("head-owner", skullMeta.getOwningPlayer().getUniqueId()
+                .toString());
     }
 
     @Override

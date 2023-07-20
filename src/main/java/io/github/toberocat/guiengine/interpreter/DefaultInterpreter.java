@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.components.GuiComponent;
 import io.github.toberocat.guiengine.context.GuiContext;
+import io.github.toberocat.guiengine.exception.GuiIORuntimeException;
+import io.github.toberocat.guiengine.exception.InvalidGuiComponentException;
 import io.github.toberocat.guiengine.xml.XmlComponent;
 import io.github.toberocat.guiengine.xml.XmlGui;
 import io.github.toberocat.guiengine.render.DefaultGuiRenderEngine;
@@ -60,8 +62,10 @@ public class DefaultInterpreter implements GuiInterpreter {
         map.put("__:api:__", api.getId());
         map.put("__:ctx:__", context.getContextId());
 
-        return bindComponent(api.getXmlMapper().convertValue(map, api.getComponentIdMap()
-                .get(xmlComponent.type())), api, context);
+        Class<? extends GuiComponent> componentClass = api.getComponentIdMap().get(xmlComponent.type());
+        if (componentClass == null)
+            throw new InvalidGuiComponentException(String.format("Type %s isn't recognised as a component", xmlComponent.type()));
+        return bindComponent(api.getXmlMapper().convertValue(map, componentClass), api, context);
     }
 
     @Override

@@ -94,7 +94,13 @@ public record ParserContext(@NotNull JsonNode node,
     }
 
     public @NotNull Optional<UUID> getOptionalUUID(@NotNull String field) {
-        return getOptionalString(field).map(UUID::fromString);
+        return getOptionalString(field).map(x -> {
+            try {
+                return UUID.fromString(x);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        });
     }
 
     public @NotNull Optional<Boolean> getOptionalBoolean(@NotNull String field) {

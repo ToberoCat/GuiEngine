@@ -94,10 +94,6 @@
                             <outputFile>${server.location}/GuiEngine-${project.version}.jar</outputFile>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.apache.commons</pattern>
-                                    <shadedPattern>io.github.toberocat.guiengine.org.apache.commons</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.fasterxml.jackson</pattern>
                                     <shadedPattern>io.github.toberocat.guiengine.com.fasterxml.jackson</shadedPattern>
                                 </relocation>

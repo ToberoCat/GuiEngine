@@ -13,14 +13,32 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.function.Consumer;
 
 /**
+ * Represents a listener for GUI-related events.
+ * It provides a method to register a listener for a specific event class, and the associated event handler.
+ * <p>
+ * This class is licensed under the GNU General Public License.
  * Created: 21.05.2023
- *
- * @author Tobias Madlberger (Tobias)
+ * Author: Tobias Madlberger (Tobias)
  */
 public interface GuiEventListener {
 
+    /**
+     * Gets the associated `GuiContext` for the listener.
+     *
+     * @return The `GuiContext` associated with the listener.
+     */
     @NotNull GuiContext getContext();
 
+    /**
+     * Registers a listener for a specific event class along with its associated event handler.
+     * The `listener` parameter is a consumer that handles the event when it is triggered.
+     * The event will only be handled if the event class is assignable from the actual event's class,
+     * and if the context of the event matches the context associated with this `GuiEventListener`.
+     *
+     * @param clazz    The class of the event to listen for.
+     * @param listener The event handler that consumes the event when triggered.
+     * @param <E>      The type of the event.
+     */
     default <E extends GuiEngineEvent> void listen(@NotNull Class<E> clazz, @NotNull Consumer<E> listener) {
         HandlerList handlerList;
         try {
@@ -29,12 +47,11 @@ public interface GuiEventListener {
             throw new RuntimeException(e);
         }
 
-        handlerList.register(new RegisteredListener(new Listener() {}, (bukkitListener, event) -> {
-            if (!clazz.isAssignableFrom(event.getClass()))
-                return;
+        handlerList.register(new RegisteredListener(new Listener() {
+        }, (bukkitListener, event) -> {
+            if (!clazz.isAssignableFrom(event.getClass())) return;
             E e = clazz.cast(event);
-            if (e.getContext() != getContext())
-                return;
+            if (e.getContext() != getContext()) return;
 
             listener.accept(e);
         }, EventPriority.NORMAL, GuiEngineApiPlugin.getPlugin(), false));

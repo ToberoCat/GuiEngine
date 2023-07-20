@@ -15,26 +15,32 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 /**
+ * Custom GUI function to call an action when triggered.
+ * <p>
  * Created: 29.04.2023
- *
- * @author Tobias Madlberger (Tobias)
+ * Author: Tobias Madlberger (Tobias)
  */
 @JsonDeserialize(using = ActionFunction.Deserializer.class)
 public record ActionFunction(@NotNull String action) implements GuiFunction {
     public static final String ID = "action";
 
+    /**
+     * Calls the specified action using the provided API and context.
+     *
+     * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
+     * @param context The `GuiContext` instance representing the GUI context for which the action is called.
+     */
     @Override
-    public void call(@NotNull GuiEngineApi api,
-                     @NotNull GuiContext context) {
+    public void call(@NotNull GuiEngineApi api, @NotNull GuiContext context) {
         Player viewer = context.viewer();
-        if (viewer == null)
-            return;
+        if (viewer == null) return;
 
-        new Actions(action)
-                .localActions(context.getLocalActions())
-                .run(viewer);
+        new Actions(action).localActions(context.getLocalActions()).run(viewer);
     }
 
+    /**
+     * Custom deserializer to convert JSON data into an `ActionFunction` instance.
+     */
     protected static class Deserializer extends JsonDeserializer<ActionFunction> {
         @Override
         public ActionFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
