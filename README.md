@@ -2,6 +2,7 @@
 [![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://ToberoCat.github.io/GuiEngine/javadoc/)
 [![](https://jitpack.io/v/ToberoCat/GuiEngine.svg)](https://jitpack.io/#ToberoCat/GuiEngine)
 [![ToberoCat - GuiEngine](https://img.shields.io/static/v1?label=ToberoCat&message=GuiEngine&color=%23FEDD58&logo=github)](https://github.com/ToberoCat/GuiEngine "Go to GitHub repo")
+[![Donate PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg?logo=paypal&style=flat-square)](https://www.paypal.com/donate/?hosted_button_id=BGB6QWR886Q6Y)
 [![stars - GuiEngine](https://img.shields.io/github/stars/ToberoCat/GuiEngine?style=social)](https://github.com/ToberoCat/GuiEngine)
 [![forks - GuiEngine](https://img.shields.io/github/forks/ToberoCat/GuiEngine?style=social)](https://github.com/ToberoCat/GuiEngine)
 [![GitHub release](https://img.shields.io/github/release/ToberoCat/GuiEngine?include_prereleases=&sort=semver&color=%23FEDD58)](https://github.com/ToberoCat/GuiEngine/releases/)
