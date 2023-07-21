@@ -46,6 +46,39 @@ public record GeneratorContext(@NotNull JsonGenerator generator) {
     }
 
     /**
+     * Writes a JSON number field with the specified field name and value to the generator.
+     *
+     * @param fieldName The name of the JSON field to write.
+     * @param value     The integer value to write for the field.
+     * @throws IOException If an I/O error occurs while writing to the generator.
+     */
+    public void writeNumberField(@NotNull String fieldName, long value) throws IOException {
+        generator.writeNumberField(fieldName, value);
+    }
+
+    /**
+     * Writes a JSON number field with the specified field name and value to the generator.
+     *
+     * @param fieldName The name of the JSON field to write.
+     * @param value     The integer value to write for the field.
+     * @throws IOException If an I/O error occurs while writing to the generator.
+     */
+    public void writeNumberField(@NotNull String fieldName, float value) throws IOException {
+        generator.writeNumberField(fieldName, value);
+    }
+
+    /**
+     * Writes a JSON number field with the specified field name and value to the generator.
+     *
+     * @param fieldName The name of the JSON field to write.
+     * @param value     The integer value to write for the field.
+     * @throws IOException If an I/O error occurs while writing to the generator.
+     */
+    public void writeNumberField(@NotNull String fieldName, double value) throws IOException {
+        generator.writeNumberField(fieldName, value);
+    }
+
+    /**
      * Writes a JSON boolean field with the specified field name and value to the generator.
      *
      * @param fieldName The name of the JSON field to write.

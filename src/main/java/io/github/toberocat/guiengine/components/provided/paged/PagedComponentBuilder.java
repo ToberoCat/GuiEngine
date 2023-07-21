@@ -66,6 +66,7 @@ public class PagedComponentBuilder extends EmbeddedGuiComponentBuilder<PagedComp
         super.deserialize(node, false);
         setShowingPage(node.getOptionalInt("showing-page").orElse(0));
         setParent(node);
-        setPattern(node.getOptionalString("pattern").map(x -> Arrays.stream(x.split(",")).mapToInt(Integer::parseInt).toArray()).orElse(new int[0]));
+        setPattern(node.getOptionalString("pattern").map(x -> Arrays.stream(x.split(","))
+                .mapToInt(Integer::parseInt).toArray()).orElse(new int[0]));
     }
 }

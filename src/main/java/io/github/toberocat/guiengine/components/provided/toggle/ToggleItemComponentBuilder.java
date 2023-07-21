@@ -59,7 +59,9 @@ public class ToggleItemComponentBuilder extends AbstractGuiComponentBuilder<Togg
     @Override
     public void deserialize(@NotNull ParserContext node) throws IOException {
         super.deserialize(node);
-        setOptions(node.getOptionalNode("option").orElseThrow(() -> new MissingRequiredParamException(this, "option")));
-        setSelected(node.getOptionalInt("selected").orElseThrow(() -> new MissingRequiredParamException(this, "selected")));
+        setOptions(node.getOptionalNode("option").orElseThrow(() ->
+                new MissingRequiredParamException(this, "option")));
+        setSelected(node.getOptionalInt("selected").orElseThrow(() ->
+                new MissingRequiredParamException(this, "selected")));
     }
 }
