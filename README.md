@@ -12,6 +12,7 @@
 [![SpigotMain - GuiEngine](https://img.shields.io/badge/Spigot-GuiEngine-orange)](https://www.spigotmc.org/resources/guiengine-%E2%9C%A8-craft-unlimited-guis-effortlessly-%E2%9C%A8-1-16-1-20-1-api.109983/ "Spigot GuiEngine page")
 
 </div>
+
 ## Developers
 
 Add this repo to your maven project:
