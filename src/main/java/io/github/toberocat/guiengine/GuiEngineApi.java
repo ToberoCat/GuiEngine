@@ -165,7 +165,7 @@ public final class GuiEngineApi {
         int populationSize = totals.length;
         double variance = sumSquaredDifferences / populationSize;
         double std = Math.sqrt(variance);
-        Bukkit.getConsoleSender().sendMessage(String.format("[GuiEngine] §bTook §e%.3fms ± %.3fms§b to render a single gui from §e%s", avg, std, id));
+        Bukkit.getConsoleSender().sendMessage(String.format("[GuiEngine] §bIt takes §e%.3fms ± %.3fms§b on average to render a gui from §e%s", avg, std, id));
     }
 
     /**

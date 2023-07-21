@@ -44,7 +44,7 @@ public record RemoveComponentFunction(@NotNull String target) implements GuiFunc
         @Override
         public RemoveComponentFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
-            return new RemoveComponentFunction(JsonUtils.getOptionalString(new ParserContext(node, null, null), "target").orElseThrow());
+            return new RemoveComponentFunction(new ParserContext(node, null, null).getOptionalString("target").orElseThrow());
         }
     }
 }

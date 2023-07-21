@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.toberocat</groupId>
-    <artifactId>GuiEngine</artifactId>
+    <artifactId>gui-engine</artifactId>
     <version>1.1.1</version>
     <packaging>jar</packaging>
     <properties>
@@ -18,7 +18,7 @@
         <commons.text.version>1.10.0</commons.text.version>
         <jetbrains.annotations.version>23.0.0</jetbrains.annotations.version>
         <spigot.api.version>1.16.1-R0.1-SNAPSHOT</spigot.api.version>
-        <toberocore.version>1.0.0</toberocore.version>
+        <toberocore.version>-42a092f660-1</toberocore.version>
 
         <!-- Server Location -->
         <server.location>H:\Development\Minecraft\Spigot\Server1.20\plugins</server.location>
@@ -29,9 +29,18 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.ToberoCat</groupId>
+            <artifactId>ToberoCore</artifactId>
+            <version>${toberocore.version}</version>
+        </dependency>
         <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -58,12 +67,6 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>${spigot.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.toberocat</groupId>
-            <artifactId>ToberoCore</artifactId>
-            <version>${toberocore.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -132,6 +135,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
             </plugin>
         </plugins>
         <resources>

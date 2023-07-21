@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.function.GuiFunction;
-import io.github.toberocat.guiengine.utils.JsonUtils;
 import io.github.toberocat.guiengine.utils.ParserContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +45,7 @@ public record EditComponentFunction(@NotNull String target, @NotNull String prop
         @Override
         public EditComponentFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
-            return new EditComponentFunction(JsonUtils.getOptionalString(new ParserContext(node, null, null), "target").orElseThrow(), JsonUtils.getOptionalString(new ParserContext(node, null, null), "attribute").orElseThrow(), JsonUtils.getOptionalString(new ParserContext(node, null, null), "set-value").orElseThrow());
+            return new EditComponentFunction(new ParserContext(node, null, null).getOptionalString("target").orElseThrow(), new ParserContext(node, null, null).getOptionalString("attribute").orElseThrow(), new ParserContext(node, null, null).getOptionalString("set-value").orElseThrow());
         }
     }
 }

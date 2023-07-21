@@ -1,6 +1,5 @@
 package io.github.toberocat.guiengine.components.provided.embedded;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.components.AbstractGuiComponent;
 import io.github.toberocat.guiengine.context.GuiContext;
@@ -11,7 +10,6 @@ import io.github.toberocat.guiengine.utils.Utils;
 import io.github.toberocat.guiengine.utils.VirtualInventory;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.DragType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -25,9 +23,10 @@ import java.util.Map;
 
 
 /**
+ * A GUI component that embeds another GUI inside it.
+ * This component allows embedding and rendering a target GUI inside the current GUI.
  * Created: 06.04.2023
- *
- * @author Tobias Madlberger (Tobias)
+ * Author: Tobias Madlberger (Tobias)
  */
 public class EmbeddedGuiComponent extends AbstractGuiComponent {
     public static final @NotNull String TYPE = "embedded";
@@ -36,19 +35,24 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     protected @Nullable GuiContext embedded;
 
-    public EmbeddedGuiComponent(int offsetX,
-                                int offsetY,
-                                int width,
-                                int height,
-                                @NotNull RenderPriority priority,
-                                @NotNull String id,
-                                @NotNull List<GuiFunction> clickFunctions,
-                                @NotNull List<GuiFunction> dragFunctions,
-                                @NotNull List<GuiFunction> closeFunctions,
-                                boolean hidden,
-                                @NotNull String targetGui,
-                                boolean copyAir,
-                                boolean interactions) {
+    /**
+     * Constructor for EmbeddedGuiComponent.
+     *
+     * @param offsetX        The X offset of the GUI component.
+     * @param offsetY        The Y offset of the GUI component.
+     * @param width          The width of the GUI component.
+     * @param height         The height of the GUI component.
+     * @param priority       The rendering priority of the GUI component.
+     * @param id             The ID of the GUI component.
+     * @param clickFunctions The list of click functions for the GUI component.
+     * @param dragFunctions  The list of drag functions for the GUI component.
+     * @param closeFunctions The list of close functions for the GUI component.
+     * @param hidden         true if the GUI component is hidden, false otherwise.
+     * @param targetGui      The ID of the target GUI to embed inside this component.
+     * @param copyAir        true to copy air slots from the embedded GUI, false to skip empty slots.
+     * @param interactions   true to allow interactions with the embedded GUI, false to ignore interactions.
+     */
+    public EmbeddedGuiComponent(int offsetX, int offsetY, int width, int height, @NotNull RenderPriority priority, @NotNull String id, @NotNull List<GuiFunction> clickFunctions, @NotNull List<GuiFunction> dragFunctions, @NotNull List<GuiFunction> closeFunctions, boolean hidden, @NotNull String targetGui, boolean copyAir, boolean interactions) {
         super(offsetX, offsetY, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden);
         this.targetGui = targetGui;
         this.copyAir = copyAir;
@@ -65,11 +69,9 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     @Override
     public void onViewInit(@NotNull Map<String, String> placeholders) {
-        if (context == null || api == null || context.viewer() == null)
-            return;
+        if (context == null || api == null || context.viewer() == null) return;
 
-        embedded = context.interpreter().loadContent(api, context.viewer(),
-                api.loadXmlGui(placeholders, targetGui));
+        embedded = context.interpreter().loadContent(api, context.viewer(), api.loadXmlGui(placeholders, targetGui));
         embedded.setInventory(new VirtualInventory(height, () -> context.render()));
         embedded.setViewer(context.viewer());
     }
@@ -77,22 +79,15 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
         super.clickedComponent(event);
-        if (!interactions || embedded == null)
-            return;
-        InventoryClickEvent fakedEvent = new InventoryClickEvent(event.getView(),
-                event.getSlotType(),
-                event.getSlot() - Utils.translateToSlot(offsetX, offsetY),
-                event.getClick(),
-                event.getAction(),
-                event.getHotbarButton());
+        if (!interactions || embedded == null) return;
+        InventoryClickEvent fakedEvent = new InventoryClickEvent(event.getView(), event.getSlotType(), event.getSlot() - Utils.translateToSlot(offsetX, offsetY), event.getClick(), event.getAction(), event.getHotbarButton());
         embedded.clickedComponent(fakedEvent);
     }
 
     @Override
     public void draggedComponent(@NotNull InventoryDragEvent event) {
         super.draggedComponent(event);
-        if (!interactions || embedded == null)
-            return;
+        if (!interactions || embedded == null) return;
         // ToDo: Fake the event (offset the slot to be originated at zero)
         embedded.draggedComponent(event);
     }
@@ -100,8 +95,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     @Override
     public void closedComponent(@NotNull InventoryCloseEvent event) {
         super.closedComponent(event);
-        if (!interactions || embedded == null)
-            return;
+        if (!interactions || embedded == null) return;
         embedded.closedComponent(event);
     }
 
@@ -111,10 +105,8 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     }
 
     @Override
-    public void render(@NotNull Player viewer,
-                       @NotNull ItemStack[][] buffer) {
-        if (context == null || api == null || embedded == null)
-            return;
+    public void render(@NotNull Player viewer, @NotNull ItemStack[][] buffer) {
+        if (context == null || api == null || embedded == null) return;
 
         ItemStack[][] virtualInventory = new ItemStack[embedded.height()][embedded.width()];
         context.interpreter().getRenderEngine().renderGui(virtualInventory, embedded, viewer);

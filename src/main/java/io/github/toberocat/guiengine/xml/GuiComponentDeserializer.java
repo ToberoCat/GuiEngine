@@ -16,17 +16,36 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 /**
- * Created: 10.07.2023
+ * Custom JSON deserializer for a specific type of {@link GuiComponent}.
+ * This class is responsible for deserializing JSON data into a {@link GuiComponent} object using its builder.
  *
- * @author Tobias Madlberger (Tobias)
+ * @param <C> The type of {@link GuiComponent} to be deserialized.
+ * @param <B> The type of {@link GuiComponentBuilder} associated with the component to be deserialized.
+ *            <p>
+ *            Created: 10.07.2023
+ *            Author: Tobias Madlberger (Tobias)
  */
 public class GuiComponentDeserializer<C extends GuiComponent, B extends GuiComponentBuilder> extends JsonDeserializer<C> {
+
     private final @NotNull Class<B> builderClazz;
 
+    /**
+     * Constructor for the GuiComponentDeserializer.
+     *
+     * @param builderClazz The class of the {@link GuiComponentBuilder} associated with the component to be deserialized.
+     */
     public GuiComponentDeserializer(@NotNull Class<B> builderClazz) {
         this.builderClazz = builderClazz;
     }
 
+    /**
+     * Deserialize JSON data into a {@link GuiComponent} object using its builder.
+     *
+     * @param p                      The {@link JsonParser} to read the JSON data from.
+     * @param deserializationContext The {@link DeserializationContext} to use during deserialization.
+     * @return A {@link GuiComponent} object created from the JSON data using its builder.
+     * @throws IOException If an I/O error occurs during JSON parsing.
+     */
     @Override
     public C deserialize(JsonParser p, DeserializationContext deserializationContext) throws IOException {
         B builder;
@@ -36,7 +55,9 @@ public class GuiComponentDeserializer<C extends GuiComponent, B extends GuiCompo
                  NoSuchMethodException e) {
             throw new RuntimeException("Builder " + builderClazz.getName() + " has no default constructor (0 arguments)", e);
         }
+
         JsonNode node = p.getCodec().readTree(p);
+
         String apiId = node.get("__:api:__").asText();
         UUID contextId = UUID.fromString(node.get("__:ctx:__").asText());
 

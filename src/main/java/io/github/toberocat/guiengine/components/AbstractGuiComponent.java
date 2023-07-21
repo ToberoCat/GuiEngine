@@ -1,6 +1,5 @@
 package io.github.toberocat.guiengine.components;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.context.GuiContext;
@@ -18,33 +17,75 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * An abstract base class for GUI components.
+ * This class provides common functionality for GUI components and implements the GuiComponent interface.
  * Created: 04/02/2023
- *
- * @author Tobias Madlberger (Tobias)
+ * Author: Tobias Madlberger (Tobias)
  */
 public abstract class AbstractGuiComponent implements GuiComponent {
-    protected int offsetX, offsetY;
-    protected final int width, height;
+    /**
+     * X position of the component
+     */
+    protected int offsetX;
+    /**
+     * Y position of the component
+     */
+    protected int offsetY;
+    /**
+     * The width of this component
+     */
+    protected final int width;
+    /**
+     * The height of this component
+     */
+    protected final int height;
+    /**
+     * The context this component owns to
+     */
     protected @Nullable GuiContext context;
+    /**
+     * The api this component belongs to
+     */
     protected @Nullable GuiEngineApi api;
-    private final @NotNull RenderPriority priority;
-    private final @NotNull String id;
+
+    /**
+     * The render priority of this component. Determines the order of rendering nad the order of event receipation
+     */
+    protected final @NotNull RenderPriority priority;
+    protected final @NotNull String id;
+
+    /**
+     * The functions that will get called once a component has been clicked
+     */
     protected final @NotNull List<GuiFunction> clickFunctions;
+
+    /**
+     * The functions that will get called once a component is part of a drag event
+     */
     protected final @NotNull List<GuiFunction> dragFunctions;
+
+    /**
+     * The functions that will get called when a component's gui gets closed
+     */
     protected final @NotNull List<GuiFunction> closeFunctions;
 
     private boolean hidden;
 
-    public AbstractGuiComponent(int offsetX,
-                                int offsetY,
-                                int width,
-                                int height,
-                                @NotNull RenderPriority priority,
-                                @NotNull String id,
-                                @NotNull List<GuiFunction> clickFunctions,
-                                @NotNull List<GuiFunction> dragFunctions,
-                                @NotNull List<GuiFunction> closeFunctions,
-                                boolean hidden) {
+    /**
+     * Constructor for AbstractGuiComponent.
+     *
+     * @param offsetX        The X offset of the GUI component.
+     * @param offsetY        The Y offset of the GUI component.
+     * @param width          The width of the GUI component.
+     * @param height         The height of the GUI component.
+     * @param priority       The rendering priority of the GUI component.
+     * @param id             The ID of the GUI component.
+     * @param clickFunctions The list of click functions for the GUI component.
+     * @param dragFunctions  The list of drag functions for the GUI component.
+     * @param closeFunctions The list of close functions for the GUI component.
+     * @param hidden         true if the GUI component is hidden, false otherwise.
+     */
+    public AbstractGuiComponent(int offsetX, int offsetY, int width, int height, @NotNull RenderPriority priority, @NotNull String id, @NotNull List<GuiFunction> clickFunctions, @NotNull List<GuiFunction> dragFunctions, @NotNull List<GuiFunction> closeFunctions, boolean hidden) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.width = width;
@@ -58,8 +99,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
     }
 
     @Override
-    public void serialize(@NotNull GeneratorContext gen,
-                          @NotNull SerializerProvider serializers) throws IOException {
+    public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         gen.writeStringField("type", getType());
         gen.writeStringField("id", getId());
         gen.writeStringField("priority", renderPriority().toString());
@@ -77,8 +117,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
         event.setCancelled(true);
-        if (context == null || api == null)
-            return;
+        if (context == null || api == null) return;
 
         FunctionProcessor.callFunctions(clickFunctions, api, context);
         context.render();
@@ -87,8 +126,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
     @Override
     public void draggedComponent(@NotNull InventoryDragEvent event) {
         event.setCancelled(true);
-        if (context == null || api == null)
-            return;
+        if (context == null || api == null) return;
 
         FunctionProcessor.callFunctions(dragFunctions, api, context);
         context.render();
@@ -96,8 +134,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
 
     @Override
     public void closedComponent(@NotNull InventoryCloseEvent event) {
-        if (context == null || api == null)
-            return;
+        if (context == null || api == null) return;
 
         FunctionProcessor.callFunctions(closeFunctions, api, context);
         context.render();
@@ -164,14 +201,29 @@ public abstract class AbstractGuiComponent implements GuiComponent {
         this.context = context;
     }
 
+    /**
+     * Get the list of click functions for the GUI component.
+     *
+     * @return The list of click functions.
+     */
     public @NotNull List<GuiFunction> getClickFunctions() {
         return clickFunctions;
     }
 
+    /**
+     * Get the list of drag functions for the GUI component.
+     *
+     * @return The list of drag functions.
+     */
     public @NotNull List<GuiFunction> getDragFunctions() {
         return dragFunctions;
     }
 
+    /**
+     * Get the list of close functions for the GUI component.
+     *
+     * @return The list of close functions.
+     */
     public @NotNull List<GuiFunction> getCloseFunctions() {
         return closeFunctions;
     }

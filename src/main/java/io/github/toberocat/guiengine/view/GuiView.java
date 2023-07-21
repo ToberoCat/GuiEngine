@@ -5,9 +5,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created: 04/02/2023
- *
- * @author Tobias Madlberger (Tobias)
+ * A record class representing a GUI view in a Minecraft plugin.
  */
 public record GuiView(@NotNull Inventory inventory, @NotNull GuiContext context) {
 }

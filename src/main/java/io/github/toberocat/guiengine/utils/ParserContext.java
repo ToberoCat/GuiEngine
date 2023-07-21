@@ -15,37 +15,40 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
- * Created: 14.07.2023
- *
- * @author Tobias Madlberger (Tobias)
+ * A helper class representing a context for parsing JSON data.
+ * This class provides utility methods to extract values from a JSON node
+ * and convert them to their corresponding data types.
  */
-public record ParserContext(@NotNull JsonNode node,
-                            @NotNull GuiContext context,
-                            @NotNull GuiEngineApi api) {
+public record ParserContext(@NotNull JsonNode node, @NotNull GuiContext context, @NotNull GuiEngineApi api) {
 
+    /**
+     * Get a child node of the current node based on the specified field name.
+     *
+     * @param field The field name of the child node to retrieve.
+     * @return A ParserContext representing the child node if found, or null if not present.
+     */
     public @Nullable ParserContext get(String field) {
         JsonNode n = node.get(field);
-        if (n == null)
-            return null;
+        if (n == null) return null;
         return new ParserContext(n, context, api);
     }
 
+    /**
+     * Get an optional child node of the current node based on the specified field name.
+     *
+     * @param field The field name of the optional child node to retrieve.
+     * @return An Optional containing the child node if found, or an empty Optional if not present.
+     */
     public @NotNull Optional<ParserContext> getOptionalNode(@NotNull String field) {
         return Optional.ofNullable(get(field));
     }
 
     /**
-     * Read a node's children as list.
-     * Example:
-     * This json {"component":{"type":"item"}
-     * would get parsed into a list, that would look like this:
-     * [{"type":"item"}]
-     * <p>
-     * This json {"component":[{"type":"item"}, {"type":"head"}}]}
-     * would get parsed into
-     * [{"type":"item"}, {"type":"head"}]
+     * Read a node's children as a list of ParserContext objects.
+     * If the current node is an array, each element will be represented as a separate ParserContext object.
+     * If the current node is not an array, the current node itself will be the only element in the list.
      *
-     * @return An optional list with the children
+     * @return A list of ParserContext objects representing the node's children.
      */
     public @NotNull List<ParserContext> getFieldList() {
         List<ParserContext> children = new ArrayList<>();
@@ -59,6 +62,14 @@ public record ParserContext(@NotNull JsonNode node,
         return children;
     }
 
+    /**
+     * Get an optional list of ParserContext objects from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional list.
+     * @return An Optional containing the list of ParserContext objects if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<List<ParserContext>> getOptionalFieldList(@NotNull String field) {
         return getOptionalNode(field).map(x -> {
             List<ParserContext> children = new ArrayList<>();
@@ -73,6 +84,15 @@ public record ParserContext(@NotNull JsonNode node,
         });
     }
 
+    /**
+     * Get an optional Material enum value from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional Material.
+     * @return An Optional containing the Material enum value if found,
+     * or an empty Optional if not present.
+     * @throws InvalidGuiComponentException If the provided material doesn't match any known materials.
+     */
     public @NotNull Optional<Material> getOptionalMaterial(@NotNull String field) {
         return getOptionalString(field).map(x -> {
             try {
@@ -83,16 +103,38 @@ public record ParserContext(@NotNull JsonNode node,
         });
     }
 
+    /**
+     * Get an optional RenderPriority enum value from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional RenderPriority.
+     * @return An Optional containing the RenderPriority enum value if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<RenderPriority> getOptionalRenderPriority(@NotNull String field) {
         return getOptionalString(field).map(RenderPriority::valueOf);
     }
 
+    /**
+     * Get an optional String value from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional String.
+     * @return An Optional containing the String value if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<String> getOptionalString(@NotNull String field) {
-        return getOptionalNode(field)
-                .map(x -> x.node().asText())
-                .map(x -> FunctionProcessor.applyFunctions(api, context, x));
+        return getOptionalNode(field).map(x -> x.node().asText()).map(x -> FunctionProcessor.applyFunctions(api, context, x));
     }
 
+    /**
+     * Get an optional UUID value from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional UUID.
+     * @return An Optional containing the UUID value if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<UUID> getOptionalUUID(@NotNull String field) {
         return getOptionalString(field).map(x -> {
             try {
@@ -103,14 +145,38 @@ public record ParserContext(@NotNull JsonNode node,
         });
     }
 
+    /**
+     * Get an optional Boolean value from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional Boolean.
+     * @return An Optional containing the Boolean value if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<Boolean> getOptionalBoolean(@NotNull String field) {
         return getOptionalString(field).map(x -> x.equals("true"));
     }
 
+    /**
+     * Get an optional Integer value from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional Integer.
+     * @return An Optional containing the Integer value if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<Integer> getOptionalInt(@NotNull String field) {
         return getOptionalString(field).map(Integer::parseInt);
     }
 
+    /**
+     * Get an optional array of Strings from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional String array.
+     * @return An Optional containing the array of Strings if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<String[]> getOptionalStringArray(@NotNull String field) {
         return getOptionalNode(field).map(x -> {
             List<String> array = new LinkedList<>();
@@ -122,6 +188,14 @@ public record ParserContext(@NotNull JsonNode node,
         });
     }
 
+    /**
+     * Get an optional map of String keys and ParserContext values from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional node map.
+     * @return An Optional containing the map of String keys and ParserContext values if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<Map<String, ParserContext>> getOptionalNodeMap(@NotNull String field) {
         return getOptionalNode(field).map(root -> {
             Map<String, ParserContext> map = new HashMap<>();
@@ -135,6 +209,14 @@ public record ParserContext(@NotNull JsonNode node,
         });
     }
 
+    /**
+     * Get an optional list of GuiFunction objects from the child node of the current node
+     * based on the specified field name.
+     *
+     * @param field The field name of the optional functions.
+     * @return An Optional containing the list of GuiFunction objects if found,
+     * or an empty Optional if not present.
+     */
     public @NotNull Optional<List<GuiFunction>> getFunctions(@NotNull String field) {
         return getOptionalNode(field).map(x -> {
             try {
@@ -152,6 +234,6 @@ public record ParserContext(@NotNull JsonNode node,
                 throw new RuntimeException(e);
             }
         });
-
     }
+
 }
