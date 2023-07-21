@@ -6,7 +6,7 @@
 
     <groupId>io.github.toberocat</groupId>
     <artifactId>GuiEngine</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -66,6 +66,12 @@
             <version>${toberocore.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -96,6 +102,10 @@
                                 <relocation>
                                     <pattern>com.fasterxml.jackson</pattern>
                                     <shadedPattern>io.github.toberocat.guiengine.com.fasterxml.jackson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>io.github.toberocat.guiengine.org.bstats</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

@@ -1,0 +1,15 @@
+items:
+  example:
+    name: "§eOpen the example gui"
+    material: "SLIME_BALL"
+    lore:
+      - ""
+      - "§7Click this item to"
+      - "§7open the gui §eexample"
+  my_gui_item:
+    name: "§bA item with special powers"
+    material: "GOLDEN_APPLE"
+    lore:
+      - ""
+      - "§7Click me! I can't get eaten"
+update-checker: true

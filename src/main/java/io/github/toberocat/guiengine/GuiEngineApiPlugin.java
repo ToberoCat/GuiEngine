@@ -21,12 +21,19 @@ import io.github.toberocat.guiengine.function.compute.HasNotPermissionFunction;
 import io.github.toberocat.guiengine.function.compute.HasPermissionFunction;
 import io.github.toberocat.guiengine.interpreter.DefaultInterpreter;
 import io.github.toberocat.guiengine.interpreter.InterpreterManager;
+import io.github.toberocat.guiengine.item.GuiItemManager;
+import io.github.toberocat.guiengine.listeners.ItemClickListener;
+import io.github.toberocat.guiengine.listeners.PlayerJoinListener;
+import io.github.toberocat.guiengine.utils.BStatsCollector;
+import io.github.toberocat.guiengine.utils.UpdateChecker;
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager;
 import io.github.toberocat.toberocore.action.ActionCore;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 /**
  * This class represents the main plugin class for the GuiEngineApi plugin.
@@ -41,6 +48,10 @@ import java.io.File;
  * @since 04/02/2023
  */
 public class GuiEngineApiPlugin extends JavaPlugin {
+    /**
+     * The current version of this plugin
+     */
+    public static boolean LATEST_VERSION = true;
 
     /**
      * The singleton instance of the GuiEngineApiPlugin.
@@ -56,6 +67,7 @@ public class GuiEngineApiPlugin extends JavaPlugin {
      * The manager responsible for managing GUI views.
      */
     private DefaultGuiViewManager guiViewManager;
+    private GuiItemManager guiItemManager;
 
     /**
      * Called when the plugin is enabled. Initializes the plugin and registers necessary components, functions, actions, and commands.
@@ -68,6 +80,7 @@ public class GuiEngineApiPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         instance = this;
 
         createManagers();
@@ -80,6 +93,8 @@ public class GuiEngineApiPlugin extends JavaPlugin {
 
         addDefaultApi();
         registerCommands();
+        checkForUpdate();
+        new BStatsCollector(this);
     }
 
     /**
@@ -110,11 +125,21 @@ public class GuiEngineApiPlugin extends JavaPlugin {
     }
 
     /**
+     * Gets the item manager
+     *
+     * @return The GuiItem Manager
+     */
+    public GuiItemManager getGuiItemManager() {
+        return guiItemManager;
+    }
+
+    /**
      * Creates the manager instances for GUI views and interpreters.
      */
     private void createManagers() {
         guiViewManager = new DefaultGuiViewManager();
         interpreterManager = new InterpreterManager();
+        guiItemManager = new GuiItemManager(getConfig());
     }
 
     /**
@@ -122,30 +147,34 @@ public class GuiEngineApiPlugin extends JavaPlugin {
      * This allows the creation of instances with these components from their respective builders.
      */
     private void registerComponents() {
-        GuiEngineApi.registerSharedFactory(
-                SimpleItemComponent.TYPE,
-                SimpleItemComponent.class,
-                SimpleItemComponentBuilder.class
-        );
+        GuiEngineApi.registerSharedFactory(SimpleItemComponent.TYPE, SimpleItemComponent.class, SimpleItemComponentBuilder.class);
 
-        GuiEngineApi.registerSharedFactory(
-                EmbeddedGuiComponent.TYPE,
-                EmbeddedGuiComponent.class,
-                EmbeddedGuiComponentBuilder.class
-        );
+        GuiEngineApi.registerSharedFactory(EmbeddedGuiComponent.TYPE, EmbeddedGuiComponent.class, EmbeddedGuiComponentBuilder.class);
 
-        GuiEngineApi.registerSharedFactory(
-                ToggleItemComponent.TYPE,
-                ToggleItemComponent.class,
-                ToggleItemComponentBuilder.class
-        );
+        GuiEngineApi.registerSharedFactory(ToggleItemComponent.TYPE, ToggleItemComponent.class, ToggleItemComponentBuilder.class);
 
-        GuiEngineApi.registerSharedFactory(
-                PagedComponent.TYPE,
-                PagedComponent.class,
-                PagedComponentBuilder.class
-        );
+        GuiEngineApi.registerSharedFactory(PagedComponent.TYPE, PagedComponent.class, PagedComponentBuilder.class);
     }
+
+    /**
+     * Checks for updates
+     */
+    private void checkForUpdate() {
+        if (!getConfig().getBoolean("update-checker")) return;
+
+        Pattern pattern = Pattern.compile("[^0-9]");
+        UpdateChecker checker = new UpdateChecker(this, 109983);
+        checker.getVersion(version -> {
+            String latest = pattern.matcher(version).replaceAll("");
+            String current = pattern.matcher(getDescription().getVersion()).replaceAll("");
+            if (latest.equals(current)) return;
+            LATEST_VERSION = false;
+
+            Bukkit.getOnlinePlayers().forEach(PlayerJoinListener::send);
+            Bukkit.getConsoleSender().sendMessage(String.format("§bA newer version of §eGuiEngine§b is available on §espigotmc.org§b. §e%s §b-> §e%s", getDescription().getVersion(), version));
+        });
+    }
+
 
     /**
      * Registers the default functions for GUI interactions to the FunctionProcessor.
@@ -202,5 +231,7 @@ public class GuiEngineApiPlugin extends JavaPlugin {
      */
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(guiViewManager, this);
+        getServer().getPluginManager().registerEvents(new ItemClickListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
     }
 }

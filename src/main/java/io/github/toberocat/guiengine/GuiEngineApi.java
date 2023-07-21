@@ -11,6 +11,7 @@ import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException;
 import io.github.toberocat.guiengine.exception.InvalidGuiComponentException;
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter;
 import io.github.toberocat.guiengine.interpreter.InterpreterManager;
+import io.github.toberocat.guiengine.utils.FileUtils;
 import io.github.toberocat.guiengine.utils.VirtualInventory;
 import io.github.toberocat.guiengine.utils.VirtualPlayer;
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager;
@@ -21,12 +22,14 @@ import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -35,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +56,7 @@ public final class GuiEngineApi {
     public static final @NotNull Map<UUID, GuiContext> LOADED_CONTEXTS = new HashMap<>();
     public static final @NotNull FileFilter DEFAULT_GUI_FILTER = file -> file.getName().endsWith(".gui");
     public static final List<SimpleModule> SHARED_MODULES = new LinkedList<>();
+    public static final Pattern GUI_ID_REGEX = Pattern.compile("[^a-zA-Z_-]", Pattern.MULTILINE);
     public static final Map<String, Class<? extends GuiComponent>> SHARED_COMPONENT_ID_MAPS = new HashMap<>();
 
     private final @NotNull ObjectMapper xmlMapper = new XmlMapper();
@@ -75,6 +80,18 @@ public final class GuiEngineApi {
     }
 
     /**
+     * Constructs a new `GuiEngineApi` instance for the specified plugin.
+     * The ID will be automatically set to the plugin's name, and the gui folder will be the data-folder/guis
+     * <p>
+     * This has the advantage that GuiEngine automatically copies the guis folder from the resources
+     *
+     * @param plugin The plugin this API owns to
+     */
+    public GuiEngineApi(@NotNull JavaPlugin plugin) throws IOException, URISyntaxException {
+        this(plugin.getName(), FileUtils.copyAll(plugin, "guis"));
+    }
+
+    /**
      * Constructs a new `GuiEngineApi` instance with the specified ID, GUI folder, and GUI filter.
      *
      * @param id        The ID for this `GuiEngineApi` instance.
@@ -87,7 +104,7 @@ public final class GuiEngineApi {
         this.plugin = GuiEngineApiPlugin.getPlugin();
         this.availableGuis = new HashSet<>();
         this.xmlMapper.registerModules(SHARED_MODULES);
-        this.id = id;
+        this.id = GUI_ID_REGEX.matcher(id).replaceAll("");
 
         if (!guiFolder.exists() && !guiFolder.mkdirs()) {
             Bukkit.getLogger().severe("Couldn't create gui folder " + guiFolder.getAbsolutePath());
