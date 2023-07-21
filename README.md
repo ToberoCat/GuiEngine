@@ -1,5 +1,6 @@
 # GuiEngine
 [![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://ToberoCat.github.io/GuiEngine/javadoc/)
+[![](https://jitpack.io/v/ToberoCat/GuiEngine.svg)](https://jitpack.io/#ToberoCat/GuiEngine)
 
 ## Developers
 
