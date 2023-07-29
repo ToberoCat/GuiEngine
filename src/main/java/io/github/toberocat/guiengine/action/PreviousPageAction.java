@@ -46,7 +46,7 @@ public class PreviousPageAction extends Action {
     @Override
     public void run(@NotNull Player player) {
         int value = (pagedComponent.getShowingPage() - 1) % pagedComponent.getAvailablePages();
-        if (value < 0) return;
+        if (0 > value) return;
         pagedComponent.setShowingPage(value);
     }
 }

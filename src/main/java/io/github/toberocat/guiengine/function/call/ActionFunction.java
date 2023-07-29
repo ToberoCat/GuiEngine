@@ -33,7 +33,7 @@ public record ActionFunction(@NotNull String action) implements GuiFunction {
     @Override
     public void call(@NotNull GuiEngineApi api, @NotNull GuiContext context) {
         Player viewer = context.viewer();
-        if (viewer == null) return;
+        if (null == viewer) return;
 
         new Actions(action).localActions(context.getLocalActions()).run(viewer);
     }
@@ -43,7 +43,7 @@ public record ActionFunction(@NotNull String action) implements GuiFunction {
      */
     protected static class Deserializer extends JsonDeserializer<ActionFunction> {
         @Override
-        public ActionFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        public @NotNull ActionFunction deserialize(@NotNull JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
             return new ActionFunction(node.get("").textValue());
         }

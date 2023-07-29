@@ -29,7 +29,7 @@ public record ParserContext(@NotNull JsonNode node, @NotNull GuiContext context,
      */
     public @Nullable ParserContext get(String field) {
         JsonNode n = node.get(field);
-        if (n == null) return null;
+        if (null == n) return null;
         return new ParserContext(n, context, api);
     }
 
@@ -154,7 +154,7 @@ public record ParserContext(@NotNull JsonNode node, @NotNull GuiContext context,
      * or an empty Optional if not present.
      */
     public @NotNull Optional<Boolean> getOptionalBoolean(@NotNull String field) {
-        return getOptionalString(field).map(x -> x.equals("true"));
+        return getOptionalString(field).map(x -> "true".equals(x));
     }
 
     /**

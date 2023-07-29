@@ -101,9 +101,9 @@ public final class GuiEngineApi {
     public GuiEngineApi(@NotNull String id, @NotNull File guiFolder, @NotNull FileFilter guiFilter) {
         this.guiFilter = guiFilter;
         this.guiFolder = guiFolder;
-        this.plugin = GuiEngineApiPlugin.getPlugin();
-        this.availableGuis = new HashSet<>();
-        this.xmlMapper.registerModules(SHARED_MODULES);
+        plugin = GuiEngineApiPlugin.getPlugin();
+        availableGuis = new HashSet<>();
+        xmlMapper.registerModules(SHARED_MODULES);
         this.id = GUI_ID_REGEX.matcher(id).replaceAll("");
 
         if (!guiFolder.exists() && !guiFolder.mkdirs()) {
@@ -194,7 +194,7 @@ public final class GuiEngineApi {
     public @NotNull GuiContext openGui(@NotNull Player player, @NotNull String guiId, @NotNull Map<String, String> placeholders) throws GuiNotFoundRuntimeException, GuiIORuntimeException {
         XmlGui xmlGui = loadXmlGui(placeholders, guiId);
         GuiInterpreter interpreter = plugin.getInterpreterManager().getInterpreter(xmlGui.getInterpreter());
-        if (interpreter == null) throw new GuiIORuntimeException("No interpreter found for " + xmlGui.getInterpreter());
+        if (null == interpreter) throw new GuiIORuntimeException("No interpreter found for " + xmlGui.getInterpreter());
 
         GuiContext context = interpreter.loadContent(this, player, xmlGui);
         interpreter.getRenderEngine().showGui(context, player, placeholders);
@@ -293,7 +293,7 @@ public final class GuiEngineApi {
     private @NotNull List<File> listGuis(@NotNull File folder) {
         File[] files = folder.listFiles();
         List<File> guis = new LinkedList<>();
-        if (files == null) return guis;
+        if (null == files) return guis;
 
         for (File file : files) {
             if (file.isDirectory()) {
@@ -326,7 +326,7 @@ public final class GuiEngineApi {
 
             now = System.currentTimeMillis();
             GuiInterpreter interpreter = plugin.getInterpreterManager().getInterpreter(xmlGui.getInterpreter());
-            if (interpreter == null)
+            if (null == interpreter)
                 throw new GuiIORuntimeException("No interpreter found for " + xmlGui.getInterpreter());
             GuiContext context = interpreter.loadContent(this, virtualPlayer, xmlGui);
 
@@ -351,7 +351,7 @@ public final class GuiEngineApi {
 
             try {
                 @Nullable Exception exception = renderTask.get(1, TimeUnit.SECONDS);
-                if (exception != null) throw exception;
+                if (null != exception) throw exception;
                 delta = System.currentTimeMillis() - now;
                 logger.log(Level.FINE, "Took %dms rendering to a virtual player %s", new Object[]{delta, gui});
 

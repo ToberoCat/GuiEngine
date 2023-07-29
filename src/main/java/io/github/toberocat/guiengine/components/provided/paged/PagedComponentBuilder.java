@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @author Tobias Madlberger (Tobias)
  */
 public class PagedComponentBuilder extends EmbeddedGuiComponentBuilder<PagedComponentBuilder> {
-    private int showingPage = 0;
+    private int showingPage;
     private int[] pattern = new int[0];
     private @Nullable ParserContext parent;
 
@@ -56,14 +56,14 @@ public class PagedComponentBuilder extends EmbeddedGuiComponentBuilder<PagedComp
 
     @Override
     public @NotNull PagedComponent createComponent() {
-        assert parent != null;
-        assert targetGui != null;
+        assert null != parent;
+        assert null != targetGui;
         return new PagedComponent(x, y, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden, targetGui, copyAir, interactions, parent, pattern, showingPage);
     }
 
     @Override
     public void deserialize(@NotNull ParserContext node) throws IOException {
-        super.deserialize(node, false);
+        deserialize(node, false);
         setShowingPage(node.getOptionalInt("showing-page").orElse(0));
         setParent(node);
         setPattern(node.getOptionalString("pattern").map(x -> Arrays.stream(x.split(","))

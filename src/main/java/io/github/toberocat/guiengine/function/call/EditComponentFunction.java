@@ -43,7 +43,7 @@ public record EditComponentFunction(@NotNull String target, @NotNull String prop
     protected static class Deserializer extends JsonDeserializer<EditComponentFunction> {
 
         @Override
-        public EditComponentFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        public @NotNull EditComponentFunction deserialize(@NotNull JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
             return new EditComponentFunction(new ParserContext(node, null, null).getOptionalString("target").orElseThrow(), new ParserContext(node, null, null).getOptionalString("attribute").orElseThrow(), new ParserContext(node, null, null).getOptionalString("set-value").orElseThrow());
         }

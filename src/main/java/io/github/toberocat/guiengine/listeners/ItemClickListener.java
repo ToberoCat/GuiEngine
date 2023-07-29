@@ -26,15 +26,15 @@ public class ItemClickListener implements Listener {
     @EventHandler
     private void click(@NotNull PlayerInteractEvent event) {
         ItemStack stack = event.getItem();
-        if (stack == null) return;
+        if (null == stack) return;
 
         String apiId = ItemUtils.getPersistent(stack, GiveCommand.API_NAME_KEY, PersistentDataType.STRING);
         String guiId = ItemUtils.getPersistent(stack, GiveCommand.GUI_ID_KEY, PersistentDataType.STRING);
 
-        if (apiId == null || guiId == null) return;
+        if (null == apiId || null == guiId) return;
 
         GuiEngineApi api = GuiEngineApi.APIS.get(apiId);
-        if (api == null) return;
+        if (null == api) return;
 
         event.setCancelled(true);
         api.openGui(event.getPlayer(), guiId);

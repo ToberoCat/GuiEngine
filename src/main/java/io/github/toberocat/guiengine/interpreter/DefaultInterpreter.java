@@ -59,7 +59,7 @@ public class DefaultInterpreter implements GuiInterpreter {
 
         for (XmlComponent component : xmlGui.getComponents()) {
             GuiComponent guiComponent = createComponent(component, api, context);
-            if (guiComponent == null) continue;
+            if (null == guiComponent) continue;
             context.components().add(guiComponent);
         }
 
@@ -82,7 +82,7 @@ public class DefaultInterpreter implements GuiInterpreter {
         map.put("__:ctx:__", context.getContextId());
 
         Class<? extends GuiComponent> componentClass = api.getComponentIdMap().get(xmlComponent.type());
-        if (componentClass == null)
+        if (null == componentClass)
             throw new InvalidGuiComponentException(String.format("Type %s isn't recognized as a component", xmlComponent.type()));
         return bindComponent(api.getXmlMapper().convertValue(map, componentClass), api, context);
     }

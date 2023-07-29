@@ -2,10 +2,12 @@ package io.github.toberocat.guiengine.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
@@ -34,10 +36,10 @@ public class UpdateChecker {
      *
      * @param consumer A consumer that will receive the latest version information as a String.
      */
-    public void getVersion(final Consumer<String> consumer) {
+    public void getVersion(final @NotNull Consumer<String> consumer) {
         // Run the version check task asynchronously to avoid blocking the main thread.
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-            try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream(); Scanner scanner = new Scanner(inputStream)) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId).openStream(); Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8)) {
                 // The API returns the latest version as a single line of text.
                 if (scanner.hasNext()) {
                     consumer.accept(scanner.next());

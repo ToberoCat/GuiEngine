@@ -25,7 +25,7 @@ public class InterpreterManager {
      * Creates a new InterpreterManager with an empty interpreter map.
      */
     public InterpreterManager() {
-        this.interpreterMap = new HashMap<>();
+        interpreterMap = new HashMap<>();
     }
 
     /**

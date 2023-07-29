@@ -47,7 +47,7 @@ public class GuiComponentDeserializer<C extends GuiComponent, B extends GuiCompo
      * @throws IOException If an I/O error occurs during JSON parsing.
      */
     @Override
-    public C deserialize(JsonParser p, DeserializationContext deserializationContext) throws IOException {
+    public @NotNull C deserialize(@NotNull JsonParser p, DeserializationContext deserializationContext) throws IOException {
         B builder;
         try {
             builder = builderClazz.getConstructor().newInstance();

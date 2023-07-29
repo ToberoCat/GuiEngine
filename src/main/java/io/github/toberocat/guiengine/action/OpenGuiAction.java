@@ -35,13 +35,13 @@ public class OpenGuiAction extends Action {
      * @param args   The arguments passed to the action. The first argument is expected to be the API ID, and the second argument is the GUI ID.
      */
     @Override
-    public void run(@NotNull Player player, @NotNull String[] args) {
-        if (args.length != 2) return;
+    public void run(@NotNull Player player, @NotNull String @NotNull [] args) {
+        if (2 != args.length) return;
 
         String apiId = args[0];
         String guiId = args[1];
         GuiEngineApi api = GuiEngineApi.APIS.get(apiId);
-        if (api == null) return;
+        if (null == api) return;
 
         try {
             api.openGui(player, guiId);

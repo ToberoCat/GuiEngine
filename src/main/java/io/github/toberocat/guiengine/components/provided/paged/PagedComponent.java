@@ -69,7 +69,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
         this.parent = parent;
         this.pattern = pattern;
         this.showingPage = showingPage;
-        this.pages = new ArrayList<>();
+        pages = new ArrayList<>();
     }
 
     @Override
@@ -94,8 +94,8 @@ public class PagedComponent extends EmbeddedGuiComponent {
             createPage(page);
         }
 
-        assert context != null;
-        assert api != null;
+        assert null != context;
+        assert null != api;
         emptyFill = JsonUtils.getOptionalNode(parent, "fill-empty").map(x -> {
             try {
                 return context.interpreter().createComponent(context.interpreter().xmlComponent(x.node(), api), api, context);
@@ -132,17 +132,18 @@ public class PagedComponent extends EmbeddedGuiComponent {
      * @param component The component to add.
      */
     public void addComponent(@NotNull GuiComponent component) {
-        assert api != null;
+        assert null != api;
 
         GuiContext page = pages.get(pages.size() - 1);
-        int slot = pattern[currentPatternIndex++];
+        int slot = pattern[currentPatternIndex];
+        currentPatternIndex++;
 
         CoordinatePair pair = Utils.translateFromSlot(slot);
         component.setOffsetX(pair.x());
         component.setOffsetY(pair.y());
         page.add(api, component);
 
-        embedded = this.pages.get(showingPage);
+        embedded = pages.get(showingPage);
         if (currentPatternIndex < pattern.length) return;
         currentPatternIndex = 0;
         addPage(createEmptyPage());
@@ -154,7 +155,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
      * @return The created empty page.
      */
     private @NotNull GuiContext createEmptyPage() {
-        assert context != null;
+        assert null != context;
         GuiContext page = new GuiContext(context.interpreter(), "Page " + pages.size(), width, height);
         page.setInventory(context.inventory());
         page.setViewer(context.viewer());
@@ -169,7 +170,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
 
     @Override
     public void render(@NotNull Player viewer, @NotNull ItemStack[][] buffer) {
-        if (emptyFill != null) {
+        if (null != emptyFill) {
             for (int slot : pattern) {
                 CoordinatePair pair = Utils.translateFromSlot(slot);
                 emptyFill.setOffsetX(offsetX + pair.x());
@@ -182,7 +183,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
 
     @Override
     public void addActions(@NotNull Set<Action> actions) {
-        if (context == null || api == null) return;
+        if (null == context || null == api) return;
         actions.add(new NextPageAction(this));
         actions.add(new PreviousPageAction(this));
     }
@@ -194,11 +195,11 @@ public class PagedComponent extends EmbeddedGuiComponent {
      * @throws IllegalArgumentException If the specified page is not within the valid bounds.
      */
     public void setShowingPage(int page) {
-        if (page < 0 || page >= this.pages.size()) throw new IllegalArgumentException("Page not in valid bounds");
-        this.showingPage = page;
-        embedded = this.pages.get(showingPage);
+        if (0 > page || page >= pages.size()) throw new IllegalArgumentException("Page not in valid bounds");
+        showingPage = page;
+        embedded = pages.get(showingPage);
 
-        if (context == null) return;
+        if (null == context) return;
 
         context.render();
     }
@@ -238,15 +239,15 @@ public class PagedComponent extends EmbeddedGuiComponent {
      * @throws JsonProcessingException If there is an error while processing the JSON data.
      */
     private void parseComponents(@NotNull ParserContext parent, @NotNull Consumer<GuiComponent> addToPage) throws JsonProcessingException {
-        assert context != null;
-        assert api != null;
+        assert null != context;
+        assert null != api;
 
         List<ParserContext> components = parent.getOptionalFieldList("component").orElse(new ArrayList<>());
         for (ParserContext component : components) {
             XmlComponent xml = context.interpreter().xmlComponent(component.node(), api);
             GuiComponent guiComponent = context.interpreter().createComponent(xml, api, context);
 
-            if (guiComponent == null) continue;
+            if (null == guiComponent) continue;
             addToPage.accept(guiComponent);
         }
     }
@@ -257,7 +258,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
      * @param pageNode The parser context representing the page data.
      */
     private void createPage(@NotNull ParserContext pageNode) {
-        assert api != null;
+        assert null != api;
 
         int position = pageNode.getOptionalInt("position").orElse(pages.size() - 1);
         GuiContext page = createEmptyPage();

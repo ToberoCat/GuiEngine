@@ -22,7 +22,7 @@ public class JsonUtils {
      * @param array The Object array to write into the JSON array.
      * @throws IOException If an I/O error occurs during the writing process.
      */
-    public static void writeArray(@NotNull GeneratorContext gen, @NotNull String field, @NotNull Object[] array) throws IOException {
+    public static void writeArray(@NotNull GeneratorContext gen, @NotNull String field, @NotNull Object @NotNull [] array) throws IOException {
         JsonGenerator generator = gen.generator();
         generator.writeArrayFieldStart(field);
         for (Object element : array)
@@ -38,7 +38,7 @@ public class JsonUtils {
      * @param array The int array to write into the JSON array.
      * @throws IOException If an I/O error occurs during the writing process.
      */
-    public static void writeArray(@NotNull GeneratorContext gen, @NotNull String field, int[] array) throws IOException {
+    public static void writeArray(@NotNull GeneratorContext gen, @NotNull String field, int @NotNull [] array) throws IOException {
         JsonGenerator generator = gen.generator();
         generator.writeArrayFieldStart(field);
         for (int element : array)

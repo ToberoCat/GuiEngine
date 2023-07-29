@@ -88,8 +88,8 @@ public class SimpleItemComponentBuilder<B extends SimpleItemComponentBuilder<B>>
      * @return The item-stack
      */
     protected @NotNull ItemStack getItemStack() {
-        if (material != null) return ItemUtils.createItem(material, name, 1, lore);
-        return textureId != null ? ItemUtils.createHead(textureId, name, 1, lore) : owner != null ? ItemUtils.createSkull(Bukkit.getOfflinePlayer(owner), 1, name, lore) : ItemUtils.createItem(Material.PLAYER_HEAD, name, 1, lore);
+        if (null != material) return ItemUtils.createItem(material, name, 1, lore);
+        return null != textureId ? ItemUtils.createHead(textureId, name, 1, lore) : null != owner ? ItemUtils.createSkull(Bukkit.getOfflinePlayer(owner), 1, name, lore) : ItemUtils.createItem(Material.PLAYER_HEAD, name, 1, lore);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class SimpleItemComponentBuilder<B extends SimpleItemComponentBuilder<B>>
 
         String texture = node.getOptionalString("head-texture").map(String::trim).orElse(null);
         UUID headOwner = node.getOptionalUUID("head-owner").orElse(null);
-        if (texture != null || headOwner != null) {
+        if (null != texture || null != headOwner) {
             setOwner(headOwner);
             setTextureId(texture);
         } else {

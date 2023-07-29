@@ -46,8 +46,8 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
     private final @NotNull List<GuiComponent> components;
     private final @NotNull Set<Action> localActions;
     private final @NotNull UUID contextId;
-    private Inventory inventory;
-    private Player viewer;
+    private @Nullable Inventory inventory;
+    private @Nullable Player viewer;
 
     /**
      * Constructs a new `GuiContext` with the provided interpreter, title, width, and height.
@@ -62,9 +62,9 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
         this.title = title;
         this.width = width;
         this.height = height;
-        this.components = new ArrayList<>();
-        this.localActions = new HashSet<>();
-        this.contextId = UUID.randomUUID();
+        components = new ArrayList<>();
+        localActions = new HashSet<>();
+        contextId = UUID.randomUUID();
         GuiEngineApi.LOADED_CONTEXTS.put(contextId, this);
     }
 
@@ -129,7 +129,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
     public void editXmlComponentById(@NotNull GuiEngineApi api, @NotNull String id, @NotNull Consumer<XmlComponent> editCallback) {
         GuiComponent component = findComponentById(id);
         int index = components.indexOf(component);
-        if (component == null || index < 0) return;
+        if (null == component || 0 > index) return;
 
         XmlComponent xml = interpreter().componentToXml(api, component);
         editCallback.accept(xml);
@@ -164,7 +164,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
      * @param api        The `GuiEngineApi` associated with the XML components.
      * @param components The XML components to add.
      */
-    public void add(@NotNull GuiEngineApi api, @NotNull XmlComponent... components) {
+    public void add(@NotNull GuiEngineApi api, @NotNull XmlComponent @NotNull ... components) {
         for (XmlComponent component : components) {
             this.components.add(interpreter().createComponent(component, api, this));
         }
@@ -322,10 +322,10 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
      * @return `true` if the objects are equal, otherwise `false`.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (null == o || getClass() != o.getClass()) return false;
 
         GuiContext that = (GuiContext) o;
 

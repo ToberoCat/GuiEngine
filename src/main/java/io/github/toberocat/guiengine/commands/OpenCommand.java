@@ -46,15 +46,15 @@ public class OpenCommand extends PlayerSubCommand {
      * @throws CommandExceptions If an error occurs during command execution.
      */
     @Override
-    protected boolean runPlayer(@NotNull Player player, @NotNull String[] args) throws CommandExceptions {
-        if (args.length == 0) throw new CommandExceptions("This command needs a GUI ID provided");
+    protected boolean runPlayer(@NotNull Player player, @NotNull String @NotNull [] args) throws CommandExceptions {
+        if (0 == args.length) throw new CommandExceptions("This command needs a GUI ID provided");
 
         try {
             String apiId = args[0];
             String guiId = args[1];
 
             GuiEngineApi api = GuiEngineApi.APIS.get(apiId);
-            if (api == null) {
+            if (null == api) {
                 player.sendMessage("§cNo API found with ID " + apiId);
                 return false;
             }
@@ -74,10 +74,10 @@ public class OpenCommand extends PlayerSubCommand {
      * @return A list of available API IDs or GUI IDs for tab completion.
      */
     @Override
-    protected @Nullable List<String> runPlayerTab(@NotNull Player player, @NotNull String[] args) {
-        if (args.length <= 1) return GuiEngineApi.APIS.keySet().stream().toList();
+    protected @Nullable List<String> runPlayerTab(@NotNull Player player, @NotNull String @NotNull [] args) {
+        if (1 >= args.length) return GuiEngineApi.APIS.keySet().stream().toList();
         GuiEngineApi api = GuiEngineApi.APIS.get(args[0]);
-        if (api == null) {
+        if (null == api) {
             player.sendMessage("§cNo API found with ID " + args[0]);
             return Collections.emptyList();
         }

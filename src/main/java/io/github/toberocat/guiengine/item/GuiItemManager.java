@@ -30,10 +30,10 @@ public class GuiItemManager {
      */
     public GuiItemManager(@NotNull FileConfiguration config) {
         ConfigurationSection section = config.getConfigurationSection("items");
-        if (section == null) return;
+        if (null == section) return;
         for (String key : section.getKeys(false)) {
             ConfigurationSection itemSection = section.getConfigurationSection(key);
-            if (itemSection == null) continue;
+            if (null == itemSection) continue;
 
             knownItems.put(key, ItemCore.create(itemSection));
         }

@@ -37,7 +37,7 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
      */
     public static final String TYPE = "toggle";
     private final ParserContext options;
-    private @Nullable GuiComponent[] selectionModel;
+    private @Nullable GuiComponent @Nullable [] selectionModel;
     private @NotNull String[] valueSelectionModel;
     private int selected;
 
@@ -66,8 +66,8 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
     @Override
     public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         super.serialize(gen, serializers);
-        gen.writePOJOField("option", getOptions());
-        gen.writeNumberField("selected", getSelected());
+        gen.writePOJOField("option", options);
+        gen.writeNumberField("selected", selected);
     }
 
     @Override
@@ -80,8 +80,8 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
      *
      * @return The selection model as an array of GuiComponents.
      */
-    private @NotNull GuiComponent[] createSelectionModel() {
-        if (context == null || api == null) return null;
+    private GuiComponent @Nullable [] createSelectionModel() {
+        if (null == context || null == api) return null;
 
         List<ParserContext> nodes = options.getFieldList();
         List<GuiComponent> components = new ArrayList<>();
@@ -106,7 +106,7 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
         super.clickedComponent(event);
 
         selected = (selected + 1) % selectionModel.length;
-        if (context == null) return;
+        if (null == context) return;
 
         context.render();
     }
@@ -117,7 +117,7 @@ public class ToggleItemComponent extends AbstractGuiComponent implements Selecta
     }
 
     @Override
-    public void render(@NotNull Player viewer, @NotNull ItemStack[][] inventory) {
+    public void render(@NotNull Player viewer, @NotNull ItemStack[] @NotNull [] inventory) {
         ItemStack[][] virtualInventory = new ItemStack[1][1];
         selectionModel[selected].render(viewer, virtualInventory);
         inventory[offsetY][offsetX] = virtualInventory[0][0];

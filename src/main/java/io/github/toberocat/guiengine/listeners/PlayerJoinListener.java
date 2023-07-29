@@ -22,7 +22,7 @@ public class PlayerJoinListener implements Listener {
      * @param event The PlayerJoinEvent to handle.
      */
     @EventHandler
-    private void join(PlayerJoinEvent event) {
+    private void join(@NotNull PlayerJoinEvent event) {
         Player player = event.getPlayer();
         send(player);
     }

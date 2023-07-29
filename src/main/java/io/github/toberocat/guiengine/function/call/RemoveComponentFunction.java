@@ -42,7 +42,7 @@ public record RemoveComponentFunction(@NotNull String target) implements GuiFunc
     protected static class Deserializer extends JsonDeserializer<RemoveComponentFunction> {
 
         @Override
-        public RemoveComponentFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        public @NotNull RemoveComponentFunction deserialize(@NotNull JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
             return new RemoveComponentFunction(new ParserContext(node, null, null).getOptionalString("target").orElseThrow());
         }

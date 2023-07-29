@@ -69,7 +69,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     @Override
     public void onViewInit(@NotNull Map<String, String> placeholders) {
-        if (context == null || api == null || context.viewer() == null) return;
+        if (null == context || null == api || null == context.viewer()) return;
 
         embedded = context.interpreter().loadContent(api, context.viewer(), api.loadXmlGui(placeholders, targetGui));
         embedded.setInventory(new VirtualInventory(height, () -> context.render()));
@@ -79,7 +79,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
         super.clickedComponent(event);
-        if (!interactions || embedded == null) return;
+        if (!interactions || null == embedded) return;
         InventoryClickEvent fakedEvent = new InventoryClickEvent(event.getView(), event.getSlotType(), event.getSlot() - Utils.translateToSlot(offsetX, offsetY), event.getClick(), event.getAction(), event.getHotbarButton());
         embedded.clickedComponent(fakedEvent);
     }
@@ -87,7 +87,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     @Override
     public void draggedComponent(@NotNull InventoryDragEvent event) {
         super.draggedComponent(event);
-        if (!interactions || embedded == null) return;
+        if (!interactions || null == embedded) return;
         // ToDo: Fake the event (offset the slot to be originated at zero)
         embedded.draggedComponent(event);
     }
@@ -95,7 +95,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     @Override
     public void closedComponent(@NotNull InventoryCloseEvent event) {
         super.closedComponent(event);
-        if (!interactions || embedded == null) return;
+        if (!interactions || null == embedded) return;
         embedded.closedComponent(event);
     }
 
@@ -106,7 +106,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
 
     @Override
     public void render(@NotNull Player viewer, @NotNull ItemStack[][] buffer) {
-        if (context == null || api == null || embedded == null) return;
+        if (null == context || null == api || null == embedded) return;
 
         ItemStack[][] virtualInventory = new ItemStack[embedded.height()][embedded.width()];
         context.interpreter().getRenderEngine().renderGui(virtualInventory, embedded, viewer);
@@ -115,7 +115,7 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
         for (int y = 0; y < Math.min(context.height() - offsetY, embedded.height()); y++) {
             for (int x = 0; x < width; x++) {
                 ItemStack item = virtualInventory[y][x];
-                if (copyAir || (item != null && item.getType() != Material.AIR))
+                if (copyAir || (null != item && Material.AIR != item.getType()))
                     buffer[y + offsetY][x + offsetX] = item;
             }
         }

@@ -58,12 +58,12 @@ public class FileUtils {
      * @throws URISyntaxException If the plugin's root URL cannot be converted to a URI.
      * @throws IOException        If an I/O error occurs while listing the files and directories.
      */
-    public static List<Path> list(@NotNull JavaPlugin plugin, @NotNull String root) throws URISyntaxException, IOException {
+    public static @NotNull List<Path> list(@NotNull JavaPlugin plugin, @NotNull String root) throws URISyntaxException, IOException {
         java.net.URL url = plugin.getClass().getResource("/" + root);
-        if (url == null) return Collections.emptyList();
+        if (null == url) return Collections.emptyList();
         java.net.URI uri = url.toURI();
         Path myPath;
-        if (uri.getScheme().equals("jar")) {
+        if ("jar".equals(uri.getScheme())) {
             try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
                 myPath = fileSystem.getPath("/" + root);
             } catch (FileSystemAlreadyExistsException e) {
@@ -91,7 +91,7 @@ public class FileUtils {
      */
     public static void copyResource(@NotNull JavaPlugin plugin, @NotNull String res) throws IOException {
         InputStream src = plugin.getClass().getResourceAsStream("/" + res);
-        if (src == null) return;
+        if (null == src) return;
         File file = new File(plugin.getDataFolder(), res);
         if (!file.exists()) file.mkdirs();
         else return;

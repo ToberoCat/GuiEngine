@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class SimpleItemComponent extends AbstractGuiComponent {
     public static final @NotNull String TYPE = "item";
-    protected final ItemStack stack;
+    protected final @NotNull ItemStack stack;
 
     /**
      * Constructor for SimpleItemComponent.
@@ -49,14 +49,14 @@ public class SimpleItemComponent extends AbstractGuiComponent {
         gen.writeStringField("material", stack.getType().name());
 
         ItemMeta meta = stack.getItemMeta();
-        if (meta == null) return;
+        if (null == meta) return;
 
         gen.writeStringField("name", meta.getDisplayName());
-        if (meta.getLore() != null) JsonUtils.writeArray(gen, "lore", meta.getLore().toArray());
+        if (null != meta.getLore()) JsonUtils.writeArray(gen, "lore", meta.getLore().toArray());
 
         if (!(meta instanceof SkullMeta skullMeta)) return;
 
-        if (skullMeta.getOwningPlayer() == null) return;
+        if (null == skullMeta.getOwningPlayer()) return;
 
         gen.writeStringField("head-owner", skullMeta.getOwningPlayer().getUniqueId().toString());
     }
@@ -68,7 +68,7 @@ public class SimpleItemComponent extends AbstractGuiComponent {
 
     @Override
     public void render(@NotNull Player viewer, @NotNull ItemStack[][] inventory) {
-        if (context == null || api == null) return;
+        if (null == context || null == api) return;
         inventory[offsetY][offsetX] = stack;
     }
 }

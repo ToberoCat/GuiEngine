@@ -26,7 +26,7 @@ public class HasNotPermissionFunction implements ComputeFunction {
     @Override
     public @NotNull String compute(@NotNull GuiEngineApi api, @NotNull GuiContext context, @NotNull String value) {
         String permission = value.replace(PREFIX, "");
-        return String.valueOf(context.viewer() == null || !context.viewer().hasPermission(permission));
+        return String.valueOf(null == context.viewer() || !context.viewer().hasPermission(permission));
     }
 
     /**

@@ -63,7 +63,7 @@ public record AddComponentsFunction(@NotNull JsonNode root) implements GuiFuncti
     protected static class Deserializer extends JsonDeserializer<AddComponentsFunction> {
 
         @Override
-        public AddComponentsFunction deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        public @NotNull AddComponentsFunction deserialize(@NotNull JsonParser p, DeserializationContext ctxt) throws IOException {
             return new AddComponentsFunction(p.getCodec().readTree(p));
         }
     }

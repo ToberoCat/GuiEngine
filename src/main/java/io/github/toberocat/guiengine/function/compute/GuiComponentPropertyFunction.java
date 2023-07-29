@@ -29,11 +29,11 @@ public class GuiComponentPropertyFunction implements ComputeFunction {
     public @NotNull String compute(@NotNull GuiEngineApi api, @NotNull GuiContext context, @NotNull String value) {
         String without = value.replace(PREFIX, "");
         String[] split = without.split("\\.");
-        if (split.length != 2) return "REQUIRES FORMAT {#id.method}";
+        if (2 != split.length) return "REQUIRES FORMAT {#id.method}";
         String id = split[0];
         String methodName = split[1];
         GuiComponent component = context.findComponentById(id);
-        if (component == null) return "NO COMPONENT FOUND";
+        if (null == component) return "NO COMPONENT FOUND";
 
         try {
             return component.getClass().getMethod(methodName).invoke(component).toString();

@@ -22,9 +22,9 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
 
     protected @NotNull RenderPriority priority = RenderPriority.NORMAL;
     protected @NotNull String id = UUID.randomUUID().toString();
-    protected int x = 0;
-    protected int y = 0;
-    protected boolean hidden = false;
+    protected int x;
+    protected int y;
+    protected boolean hidden;
 
     protected @NotNull List<GuiFunction> clickFunctions = new ArrayList<>();
     protected @NotNull List<GuiFunction> dragFunctions = new ArrayList<>();
@@ -36,7 +36,7 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
      * @param priority The RenderPriority to set.
      * @return The builder instance.
      */
-    public @NotNull B setPriority(RenderPriority priority) {
+    public @NotNull B setPriority(@NotNull RenderPriority priority) {
         this.priority = priority;
         return self();
     }
@@ -47,7 +47,7 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
      * @param id The ID to set.
      * @return The builder instance.
      */
-    public @NotNull B setId(String id) {
+    public @NotNull B setId(@NotNull String id) {
         this.id = id;
         return self();
     }
@@ -91,7 +91,7 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
      * @param clickFunctions The list of click functions to set.
      * @return The builder instance.
      */
-    public @NotNull B setClickFunctions(List<GuiFunction> clickFunctions) {
+    public @NotNull B setClickFunctions(@NotNull List<GuiFunction> clickFunctions) {
         this.clickFunctions = clickFunctions;
         return self();
     }
@@ -102,7 +102,7 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
      * @param dragFunctions The list of drag functions to set.
      * @return The builder instance.
      */
-    public @NotNull B setDragFunctions(List<GuiFunction> dragFunctions) {
+    public @NotNull B setDragFunctions(@NotNull List<GuiFunction> dragFunctions) {
         this.dragFunctions = dragFunctions;
         return self();
     }
@@ -113,7 +113,7 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
      * @param closeFunctions The list of close functions to set.
      * @return The builder instance.
      */
-    public @NotNull B setCloseFunctions(List<GuiFunction> closeFunctions) {
+    public @NotNull B setCloseFunctions(@NotNull List<GuiFunction> closeFunctions) {
         this.closeFunctions = closeFunctions;
         return self();
     }
@@ -151,7 +151,7 @@ public abstract class AbstractGuiComponentBuilder<B extends AbstractGuiComponent
      * @return The builder instance.
      */
     @SuppressWarnings("unchecked")
-    protected final B self() {
+    protected final @NotNull B self() {
         return (B) this;
     }
 }

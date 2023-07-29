@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -158,7 +159,7 @@ public class XmlGui {
      * @return A string representation of the XmlGui object.
      */
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return "XmlGui{" + "title='" + title + '\'' + ", interpreter='" + interpreter + '\'' + ", width=" + width + ", height=" + height + ", components=" + Arrays.toString(components) + '}';
     }
 }

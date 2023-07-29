@@ -34,15 +34,15 @@ public class DumpCommand extends OpenCommand {
      * @throws CommandExceptions If an error occurs during command execution.
      */
     @Override
-    protected boolean runPlayer(@NotNull Player player, @NotNull String[] args) throws CommandExceptions {
-        if (args.length == 0) throw new CommandExceptions("This command needs a GUI ID provided");
+    protected boolean runPlayer(@NotNull Player player, @NotNull String @NotNull [] args) throws CommandExceptions {
+        if (0 == args.length) throw new CommandExceptions("This command needs a GUI ID provided");
 
         try {
             String apiId = args[0];
             String guiId = args[1];
 
             GuiEngineApi api = GuiEngineApi.APIS.get(apiId);
-            if (api == null) {
+            if (null == api) {
                 player.sendMessage("§cNo API found with ID " + apiId);
                 return false;
             }

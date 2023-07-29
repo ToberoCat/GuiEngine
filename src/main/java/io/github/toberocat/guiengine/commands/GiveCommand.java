@@ -38,14 +38,14 @@ public class GiveCommand extends SubCommand {
     }
 
     @Override
-    protected boolean run(@NotNull CommandSender sender, @NotNull String[] args) throws CommandExceptions {
-        if (args.length < 3)
+    protected boolean run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) throws CommandExceptions {
+        if (3 > args.length)
             throw new CommandExceptions("You need to give this command four arguments: §6/guiengine give <item> <api> <gui> <player>§c. The last one is optional");
         ItemStack stack = plugin.getGuiItemManager().getItem(args[0]);
-        if (stack == null) throw new CommandExceptions("The item §6'" + args[0] + "'§c can't be found");
+        if (null == stack) throw new CommandExceptions("The item §6'" + args[0] + "'§c can't be found");
 
         GuiEngineApi api = GuiEngineApi.APIS.get(args[1]);
-        if (api == null) throw new CommandExceptions("§cNo API found with ID " + args[1]);
+        if (null == api) throw new CommandExceptions("§cNo API found with ID " + args[1]);
 
         String guiId = args[2];
         if (!api.getAvailableGuis().contains(guiId))
@@ -53,8 +53,8 @@ public class GiveCommand extends SubCommand {
 
         Player target = null;
         if (sender instanceof Player player) target = player;
-        if (args.length == 4) target = Bukkit.getPlayer(args[3]);
-        if (target == null) throw new CommandExceptions("Player not found");
+        if (4 == args.length) target = Bukkit.getPlayer(args[3]);
+        if (null == target) throw new CommandExceptions("Player not found");
 
 
         stack = new ItemBuilder(stack.clone())
@@ -70,17 +70,17 @@ public class GiveCommand extends SubCommand {
     }
 
     @Override
-    protected @Nullable List<String> runTab(@NotNull CommandSender player, @NotNull String[] args) {
-        if (args.length <= 1) return new ArrayList<>(plugin.getGuiItemManager().getKnownItems().keySet());
-        if (args.length == 2) return GuiEngineApi.APIS.keySet().stream().toList();
+    protected @Nullable List<String> runTab(@NotNull CommandSender player, @NotNull String @NotNull [] args) {
+        if (1 >= args.length) return new ArrayList<>(plugin.getGuiItemManager().getKnownItems().keySet());
+        if (2 == args.length) return GuiEngineApi.APIS.keySet().stream().toList();
 
         GuiEngineApi api = GuiEngineApi.APIS.get(args[1]);
-        if (api == null) {
+        if (null == api) {
             player.sendMessage("§cNo API found with ID " + args[1]);
             return Collections.emptyList();
         }
 
-        if (args.length == 3) return api.getAvailableGuis().stream().toList();
+        if (3 == args.length) return api.getAvailableGuis().stream().toList();
         return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).toList();
     }
 }

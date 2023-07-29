@@ -21,7 +21,7 @@ public class GuiEngineEvent extends Event {
      *
      * @return The `HandlerList` for this event.
      */
-    public static HandlerList getHandlerList() {
+    public static @NotNull HandlerList getHandlerList() {
         return HANDLERS;
     }
 
@@ -48,6 +48,6 @@ public class GuiEngineEvent extends Event {
     @NotNull
     @Override
     public HandlerList getHandlers() {
-        return getHandlerList();
+        return HANDLERS;
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.toberocat.guiengine.render.RenderPriority;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class ComponentDeserializer extends JsonDeserializer<XmlComponent> {
      * @throws IOException If an I/O error occurs during JSON parsing.
      */
     @Override
-    public XmlComponent deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public @NotNull XmlComponent deserialize(@NotNull JsonParser p, DeserializationContext ctxt) throws IOException {
         Map<String, JsonNode> data = new HashMap<>();
         JsonNode node = p.getCodec().readTree(p);
 
@@ -52,7 +53,7 @@ public class ComponentDeserializer extends JsonDeserializer<XmlComponent> {
         }
 
         JsonNode id = node.get("id");
-        String componentId = id == null ? UUID.randomUUID().toString() : id.textValue();
+        String componentId = null == id ? UUID.randomUUID().toString() : id.textValue();
 
         return new XmlComponent(data, priority, type, componentId);
     }

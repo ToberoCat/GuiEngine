@@ -19,7 +19,7 @@ public record GeneratorContext(@NotNull JsonGenerator generator) {
      * @return The JsonGenerator instance.
      */
     @Override
-    public JsonGenerator generator() {
+    public @NotNull JsonGenerator generator() {
         return generator;
     }
 

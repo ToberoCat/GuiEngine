@@ -78,7 +78,7 @@ public class EmbeddedGuiComponentBuilder<B extends EmbeddedGuiComponentBuilder<B
 
     @Override
     public @NotNull EmbeddedGuiComponent createComponent() {
-        assert targetGui != null;
+        assert null != targetGui;
         return new EmbeddedGuiComponent(x, y, width, height, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden, targetGui, copyAir, interactions);
     }
 

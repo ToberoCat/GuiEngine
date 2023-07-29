@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import io.github.toberocat.guiengine.components.GuiComponent;
 import io.github.toberocat.guiengine.utils.GeneratorContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -37,7 +38,7 @@ public class GuiComponentSerializer<C extends GuiComponent> extends StdSerialize
      * @throws IOException If an I/O error occurs during JSON generation.
      */
     @Override
-    public void serialize(C c, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+    public void serialize(@NotNull C c, @NotNull JsonGenerator jsonGenerator, @NotNull SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
 
         c.serialize(new GeneratorContext(jsonGenerator), serializerProvider);

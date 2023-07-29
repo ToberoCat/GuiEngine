@@ -23,14 +23,14 @@ public record XmlComponent(@NotNull Map<String, JsonNode> fields, @NotNull Rende
                            @NotNull String type, @NotNull String id) {
 
     /**
-     * Convert the fields of this {@link XmlComponent} to a map of objects.
+     * Convert the fields of this  to a map of objects.
      * This method is used to transform the stored JSON data to a map of objects,
      * where each field's value is converted to its corresponding Java object representation.
      * The method also adds additional properties like "id", "type", and "renderPriority" to the map.
      *
      * @param api         The {@link GuiEngineApi} instance to use for object conversion.
      * @param transformer The {@link Function} to apply to each JSON value before conversion to an object.
-     * @return A map containing the fields of this {@link XmlComponent} as Java objects, including additional properties.
+     * @return A map containing the fields of this  as Java objects, including additional properties.
      */
     public @NotNull Map<String, Object> objectFields(@NotNull GuiEngineApi api, @NotNull Function<JsonNode, JsonNode> transformer) {
         Map<String, Object> objectMap = new HashMap<>();

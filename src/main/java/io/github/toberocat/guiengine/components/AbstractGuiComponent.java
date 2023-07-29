@@ -85,7 +85,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
      * @param closeFunctions The list of close functions for the GUI component.
      * @param hidden         true if the GUI component is hidden, false otherwise.
      */
-    public AbstractGuiComponent(int offsetX, int offsetY, int width, int height, @NotNull RenderPriority priority, @NotNull String id, @NotNull List<GuiFunction> clickFunctions, @NotNull List<GuiFunction> dragFunctions, @NotNull List<GuiFunction> closeFunctions, boolean hidden) {
+    protected AbstractGuiComponent(int offsetX, int offsetY, int width, int height, @NotNull RenderPriority priority, @NotNull String id, @NotNull List<GuiFunction> clickFunctions, @NotNull List<GuiFunction> dragFunctions, @NotNull List<GuiFunction> closeFunctions, boolean hidden) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.width = width;
@@ -101,7 +101,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
     @Override
     public void serialize(@NotNull GeneratorContext gen, @NotNull SerializerProvider serializers) throws IOException {
         gen.writeStringField("type", getType());
-        gen.writeStringField("id", getId());
+        gen.writeStringField("id", id);
         gen.writeStringField("priority", renderPriority().toString());
         gen.writeNumberField("x", offsetX());
         gen.writeNumberField("y", offsetY());
@@ -117,7 +117,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
         event.setCancelled(true);
-        if (context == null || api == null) return;
+        if (null == context || null == api) return;
 
         FunctionProcessor.callFunctions(clickFunctions, api, context);
         context.render();
@@ -126,7 +126,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
     @Override
     public void draggedComponent(@NotNull InventoryDragEvent event) {
         event.setCancelled(true);
-        if (context == null || api == null) return;
+        if (null == context || null == api) return;
 
         FunctionProcessor.callFunctions(dragFunctions, api, context);
         context.render();
@@ -134,7 +134,7 @@ public abstract class AbstractGuiComponent implements GuiComponent {
 
     @Override
     public void closedComponent(@NotNull InventoryCloseEvent event) {
-        if (context == null || api == null) return;
+        if (null == context || null == api) return;
 
         FunctionProcessor.callFunctions(closeFunctions, api, context);
         context.render();
@@ -178,12 +178,12 @@ public abstract class AbstractGuiComponent implements GuiComponent {
 
     @Override
     public void setOffsetX(int x) {
-        this.offsetX = x;
+        offsetX = x;
     }
 
     @Override
     public void setOffsetY(int y) {
-        this.offsetY = y;
+        offsetY = y;
     }
 
     @Override

@@ -24,14 +24,14 @@ public class DefaultGuiViewManager implements Listener, GuiViewManager {
     /**
      * A map to store the opened inventories, mapped to the UUID of the player.
      */
-    private final Map<UUID, GuiView> openedInventories;
+    private final @NotNull Map<UUID, GuiView> openedInventories;
 
     /**
      * Create a new instance of DefaultGuiViewManager.
      * It initializes the map to store opened inventories.
      */
     public DefaultGuiViewManager() {
-        this.openedInventories = new HashMap<>();
+        openedInventories = new HashMap<>();
     }
 
     /**

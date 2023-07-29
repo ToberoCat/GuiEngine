@@ -18,13 +18,13 @@ public class DefaultGuiRenderEngine implements GuiRenderEngine {
     /**
      * The GuiViewManager associated with this render engine.
      */
-    protected final DefaultGuiViewManager viewManager;
+    protected final @NotNull DefaultGuiViewManager viewManager;
 
     /**
      * Creates a new DefaultGuiRenderEngine instance and initializes it with the GuiViewManager from the plugin.
      */
     public DefaultGuiRenderEngine() {
-        this.viewManager = GuiEngineApiPlugin.getPlugin().getGuiViewManager();
+        viewManager = GuiEngineApiPlugin.getPlugin().getGuiViewManager();
     }
 
     /**

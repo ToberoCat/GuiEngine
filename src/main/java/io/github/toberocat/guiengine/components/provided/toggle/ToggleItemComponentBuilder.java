@@ -46,7 +46,7 @@ public class ToggleItemComponentBuilder extends AbstractGuiComponentBuilder<Togg
      */
     @Override
     public @NotNull ToggleItemComponent createComponent() {
-        assert options != null; // Ensure options are set before creating the component.
+        assert null != options; // Ensure options are set before creating the component.
         return new ToggleItemComponent(x, y, 1, 1, priority, id, clickFunctions, dragFunctions, closeFunctions, hidden, options, selected);
     }
 
