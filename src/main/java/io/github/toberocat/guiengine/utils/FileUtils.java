@@ -3,15 +3,15 @@ package io.github.toberocat.guiengine.utils;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.FileSystem;
 import java.nio.file.*;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -33,7 +33,8 @@ public class FileUtils {
      * @throws URISyntaxException If the plugin's root URL cannot be converted to a URI.
      */
     public static @NotNull File copyAll(@NotNull JavaPlugin plugin, @NotNull String root) throws IOException, URISyntaxException {
-        list(plugin, root).forEach(x -> {
+        plugin.getDataFolder().mkdirs();
+        foreachIn(plugin, root, x -> {
             if (x.toString().equals(root)) return;
             try {
                 String file = root + "/" + x.getFileName();
@@ -43,7 +44,11 @@ public class FileUtils {
                     copyResource(plugin, file);
                 }
             } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String stackTrace = sw.toString();
+
+                plugin.getLogger().severe("An exception occurred: " + e.getMessage() + "\n" + stackTrace);
             }
         });
         return new File(plugin.getDataFolder(), root);
@@ -58,28 +63,30 @@ public class FileUtils {
      * @throws URISyntaxException If the plugin's root URL cannot be converted to a URI.
      * @throws IOException        If an I/O error occurs while listing the files and directories.
      */
-    public static @NotNull List<Path> list(@NotNull JavaPlugin plugin, @NotNull String root) throws URISyntaxException, IOException {
-        java.net.URL url = plugin.getClass().getResource("/" + root);
-        if (null == url) return Collections.emptyList();
-        java.net.URI uri = url.toURI();
-        Path myPath;
-        if ("jar".equals(uri.getScheme())) {
-            try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
-                myPath = fileSystem.getPath("/" + root);
-            } catch (FileSystemAlreadyExistsException e) {
-                FileSystem fileSystem = FileSystems.getFileSystem(uri);
-                myPath = fileSystem.getPath("/" + root);
-            }
-        } else {
-            myPath = Paths.get(uri);
+    public static void foreachIn(@NotNull JavaPlugin plugin, @NotNull String root, @NotNull Consumer<Path> consumer) throws URISyntaxException, IOException {
+        URL url = plugin.getClass().getResource("/" + root);
+        if (null == url) return;
+
+        URI uri = url.toURI();
+
+        if (!"jar".equals(uri.getScheme())) {
+            walk(Paths.get(uri), consumer);
+            return;
         }
 
+        try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
+            walk(fileSystem.getPath("/" + root), consumer);
+        } catch (FileSystemAlreadyExistsException e) {
+            FileSystem fileSystem = FileSystems.getFileSystem(uri);
+            walk(fileSystem.getPath("/" + root), consumer);
+        }
+    }
+
+    private static void walk(@NotNull Path myPath, @NotNull Consumer<Path> consumer) throws IOException {
         Stream<Path> walk = Files.walk(myPath, 1);
-        List<Path> paths = new LinkedList<>();
         Iterator<Path> it = walk.iterator();
-        while (it.hasNext()) paths.add(it.next());
+        while (it.hasNext()) consumer.accept(it.next());
         walk.close();
-        return paths;
     }
 
     /**

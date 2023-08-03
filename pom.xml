@@ -21,7 +21,7 @@
         <toberocore.version>-42a092f660-1</toberocore.version>
 
         <!-- Server Location -->
-        <server.location>H:\Development\Minecraft\Spigot\Server1.20\plugins</server.location>
+        <server.location>H:\Development\Minecraft\Spigot\Server1.19\plugins</server.location>
     </properties>
 
     <repositories>
