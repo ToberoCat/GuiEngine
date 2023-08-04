@@ -82,7 +82,7 @@ public class PagedComponent extends EmbeddedGuiComponent {
 
     @Override
     public void onViewInit(@NotNull Map<String, String> placeholders) {
-        addPage(createEmptyPage());
+        addEmptyPage();
 
         try {
             parseComponents(parent, this::addComponent);
@@ -229,6 +229,13 @@ public class PagedComponent extends EmbeddedGuiComponent {
      */
     public int getAvailablePages() {
         return pages.size();
+    }
+
+    /**
+     * Creates a new empty page
+     */
+    public void addEmptyPage() {
+        addPage(createEmptyPage());
     }
 
     /**

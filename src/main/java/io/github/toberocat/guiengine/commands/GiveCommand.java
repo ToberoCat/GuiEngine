@@ -4,7 +4,7 @@ import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.GuiEngineApiPlugin;
 import io.github.toberocat.toberocore.command.SubCommand;
 import io.github.toberocat.toberocore.command.exceptions.CommandExceptions;
-import io.github.toberocat.toberocore.item.ItemBuilder;
+import io.github.toberocat.toberocore.util.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -57,14 +57,10 @@ public class GiveCommand extends SubCommand {
         if (null == target) throw new CommandExceptions("Player not found");
 
 
-        stack = new ItemBuilder(stack.clone())
-                .persistent(API_NAME_KEY, PersistentDataType.STRING, api.getId())
-                .persistent(GUI_ID_KEY, PersistentDataType.STRING, guiId)
-                .create();
+        stack = new ItemBuilder(stack.clone()).persistent(API_NAME_KEY, PersistentDataType.STRING, api.getId()).persistent(GUI_ID_KEY, PersistentDataType.STRING, guiId).create(plugin);
 
         target.getInventory().addItem(stack);
-        if (target != sender)
-            sender.sendMessage("§aYou gave §e" + target.getName() + "§a the item successfully");
+        if (target != sender) sender.sendMessage("§aYou gave §e" + target.getName() + "§a the item successfully");
 
         return true;
     }

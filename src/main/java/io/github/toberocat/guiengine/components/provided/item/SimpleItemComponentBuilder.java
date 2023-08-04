@@ -3,7 +3,7 @@ package io.github.toberocat.guiengine.components.provided.item;
 import io.github.toberocat.guiengine.components.AbstractGuiComponentBuilder;
 import io.github.toberocat.guiengine.exception.MissingRequiredParamException;
 import io.github.toberocat.guiengine.utils.ParserContext;
-import io.github.toberocat.toberocore.item.ItemUtils;
+import io.github.toberocat.toberocore.util.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -25,7 +25,6 @@ public class SimpleItemComponentBuilder<B extends SimpleItemComponentBuilder<B>>
     protected @NotNull String[] lore = new String[0];
     protected @Nullable String textureId;
     protected @Nullable UUID owner;
-
 
     /**
      * Set the texture ID for the item (only applicable to PLAYER_HEAD or SKULL items).

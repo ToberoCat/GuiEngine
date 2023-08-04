@@ -18,7 +18,7 @@
         <commons.text.version>1.10.0</commons.text.version>
         <jetbrains.annotations.version>23.0.0</jetbrains.annotations.version>
         <spigot.api.version>1.16.1-R0.1-SNAPSHOT</spigot.api.version>
-        <toberocore.version>-42a092f660-1</toberocore.version>
+        <toberocore.version>2.0.1</toberocore.version>
 
         <!-- Server Location -->
         <server.location>H:\Development\Minecraft\Spigot\Server1.19\plugins</server.location>

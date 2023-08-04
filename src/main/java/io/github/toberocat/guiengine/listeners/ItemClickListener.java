@@ -2,7 +2,7 @@ package io.github.toberocat.guiengine.listeners;
 
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.commands.GiveCommand;
-import io.github.toberocat.toberocore.item.ItemUtils;
+import io.github.toberocat.toberocore.util.ItemUtils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
