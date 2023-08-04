@@ -59,7 +59,6 @@ public class FileUtils {
      *
      * @param plugin The JavaPlugin instance of the plugin.
      * @param root   The root folder within the JAR file to list from.
-     * @return A list of Path objects representing the files and directories in the specified root folder.
      * @throws URISyntaxException If the plugin's root URL cannot be converted to a URI.
      * @throws IOException        If an I/O error occurs while listing the files and directories.
      */
