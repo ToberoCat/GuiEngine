@@ -239,6 +239,14 @@ public class PagedComponent extends EmbeddedGuiComponent {
     }
 
     /**
+     * Resets the pattern. This will break stuff with the automated paging if used wrong
+     */
+    public void resetPatternOnPage() {
+        currentPatternIndex = 0;
+    }
+
+
+    /**
      * Parses the components from the parent parser context and adds them to the specified consumer.
      *
      * @param parent    The parent parser context containing the components.
