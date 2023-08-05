@@ -124,7 +124,8 @@ public record ParserContext(@NotNull JsonNode node, @NotNull GuiContext context,
      * or an empty Optional if not present.
      */
     public @NotNull Optional<String> getOptionalString(@NotNull String field) {
-        return getOptionalNode(field).map(x -> x.node().asText()).map(x -> FunctionProcessor.applyFunctions(api, context, x));
+        return getOptionalNode(field).map(x -> x.node().asText())
+                .map(x -> FunctionProcessor.applyFunctions(api, context, x));
     }
 
     /**
@@ -154,7 +155,7 @@ public record ParserContext(@NotNull JsonNode node, @NotNull GuiContext context,
      * or an empty Optional if not present.
      */
     public @NotNull Optional<Boolean> getOptionalBoolean(@NotNull String field) {
-        return getOptionalString(field).map(x -> "true".equals(x));
+        return getOptionalString(field).map("true"::equals);
     }
 
     /**
@@ -178,13 +179,15 @@ public record ParserContext(@NotNull JsonNode node, @NotNull GuiContext context,
      * or an empty Optional if not present.
      */
     public @NotNull Optional<String[]> getOptionalStringArray(@NotNull String field) {
-        return getOptionalNode(field).map(x -> {
-            List<String> array = new LinkedList<>();
-            for (JsonNode elementNode : x.node()) {
-                String elementValue = elementNode.asText();
-                array.add(elementValue);
-            }
-            return array.toArray(String[]::new);
+        return getOptionalNode(field).map(node -> {
+            List<String> array = new ArrayList<>();
+            if (!node.node.isArray())
+                array.add(node.asText());
+            else
+                node.node.forEach(elementNode ->
+                        array.add(FunctionProcessor.applyFunctions(api, context, elementNode.asText())));
+            return array.toArray(new String[0]);
+
         });
     }
 
@@ -236,4 +239,7 @@ public record ParserContext(@NotNull JsonNode node, @NotNull GuiContext context,
         });
     }
 
+    private @NotNull String asText() {
+        return FunctionProcessor.applyFunctions(api, context, node.asText());
+    }
 }
