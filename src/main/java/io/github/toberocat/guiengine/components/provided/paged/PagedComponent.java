@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import io.github.toberocat.guiengine.action.NextPageAction;
 import io.github.toberocat.guiengine.action.PreviousPageAction;
+import io.github.toberocat.guiengine.components.ContextContainer;
 import io.github.toberocat.guiengine.components.GuiComponent;
+import io.github.toberocat.guiengine.components.GuiComponentContainer;
 import io.github.toberocat.guiengine.components.provided.embedded.EmbeddedGuiComponent;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.function.GuiFunction;
@@ -33,7 +35,8 @@ import java.util.function.Consumer;
  *
  * @author Tobias Madlberger (Tobias)
  */
-public class PagedComponent extends EmbeddedGuiComponent {
+// ToDo: Clean up paged component
+public class PagedComponent extends EmbeddedGuiComponent implements GuiComponentContainer, ContextContainer {
     public static final String TYPE = "paged";
 
     private final @NotNull List<GuiContext> pages;
@@ -147,6 +150,17 @@ public class PagedComponent extends EmbeddedGuiComponent {
         if (currentPatternIndex < pattern.length) return;
         currentPatternIndex = 0;
         addPage(createEmptyPage());
+    }
+
+    @Override
+    public void clearContainer() {
+        pages.clear();
+        resetPatternOnPage();
+    }
+
+    @Override
+    public void addContext(GuiContext context) {
+        addPage(context);
     }
 
     /**
