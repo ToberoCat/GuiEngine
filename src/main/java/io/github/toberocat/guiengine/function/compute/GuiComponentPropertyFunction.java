@@ -18,12 +18,12 @@ public class GuiComponentPropertyFunction implements ComputeFunction {
     private static final String PREFIX = "#";
 
     /**
-     * Computes the value of the provided placeholder, which represents a property of a GUI component.
+     * Computes the value of the provided placeholder, which represents a attribute of a GUI component.
      *
      * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param context The `GuiContext` instance representing the GUI context for which the computation is performed.
      * @param value   The input value containing the placeholder to compute.
-     * @return The computed value of the placeholder representing the property of a GUI component.
+     * @return The computed value of the placeholder representing the attribute of a GUI component.
      */
     @Override
     public @NotNull String compute(@NotNull GuiEngineApi api, @NotNull GuiContext context, @NotNull String value) {
@@ -45,7 +45,7 @@ public class GuiComponentPropertyFunction implements ComputeFunction {
     }
 
     /**
-     * Checks if the provided value contains the function to extract a GUI component property.
+     * Checks if the provided value contains the function to extract a GUI component attribute.
      *
      * @param value The input value to check for the function.
      * @return `true` if the function is present in the value, `false` otherwise.

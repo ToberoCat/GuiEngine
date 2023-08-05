@@ -156,6 +156,7 @@ public class PagedComponent extends EmbeddedGuiComponent implements GuiComponent
     public void clearContainer() {
         pages.clear();
         resetPatternOnPage();
+        addEmptyPage();
     }
 
     @Override

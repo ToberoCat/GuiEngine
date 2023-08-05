@@ -109,9 +109,15 @@ public abstract class AbstractGuiComponent implements GuiComponent {
         gen.writeNumberField("height", height());
         gen.writeBooleanField("hidden", hidden());
 
-        gen.writePOJOField("on-click", clickFunctions);
-        gen.writePOJOField("on-drag", dragFunctions);
-        gen.writePOJOField("on-close", closeFunctions);
+        if (clickFunctions.size() == 1) {
+            gen.writePOJOField("on-click", clickFunctions.get(0));
+        } else {
+            gen.writePOJOField("on-click", clickFunctions);
+        }
+
+        //gen.writePOJOField("on-click", clickFunctions);
+        //gen.writePOJOField("on-drag", dragFunctions);
+        //gen.writePOJOField("on-close", closeFunctions);
     }
 
     @Override

@@ -26,7 +26,7 @@ public class XmlGui {
 
     /**
      * The interpreter used by the GUI.
-     * This property is optional and will default to "default" if not specified in the XML configuration.
+     * This attribute is optional and will default to "default" if not specified in the XML configuration.
      */
     @JacksonXmlProperty(isAttribute = true)
     @JsonSetter(nulls = Nulls.SKIP)
@@ -34,7 +34,7 @@ public class XmlGui {
 
     /**
      * The width of the GUI.
-     * This property is optional and will default to 9 if not specified in the XML configuration.
+     * This attribute is optional and will default to 9 if not specified in the XML configuration.
      */
     @JacksonXmlProperty(isAttribute = true)
     @JsonSetter(nulls = Nulls.SKIP)
@@ -42,7 +42,7 @@ public class XmlGui {
 
     /**
      * The height of the GUI.
-     * This property is mandatory and must be specified in the XML configuration.
+     * This attribute is mandatory and must be specified in the XML configuration.
      */
     @JacksonXmlProperty(isAttribute = true)
     private int height = 5;
@@ -56,7 +56,7 @@ public class XmlGui {
 
     /**
      * Default constructor for the XmlGui class.
-     * Constructs an empty XmlGui object with default property values.
+     * Constructs an empty XmlGui object with default attribute values.
      */
     public XmlGui() {
     }

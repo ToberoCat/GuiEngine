@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface GuiFunction {
 
+    @NotNull String getType();
+
     /**
      * Calls the GUI function with the specified API and context.
      *

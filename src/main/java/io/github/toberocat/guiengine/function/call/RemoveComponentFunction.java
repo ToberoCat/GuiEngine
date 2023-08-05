@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.function.GuiFunction;
-import io.github.toberocat.guiengine.utils.JsonUtils;
 import io.github.toberocat.guiengine.utils.ParserContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +23,11 @@ import java.io.IOException;
 public record RemoveComponentFunction(@NotNull String target) implements GuiFunction {
 
     public static final String ID = "remove";
+
+    @Override
+    public @NotNull String getType() {
+        return ID;
+    }
 
     /**
      * Calls the `removeById` method using the provided API and context to remove a component from the GUI.

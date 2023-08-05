@@ -24,6 +24,11 @@ import java.io.IOException;
 public record ActionFunction(@NotNull String action) implements GuiFunction {
     public static final String ID = "action";
 
+    @Override
+    public @NotNull String getType() {
+        return ID;
+    }
+
     /**
      * Calls the specified action using the provided API and context.
      *

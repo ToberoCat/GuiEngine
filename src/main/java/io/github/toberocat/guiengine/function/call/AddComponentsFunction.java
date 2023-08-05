@@ -24,6 +24,11 @@ public record AddComponentsFunction(@NotNull JsonNode root) implements GuiFuncti
 
     public static final String ID = "add";
 
+    @Override
+    public @NotNull String getType() {
+        return ID;
+    }
+
     /**
      * Calls the `addComponents` method using the provided API and context to add components to the GUI.
      *

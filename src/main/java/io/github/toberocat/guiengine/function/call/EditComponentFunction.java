@@ -1,5 +1,6 @@
 package io.github.toberocat.guiengine.function.call;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -15,26 +16,31 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 /**
- * Custom GUI function to edit a component's property in the GUI.
+ * Custom GUI function to edit a component's attribute in the GUI.
  * <p>
  * Created: 29.04.2023
  * Author: Tobias Madlberger (Tobias)
  */
 @JsonDeserialize(using = EditComponentFunction.Deserializer.class)
-public record EditComponentFunction(@NotNull String target, @NotNull String property,
-                                    @NotNull String value) implements GuiFunction {
+public record EditComponentFunction(@NotNull String target, @NotNull String attribute,
+                                    @NotNull @JsonProperty("set-value") String value) implements GuiFunction {
 
     public static final String ID = "edit";
 
+    @Override
+    public @NotNull String getType() {
+        return ID;
+    }
+
     /**
-     * Calls the `editXmlComponentById` method using the provided API and context to edit a component's property in the GUI.
+     * Calls the `editXmlComponentById` method using the provided API and context to edit a component's attribute in the GUI.
      *
      * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param context The `GuiContext` instance representing the GUI context in which the component exists.
      */
     @Override
     public void call(@NotNull GuiEngineApi api, @NotNull GuiContext context) {
-        context.editXmlComponentById(api, target, xml -> xml.fields().put(property, new TextNode(value)));
+        context.editXmlComponentById(api, target, xml -> xml.fields().put(attribute, new TextNode(value)));
     }
 
     /**
@@ -45,7 +51,13 @@ public record EditComponentFunction(@NotNull String target, @NotNull String prop
         @Override
         public @NotNull EditComponentFunction deserialize(@NotNull JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
-            return new EditComponentFunction(new ParserContext(node, null, null).getOptionalString("target").orElseThrow(), new ParserContext(node, null, null).getOptionalString("attribute").orElseThrow(), new ParserContext(node, null, null).getOptionalString("set-value").orElseThrow());
+            return new EditComponentFunction(new ParserContext(node, null, null)
+                    .getOptionalString("target")
+                    .orElseThrow(), new ParserContext(node, null, null)
+                    .getOptionalString("attribute")
+                    .orElseThrow(), new ParserContext(node, null, null)
+                    .getOptionalString("set-value")
+                    .orElseThrow());
         }
     }
 }
