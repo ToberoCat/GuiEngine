@@ -57,6 +57,9 @@ public class DefaultInterpreter implements GuiInterpreter {
         GuiContext context = new GuiContext(this, xmlGui.getTitle(), xmlGui.getWidth(), xmlGui.getHeight());
         context.setViewer(viewer);
 
+        if (xmlGui.getComponents() == null)
+            return context;
+
         for (XmlComponent component : xmlGui.getComponents()) {
             GuiComponent guiComponent = createComponent(component, api, context);
             if (null == guiComponent) continue;
