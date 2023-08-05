@@ -1,9 +1,11 @@
 package io.github.toberocat.guiengine.utils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import io.github.toberocat.guiengine.function.GuiFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * GeneratorContext is a utility class that encapsulates a JsonGenerator instance to assist in writing JSON data.
@@ -98,6 +100,11 @@ public record GeneratorContext(@NotNull JsonGenerator generator) {
      */
     public void writePOJOField(@NotNull String fieldName, Object value) throws IOException {
         generator.writePOJOField(fieldName, value);
+    }
+
+    public void writeFunctionField(@NotNull String fieldName, @NotNull List<GuiFunction> functions) throws IOException {
+        if (functions.size() == 1) writePOJOField("on-click", functions.get(0));
+        else writePOJOField("on-click", functions);
     }
 
     /**
