@@ -6,7 +6,7 @@
 
     <groupId>io.github.toberocat</groupId>
     <artifactId>gui-engine</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
