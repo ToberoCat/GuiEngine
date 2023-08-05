@@ -1,5 +1,6 @@
 package io.github.toberocat.guiengine;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -9,6 +10,7 @@ import io.github.toberocat.guiengine.context.GuiContext;
 import io.github.toberocat.guiengine.exception.GuiIORuntimeException;
 import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException;
 import io.github.toberocat.guiengine.exception.InvalidGuiComponentException;
+import io.github.toberocat.guiengine.exception.InvalidGuiFileException;
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter;
 import io.github.toberocat.guiengine.interpreter.InterpreterManager;
 import io.github.toberocat.guiengine.utils.FileUtils;
@@ -217,6 +219,8 @@ public final class GuiEngineApi {
         try {
             String content = Files.readString(gui.toPath());
             return xmlMapper.readValue(StringSubstitutor.replace(content, placeholders, "%", "%"), XmlGui.class);
+        } catch (JsonParseException e) {
+            throw new InvalidGuiFileException(String.format("Couldn't parse %s.gui. Caused by: %s. Check your guis " + "syntax and validate that it isn't empty", guiId, e.getMessage()));
         } catch (IOException e) {
             throw new GuiIORuntimeException(e);
         }
@@ -366,6 +370,9 @@ public final class GuiEngineApi {
         } catch (InvalidGuiComponentException e) {
             availableGuis.remove(gui);
             plugin.getLogger().severe(String.format("%s.gui has a invalid component. %s", gui, e.getMessage()));
+        } catch (InvalidGuiFileException e) {
+            availableGuis.remove(gui);
+            plugin.getLogger().severe(e.getMessage());
         } catch (Throwable e) {
             availableGuis.remove(gui);
             e.printStackTrace();
