@@ -6,3 +6,14 @@ authors: [ Tobero ]
 commands:
   guiengine:
     description: View your guis
+permissions:
+  guiengine:
+    default: op
+  guiengine.reload:
+    default: op
+  guiengine.open:
+    default: op
+  guiengine.dump-open:
+    default: op
+  guiengine.give:
+    default: op

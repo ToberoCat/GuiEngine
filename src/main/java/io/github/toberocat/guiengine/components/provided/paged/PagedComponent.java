@@ -146,7 +146,7 @@ public class PagedComponent extends EmbeddedGuiComponent implements GuiComponent
         component.setOffsetY(pair.y());
         page.add(api, component);
 
-        embedded = pages.get(showingPage);
+        embedded = pages.get(Math.min(showingPage, pages.size() - 1));
         if (currentPatternIndex < pattern.length) return;
         currentPatternIndex = 0;
         addPage(createEmptyPage());
