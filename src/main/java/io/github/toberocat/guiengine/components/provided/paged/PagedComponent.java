@@ -137,6 +137,11 @@ public class PagedComponent extends EmbeddedGuiComponent implements GuiComponent
     public void addComponent(@NotNull GuiComponent component) {
         assert null != api;
 
+        if (currentPatternIndex >= pattern.length) {
+            currentPatternIndex = 0;
+            addPage(createEmptyPage());
+        }
+
         GuiContext page = pages.get(pages.size() - 1);
         int slot = pattern[currentPatternIndex];
         currentPatternIndex++;
@@ -147,9 +152,6 @@ public class PagedComponent extends EmbeddedGuiComponent implements GuiComponent
         page.add(api, component);
 
         embedded = pages.get(Math.min(showingPage, pages.size() - 1));
-        if (currentPatternIndex < pattern.length) return;
-        currentPatternIndex = 0;
-        addPage(createEmptyPage());
     }
 
     @Override
