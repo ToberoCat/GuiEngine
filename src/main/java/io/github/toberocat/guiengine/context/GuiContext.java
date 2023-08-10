@@ -178,10 +178,16 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
         interpreter().clickedComponent(event);
-        componentsDescending().filter(x -> x.isInComponent(event.getSlot())).filter(x -> !x.hidden()).findFirst().ifPresentOrElse(component -> {
-            Bukkit.getPluginManager().callEvent(new GuiComponentClickEvent(this, event, component));
-            component.clickedComponent(event);
-        }, () -> Bukkit.getPluginManager().callEvent(new GuiComponentClickEvent(this, event, null)));
+        componentsDescending()
+                .filter(x -> x.isInComponent(event.getSlot()))
+                .filter(x -> !x.hidden())
+                .findFirst()
+                .ifPresentOrElse(component -> {
+                    Bukkit.getPluginManager().callEvent(new GuiComponentClickEvent(this, event, component));
+                    component.clickedComponent(event);
+                }, () -> Bukkit.getPluginManager().callEvent(
+                        new GuiComponentClickEvent(this, event, null)));
+        render();
     }
 
     /**
@@ -198,6 +204,7 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
             Bukkit.getPluginManager().callEvent(new GuiComponentDragEvent(this, event, null));
             interpreter().draggedComponent(event);
         });
+        render();
     }
 
     /**

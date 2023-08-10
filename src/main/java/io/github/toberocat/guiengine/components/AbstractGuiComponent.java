@@ -120,7 +120,6 @@ public abstract class AbstractGuiComponent implements GuiComponent {
         if (null == context || null == api) return;
 
         FunctionProcessor.callFunctions(clickFunctions, api, context);
-        context.render();
     }
 
     @Override
