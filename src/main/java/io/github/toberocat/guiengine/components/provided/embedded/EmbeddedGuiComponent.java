@@ -80,7 +80,15 @@ public class EmbeddedGuiComponent extends AbstractGuiComponent {
     public void clickedComponent(@NotNull InventoryClickEvent event) {
         super.clickedComponent(event);
         if (!interactions || null == embedded) return;
-        InventoryClickEvent fakedEvent = new InventoryClickEvent(event.getView(), event.getSlotType(), event.getSlot() - Utils.translateToSlot(offsetX, offsetY), event.getClick(), event.getAction(), event.getHotbarButton());
+        int fakeHotBarButton = event.getHotbarButton();
+        if (fakeHotBarButton > 0) {
+            fakeHotBarButton = (fakeHotBarButton * 10) * 10 + offsetY;
+        } else if (fakeHotBarButton == 0) {
+            fakeHotBarButton = 1000 + offsetY;
+        } else {
+            fakeHotBarButton = (Math.abs(fakeHotBarButton) * 10 + 1) * 10 + offsetY;
+        }
+        InventoryClickEvent fakedEvent = new InventoryClickEvent(event.getView(), event.getSlotType(), event.getSlot() - Utils.translateToSlot(offsetX, offsetY), event.getClick(), event.getAction(), fakeHotBarButton);
         embedded.clickedComponent(fakedEvent);
     }
 

@@ -177,7 +177,13 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
      */
     @Override
     public void clickedComponent(@NotNull InventoryClickEvent event) {
-        interpreter().clickedComponent(event);
+        int trueHotBarButton = event.getHotbarButton();
+        if (trueHotBarButton > 8) {
+            if (trueHotBarButton % 100 / 10 == 1) trueHotBarButton = trueHotBarButton / 100; else trueHotBarButton = -(trueHotBarButton / 100);
+            if (trueHotBarButton == 10) trueHotBarButton = 0;
+        }
+        InventoryClickEvent trueEvent = new InventoryClickEvent(event.getView(), event.getSlotType(), event.getSlot(), event.getClick(), event.getAction(), trueHotBarButton);
+        interpreter().clickedComponent(trueEvent);
         componentsDescending().filter(x -> x.isInComponent(event.getSlot())).filter(x -> !x.hidden()).findFirst().ifPresentOrElse(component -> {
             Bukkit.getPluginManager().callEvent(new GuiComponentClickEvent(this, event, component));
             component.clickedComponent(event);
@@ -305,14 +311,18 @@ public final class GuiContext implements GuiEvents, GuiEventListener {
     /**
      * Renders the GUI context by updating the inventory with the components' content.
      */
-    public void render() {
+    public void render(Integer extraOffsetY) {
         ItemStack[][] content2d = new ItemStack[height()][width()];
         interpreter().getRenderEngine().renderGui(content2d, this, viewer);
 
         ItemStack[] flatContent = inventory.getContents();
-        for (int y = 0; y < height(); y++)
-            System.arraycopy(content2d[y], 0, flatContent, y * width(), width());
+        for (int y = extraOffsetY; y < height() + extraOffsetY; y++)
+            System.arraycopy(content2d[y - extraOffsetY], 0, flatContent, y * width(), width());
         inventory.setContents(flatContent);
+    }
+
+    public void render() {
+        render(0);
     }
 
     /**

@@ -120,7 +120,12 @@ public abstract class AbstractGuiComponent implements GuiComponent {
         if (null == context || null == api) return;
 
         FunctionProcessor.callFunctions(clickFunctions, api, context);
-        context.render();
+        if (event.getHotbarButton() > 8) {
+            context.render(event.getHotbarButton() % 10);
+        } else {
+            context.render();
+        }
+
     }
 
     @Override
