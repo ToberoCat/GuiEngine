@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
  * Author: Tobias Madlberger (Tobias)
  */
 public interface GuiFunction {
-    static @NotNull GuiFunction of(BiConsumer<GuiEngineApi, GuiContext> method) {
+    static @NotNull GuiFunction anonymous(BiConsumer<GuiEngineApi, GuiContext> method) {
         return new GuiFunction() {
             @Override
             public @NotNull String getType() {
