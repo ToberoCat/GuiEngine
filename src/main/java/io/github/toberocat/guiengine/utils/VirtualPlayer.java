@@ -8,6 +8,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
@@ -25,6 +26,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.profile.PlayerProfile;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
@@ -139,6 +141,11 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
+    public void sendRawMessage(@Nullable UUID uuid, @NotNull String s) {
+
+    }
+
+    @Override
     public void kickPlayer(@Nullable String message) {
 
     }
@@ -194,6 +201,11 @@ public class VirtualPlayer implements Player {
 
     @Override
     public boolean isOnGround() {
+        return false;
+    }
+
+    @Override
+    public boolean isInWater() {
         return false;
     }
 
@@ -255,6 +267,36 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
+    public void setVisualFire(boolean b) {
+
+    }
+
+    @Override
+    public boolean isVisualFire() {
+        return false;
+    }
+
+    @Override
+    public int getFreezeTicks() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxFreezeTicks() {
+        return 0;
+    }
+
+    @Override
+    public void setFreezeTicks(int i) {
+
+    }
+
+    @Override
+    public boolean isFrozen() {
+        return false;
+    }
+
+    @Override
     public void remove() {
 
     }
@@ -276,6 +318,16 @@ public class VirtualPlayer implements Player {
 
     @Override
     public void sendMessage(@NotNull String[] messages) {
+
+    }
+
+    @Override
+    public void sendMessage(@Nullable UUID uuid, @NotNull String s) {
+
+    }
+
+    @Override
+    public void sendMessage(@Nullable UUID uuid, @NotNull String... strings) {
 
     }
 
@@ -357,6 +409,12 @@ public class VirtualPlayer implements Player {
     @Override
     public UUID getUniqueId() {
         return UUID.randomUUID();
+    }
+
+    @NotNull
+    @Override
+    public PlayerProfile getPlayerProfile() {
+        return null;
     }
 
     @Override
@@ -487,6 +545,12 @@ public class VirtualPlayer implements Player {
     @NotNull
     @Override
     public Pose getPose() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public SpawnCategory getSpawnCategory() {
         return null;
     }
 
@@ -708,6 +772,16 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
+    public void playSound(@NotNull Entity entity, @NotNull Sound sound, float v, float v1) {
+
+    }
+
+    @Override
+    public void playSound(@NotNull Entity entity, @NotNull Sound sound, @NotNull SoundCategory soundCategory, float v, float v1) {
+
+    }
+
+    @Override
     public void stopSound(@NotNull Sound sound) {
 
     }
@@ -728,6 +802,11 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
+    public void stopAllSounds() {
+
+    }
+
+    @Override
     public void playEffect(@NotNull Location loc, @NotNull Effect effect, int data) {
 
     }
@@ -735,6 +814,11 @@ public class VirtualPlayer implements Player {
     @Override
     public <T> void playEffect(@NotNull Location loc, @NotNull Effect effect, @Nullable T data) {
 
+    }
+
+    @Override
+    public boolean breakBlock(@NotNull Block block) {
+        return false;
     }
 
     @Override
@@ -748,8 +832,13 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
-    public boolean sendChunkChange(@NotNull Location loc, int sx, int sy, int sz, @NotNull byte[] data) {
-        return false;
+    public void sendBlockDamage(@NotNull Location location, float v) {
+
+    }
+
+    @Override
+    public void sendEquipmentChange(@NotNull LivingEntity livingEntity, @NotNull EquipmentSlot equipmentSlot, @NotNull ItemStack itemStack) {
+
     }
 
     @Override
@@ -763,6 +852,11 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
+    public void sendSignChange(@NotNull Location location, @Nullable String[] strings, @NotNull DyeColor dyeColor, boolean b) throws IllegalArgumentException {
+
+    }
+
+    @Override
     public void sendMap(@NotNull MapView map) {
 
     }
@@ -770,6 +864,12 @@ public class VirtualPlayer implements Player {
     @Override
     public void updateInventory() {
 
+    }
+
+    @Nullable
+    @Override
+    public GameMode getPreviousGameMode() {
+        return null;
     }
 
     @Override
@@ -894,6 +994,36 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
+    public int getSaturatedRegenRate() {
+        return 0;
+    }
+
+    @Override
+    public void setSaturatedRegenRate(int i) {
+
+    }
+
+    @Override
+    public int getUnsaturatedRegenRate() {
+        return 0;
+    }
+
+    @Override
+    public void setUnsaturatedRegenRate(int i) {
+
+    }
+
+    @Override
+    public int getStarvationRate() {
+        return 0;
+    }
+
+    @Override
+    public void setStarvationRate(int i) {
+
+    }
+
+    @Override
     public boolean getAllowFlight() {
         return false;
     }
@@ -925,6 +1055,21 @@ public class VirtualPlayer implements Player {
 
     @Override
     public boolean canSee(@NotNull Player player) {
+        return false;
+    }
+
+    @Override
+    public void hideEntity(@NotNull Plugin plugin, @NotNull Entity entity) {
+
+    }
+
+    @Override
+    public void showEntity(@NotNull Plugin plugin, @NotNull Entity entity) {
+
+    }
+
+    @Override
+    public boolean canSee(@NotNull Entity entity) {
         return false;
     }
 
@@ -970,6 +1115,21 @@ public class VirtualPlayer implements Player {
 
     @Override
     public void setResourcePack(@NotNull String url, @NotNull byte[] hash) {
+
+    }
+
+    @Override
+    public void setResourcePack(@NotNull String s, @Nullable byte[] bytes, @Nullable String s1) {
+
+    }
+
+    @Override
+    public void setResourcePack(@NotNull String s, @Nullable byte[] bytes, boolean b) {
+
+    }
+
+    @Override
+    public void setResourcePack(@NotNull String s, @Nullable byte[] bytes, @Nullable String s1, boolean b) {
 
     }
 
@@ -1101,6 +1261,11 @@ public class VirtualPlayer implements Player {
         return 0;
     }
 
+    @Override
+    public int getPing() {
+        return 0;
+    }
+
     @NotNull
     @Override
     public String getLocale() {
@@ -1115,6 +1280,21 @@ public class VirtualPlayer implements Player {
     @Override
     public void openBook(@NotNull ItemStack book) {
 
+    }
+
+    @Override
+    public void openSign(@NotNull Sign sign) {
+
+    }
+
+    @Override
+    public void showDemoScreen() {
+
+    }
+
+    @Override
+    public boolean isAllowingServerListings() {
+        return false;
     }
 
     @NotNull
@@ -1283,6 +1463,12 @@ public class VirtualPlayer implements Player {
         return false;
     }
 
+    @Nullable
+    @Override
+    public ItemStack getItemInUse() {
+        return null;
+    }
+
     @Override
     public int getExpToLevel() {
         return 0;
@@ -1344,6 +1530,11 @@ public class VirtualPlayer implements Player {
     @Override
     public void setShoulderEntityRight(@Nullable Entity entity) {
 
+    }
+
+    @Override
+    public boolean dropItem(boolean b) {
+        return false;
     }
 
     @Override
@@ -1421,6 +1612,26 @@ public class VirtualPlayer implements Player {
 
     @Override
     public void setMaximumAir(int ticks) {
+
+    }
+
+    @Override
+    public int getArrowCooldown() {
+        return 0;
+    }
+
+    @Override
+    public void setArrowCooldown(int i) {
+
+    }
+
+    @Override
+    public int getArrowsInBody() {
+        return 0;
+    }
+
+    @Override
+    public void setArrowsInBody(int i) {
 
     }
 
@@ -1575,6 +1786,11 @@ public class VirtualPlayer implements Player {
     }
 
     @Override
+    public boolean isClimbing() {
+        return false;
+    }
+
+    @Override
     public void setAI(boolean ai) {
 
     }
@@ -1624,6 +1840,22 @@ public class VirtualPlayer implements Player {
     @Override
     public <T> void setMemory(@NotNull MemoryKey<T> memoryKey, @Nullable T memoryValue) {
 
+    }
+
+    @NotNull
+    @Override
+    public EntityCategory getCategory() {
+        return null;
+    }
+
+    @Override
+    public void setInvisible(boolean b) {
+
+    }
+
+    @Override
+    public boolean isInvisible() {
+        return false;
     }
 
     @Nullable

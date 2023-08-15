@@ -68,6 +68,7 @@ public class GuiEngineApiPlugin extends JavaPlugin {
      */
     private DefaultGuiViewManager guiViewManager;
     private GuiItemManager guiItemManager;
+    private GuiEngineApi guiApi;
 
     /**
      * Called when the plugin is enabled. Initializes the plugin and registers necessary components, functions, actions, and commands.
@@ -156,6 +157,10 @@ public class GuiEngineApiPlugin extends JavaPlugin {
         GuiEngineApi.registerSharedFactory(PagedComponent.TYPE, PagedComponent.class, PagedComponentBuilder.class);
     }
 
+    public GuiEngineApi getGuiApi() {
+        return guiApi;
+    }
+
     /**
      * Checks for updates
      */
@@ -204,7 +209,7 @@ public class GuiEngineApiPlugin extends JavaPlugin {
      * If an exception occurs while reloading the API, it is ignored.
      */
     private void addDefaultApi() {
-        GuiEngineApi guiApi = new GuiEngineApi("default", new File(getDataFolder(), "guis"));
+        guiApi = new GuiEngineApi("default", new File(getDataFolder(), "guis"));
         try {
             guiApi.reload();
         } catch (GuiIORuntimeException ignored) {

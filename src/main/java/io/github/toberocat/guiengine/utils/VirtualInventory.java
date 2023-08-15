@@ -141,6 +141,11 @@ public class VirtualInventory implements Inventory {
     }
 
     @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
     public void remove(@NotNull Material material) throws IllegalArgumentException {
 
     }

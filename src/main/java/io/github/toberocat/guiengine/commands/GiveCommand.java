@@ -3,7 +3,9 @@ package io.github.toberocat.guiengine.commands;
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.GuiEngineApiPlugin;
 import io.github.toberocat.toberocore.command.SubCommand;
-import io.github.toberocat.toberocore.command.exceptions.CommandExceptions;
+import io.github.toberocat.toberocore.command.arguments.Argument;
+import io.github.toberocat.toberocore.command.exceptions.CommandException;
+import io.github.toberocat.toberocore.command.options.Options;
 import io.github.toberocat.toberocore.util.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -15,8 +17,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -25,8 +27,8 @@ import java.util.List;
  * @author Tobias Madlberger (Tobias)
  */
 public class GiveCommand extends SubCommand {
-    public static @NotNull NamespacedKey API_NAME_KEY;
-    public static @NotNull NamespacedKey GUI_ID_KEY;
+    public static NamespacedKey API_NAME_KEY;
+    public static NamespacedKey GUI_ID_KEY;
 
     private final @NotNull GuiEngineApiPlugin plugin;
 
@@ -38,23 +40,23 @@ public class GiveCommand extends SubCommand {
     }
 
     @Override
-    protected boolean run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) throws CommandExceptions {
+    protected boolean handleCommand(@NotNull CommandSender sender, @NotNull String[] args) throws CommandException {
         if (3 > args.length)
-            throw new CommandExceptions("You need to give this command four arguments: §6/guiengine give <item> <api> <gui> <player>§c. The last one is optional");
+            throw new CommandException("You need to give this command four arguments: §6/guiengine give <item> <api> <gui> <player>§c. The last one is optional", new HashMap<>());
         ItemStack stack = plugin.getGuiItemManager().getItem(args[0]);
-        if (null == stack) throw new CommandExceptions("The item §6'" + args[0] + "'§c can't be found");
+        if (null == stack) throw new CommandException("The item §6'" + args[0] + "'§c can't be found", new HashMap<>());
 
         GuiEngineApi api = GuiEngineApi.APIS.get(args[1]);
-        if (null == api) throw new CommandExceptions("§cNo API found with ID " + args[1]);
+        if (null == api) throw new CommandException("§cNo API found with ID " + args[1], new HashMap<>());
 
         String guiId = args[2];
         if (!api.getAvailableGuis().contains(guiId))
-            throw new CommandExceptions("This gui doesn't exist in the specified api");
+            throw new CommandException("This gui doesn't exist in the specified api", new HashMap<>());
 
         Player target = null;
         if (sender instanceof Player player) target = player;
         if (4 == args.length) target = Bukkit.getPlayer(args[3]);
-        if (null == target) throw new CommandExceptions("Player not found");
+        if (null == target) throw new CommandException("Player not found", new HashMap<>());
 
 
         stack = new ItemBuilder(stack.clone()).persistent(API_NAME_KEY, PersistentDataType.STRING, api.getId()).persistent(GUI_ID_KEY, PersistentDataType.STRING, guiId).create(plugin);
@@ -66,13 +68,27 @@ public class GiveCommand extends SubCommand {
     }
 
     @Override
-    protected @Nullable List<String> runTab(@NotNull CommandSender player, @NotNull String @NotNull [] args) {
-        if (1 >= args.length) return new ArrayList<>(plugin.getGuiItemManager().getKnownItems().keySet());
-        if (2 == args.length) return GuiEngineApi.APIS.keySet().stream().toList();
+    protected @NotNull Options options() {
+        return new Options();
+    }
 
-        GuiEngineApi api = GuiEngineApi.APIS.get(args[1]);
+    @Override
+    protected @NotNull Argument<?>[] arguments() {
+        return new Argument[0];
+    }
+
+    @Override
+    public @Nullable List<String> routeTab(@NotNull CommandSender sender, @NotNull String[] args) throws CommandException {
+        if (!sender.hasPermission(this.getPermission())) {
+            return null;
+        }
+
+        String[] newArgs = new String[args.length - 1];
+        System.arraycopy(args, 1, newArgs, 0, newArgs.length);
+        if (1 >= newArgs.length) return GuiEngineApi.APIS.keySet().stream().toList();
+        GuiEngineApi api = GuiEngineApi.APIS.get(newArgs[0]);
         if (null == api) {
-            player.sendMessage("§cNo API found with ID " + args[1]);
+            sender.sendMessage("§cNo API found with ID " + newArgs[0]);
             return Collections.emptyList();
         }
 

@@ -3,13 +3,17 @@ package io.github.toberocat.guiengine.commands;
 import io.github.toberocat.guiengine.GuiEngineApi;
 import io.github.toberocat.guiengine.exception.GuiIORuntimeException;
 import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException;
-import io.github.toberocat.toberocore.command.exceptions.CommandExceptions;
-import io.github.toberocat.toberocore.command.subcommands.PlayerSubCommand;
+import io.github.toberocat.toberocore.command.PlayerSubCommand;
+import io.github.toberocat.toberocore.command.arguments.Argument;
+import io.github.toberocat.toberocore.command.exceptions.CommandException;
+import io.github.toberocat.toberocore.command.options.Options;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -37,17 +41,19 @@ public class OpenCommand extends PlayerSubCommand {
         super(label);
     }
 
-    /**
-     * Executes the `OpenCommand` for the specified player with the provided arguments.
-     *
-     * @param player The player executing the command.
-     * @param args   The arguments passed to the command.
-     * @return `true` if the command execution is successful, `false` otherwise.
-     * @throws CommandExceptions If an error occurs during command execution.
-     */
     @Override
-    protected boolean runPlayer(@NotNull Player player, @NotNull String @NotNull [] args) throws CommandExceptions {
-        if (0 == args.length) throw new CommandExceptions("This command needs a GUI ID provided");
+    protected @NotNull Options options() {
+        return new Options();
+    }
+
+    @Override
+    protected @NotNull Argument<?>[] arguments() {
+        return new Argument[0];
+    }
+
+    @Override
+    protected boolean handle(@NotNull Player player, @NotNull String[] args) throws CommandException {
+        if (0 == args.length) throw new CommandException("This command needs a GUI ID provided", new HashMap<>());
 
         try {
             String apiId = args[0];
@@ -61,24 +67,23 @@ public class OpenCommand extends PlayerSubCommand {
 
             api.openGui(player, guiId);
         } catch (GuiNotFoundRuntimeException | GuiIORuntimeException e) {
-            throw new CommandExceptions(e.getMessage());
+            throw new CommandException(e.getMessage(), new HashMap<>());
         }
         return true;
     }
 
-    /**
-     * Returns a list of available API IDs or GUI IDs for tab completion based on the provided arguments.
-     *
-     * @param player The player executing the command.
-     * @param args   The arguments passed to the command.
-     * @return A list of available API IDs or GUI IDs for tab completion.
-     */
     @Override
-    protected @Nullable List<String> runPlayerTab(@NotNull Player player, @NotNull String @NotNull [] args) {
-        if (1 >= args.length) return GuiEngineApi.APIS.keySet().stream().toList();
-        GuiEngineApi api = GuiEngineApi.APIS.get(args[0]);
+    public @Nullable List<String> routeTab(@NotNull CommandSender sender, @NotNull String[] args) throws CommandException {
+        if (!sender.hasPermission(this.getPermission())) {
+            return null;
+        }
+
+        String[] newArgs = new String[args.length - 1];
+        System.arraycopy(args, 1, newArgs, 0, newArgs.length);
+        if (1 >= newArgs.length) return GuiEngineApi.APIS.keySet().stream().toList();
+        GuiEngineApi api = GuiEngineApi.APIS.get(newArgs[0]);
         if (null == api) {
-            player.sendMessage("§cNo API found with ID " + args[0]);
+            sender.sendMessage("§cNo API found with ID " + newArgs[0]);
             return Collections.emptyList();
         }
 
