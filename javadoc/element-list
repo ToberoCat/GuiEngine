@@ -1,5 +1,6 @@
 io.github.toberocat.guiengine
 io.github.toberocat.guiengine.action
+io.github.toberocat.guiengine.arguments
 io.github.toberocat.guiengine.commands
 io.github.toberocat.guiengine.components
 io.github.toberocat.guiengine.components.provided.embedded
