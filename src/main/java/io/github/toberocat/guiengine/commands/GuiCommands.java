@@ -21,5 +21,6 @@ public class GuiCommands {
         executor.addChild(new DumpCommand());
         executor.addChild(new GiveCommand(GuiEngineApiPlugin.getPlugin()));
         executor.addChild(new ReloadCommand());
+        executor.addChild(new WebEditorCommand());
     }
 }
