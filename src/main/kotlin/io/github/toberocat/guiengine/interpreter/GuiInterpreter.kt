@@ -22,6 +22,8 @@ interface GuiInterpreter : GuiEvents {
     val interpreterId: String
     val renderEngine: GuiRenderEngine
 
+    fun createContext(api: GuiEngineApi, viewer: Player, xmlGui: XmlGui): GuiContext
+
     /**
      * Loads the content of a GUI based on the provided XML GUI definition and player viewer.
      *

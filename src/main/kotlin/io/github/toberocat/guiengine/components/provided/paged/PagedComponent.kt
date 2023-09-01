@@ -2,6 +2,7 @@ package io.github.toberocat.guiengine.components.provided.paged
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.node.IntNode
 import io.github.toberocat.guiengine.action.NextPageAction
 import io.github.toberocat.guiengine.action.PreviousPageAction
 import io.github.toberocat.guiengine.components.GuiComponent
@@ -16,6 +17,8 @@ import io.github.toberocat.guiengine.utils.JsonUtils.getOptionalNode
 import io.github.toberocat.guiengine.utils.JsonUtils.writeArray
 import io.github.toberocat.guiengine.utils.ParserContext
 import io.github.toberocat.guiengine.utils.Utils.translateFromSlot
+import io.github.toberocat.guiengine.utils.orElseThrow
+import io.github.toberocat.guiengine.xml.XmlGui
 import io.github.toberocat.toberocore.action.Action
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -129,7 +132,7 @@ class PagedComponent(
         assert(null != api)
         if (currentPatternIndex >= pattern.size) {
             currentPatternIndex = 0
-            addPage(createEmptyPage())
+            createEmptyPage()?.let { addPage(it) }
         }
         val page = pages[pages.size - 1]
         val slot = pattern[currentPatternIndex]
@@ -154,11 +157,22 @@ class PagedComponent(
      *
      * @return The created empty page.
      */
-    private fun createEmptyPage(): GuiContext {
-        assert(null != context)
-        val page = GuiContext(context!!.interpreter())
-        page.setInventory(context!!.inventory())
-        page.setViewer(context!!.viewer())
+    private fun createEmptyPage(): GuiContext? {
+        if (context == null || api == null || context!!.viewer() == null)
+            return null
+        val context = context!!
+        val page = context.interpreter().createContext(
+            api!!, context.viewer()!!, XmlGui(
+                context.interpreter().interpreterId,
+                emptyArray(),
+                mapOf(
+                    "width" to IntNode(width()),
+                    "height" to IntNode(height())
+                )
+            )
+        )
+        page.setInventory(context.inventory())
+        page.setViewer(context.viewer())
         return page
     }
 
@@ -222,7 +236,7 @@ class PagedComponent(
      * Creates a new empty page
      */
     fun addEmptyPage() {
-        addPage(createEmptyPage())
+        createEmptyPage()?.let { addPage(it) }
     }
 
     /**
@@ -259,7 +273,7 @@ class PagedComponent(
     private fun createPage(pageNode: ParserContext) {
         assert(null != api)
         val position = pageNode.getOptionalInt("position").orElse(pages.size - 1)
-        val page = createEmptyPage()
+        val page = createEmptyPage().orElseThrow("No gui component got created")
         try {
             parseComponents(pageNode) { component: GuiComponent? ->
                 page.add(

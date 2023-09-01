@@ -2,7 +2,7 @@ package io.github.toberocat.guiengine.interpreter.provided
 
 import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.context.provided.TitleContext
-import io.github.toberocat.guiengine.render.provided.ChestGuiRenderEngine
+import io.github.toberocat.guiengine.render.provided.EnchantingGuiRenderEngine
 import io.github.toberocat.guiengine.xml.XmlGui
 import org.bukkit.entity.Player
 
@@ -14,9 +14,9 @@ import org.bukkit.entity.Player
  * Created: 05/02/2023
  * Author: Tobias Madlberger (Tobias)
  */
-class ChestInterpreter : ContainerInterpreter {
-    override val interpreterId = "chest"
-    override val renderEngine = ChestGuiRenderEngine()
+class EnchantingInterpreter : ContainerInterpreter {
+    override val interpreterId = "enchanting"
+    override val renderEngine = EnchantingGuiRenderEngine()
     override fun createContext(api: GuiEngineApi, viewer: Player, xmlGui: XmlGui) = TitleContext(
         this, xmlGui["title"].map { it.asText() }.orElse("GuiEngine Gui")
     )

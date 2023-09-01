@@ -14,7 +14,7 @@ import java.util.*
  *
  * @param <B> The type of the builder class.
 </B> */
-abstract class AbstractGuiComponentBuilder<B : AbstractGuiComponentBuilder<B>?> : GuiComponentBuilder {
+abstract class AbstractGuiComponentBuilder<B : AbstractGuiComponentBuilder<B>> : GuiComponentBuilder {
     protected var priority = RenderPriority.NORMAL
 
     /**

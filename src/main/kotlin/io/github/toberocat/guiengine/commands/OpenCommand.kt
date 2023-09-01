@@ -6,6 +6,7 @@ import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException
 import io.github.toberocat.toberocore.command.PlayerSubCommand
 import io.github.toberocat.toberocore.command.arguments.Argument
 import io.github.toberocat.toberocore.command.exceptions.CommandException
+import io.github.toberocat.toberocore.command.options.ArgLengthOption
 import io.github.toberocat.toberocore.command.options.Options
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -29,9 +30,8 @@ open class OpenCommand
  * Constructs a new `OpenCommand` with the default label "open".
  */
 @JvmOverloads constructor(label: String = "open") : PlayerSubCommand(label) {
-    override fun options(): Options {
-        return Options()
-    }
+    override fun options(): Options = Options()
+        .cmdOpt(ArgLengthOption(2))
 
     override fun arguments(): Array<Argument<*>> = emptyArray()
 

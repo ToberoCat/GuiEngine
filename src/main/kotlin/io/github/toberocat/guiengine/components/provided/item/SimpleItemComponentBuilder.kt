@@ -16,7 +16,7 @@ import java.util.*
  *
  * @param <B> The type of the builder, used for method chaining.
 </B> */
-open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>?>
+open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>>
     : AbstractGuiComponentBuilder<B>() {
     protected var name = ""
     protected var material: Material? = null

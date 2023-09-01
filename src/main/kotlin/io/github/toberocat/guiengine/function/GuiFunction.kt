@@ -23,7 +23,7 @@ interface GuiFunction {
     fun call(api: GuiEngineApi, context: GuiContext)
 
     companion object {
-        fun anonymous(method: BiConsumer<GuiEngineApi?, GuiContext>): GuiFunction {
+        fun anonymous(method: BiConsumer<GuiEngineApi, GuiContext>): GuiFunction {
             return object : GuiFunction {
                 override val type = "anonymous"
 

@@ -17,8 +17,7 @@ import io.github.toberocat.guiengine.function.compute.GuiComponentPropertyFuncti
 import io.github.toberocat.guiengine.function.compute.HasNotPermissionFunction
 import io.github.toberocat.guiengine.function.compute.HasPermissionFunction
 import io.github.toberocat.guiengine.interpreter.InterpreterManager
-import io.github.toberocat.guiengine.interpreter.provided.ChestInterpreter
-import io.github.toberocat.guiengine.interpreter.provided.SizeableInterpreter
+import io.github.toberocat.guiengine.interpreter.provided.*
 import io.github.toberocat.guiengine.item.GuiItemManager
 import io.github.toberocat.guiengine.listeners.ItemClickListener
 import io.github.toberocat.guiengine.listeners.PlayerJoinListener
@@ -231,8 +230,15 @@ class GuiEngineApiPlugin : JavaPlugin() {
      * Registers the default interpreter, DefaultInterpreter, to the InterpreterManager.
      */
     private fun registerInterpreters() {
-        interpreterManager?.registerInterpreter(SizeableInterpreter())
-        interpreterManager?.registerInterpreter(ChestInterpreter())
+        interpreterManager?.let {
+            it.registerInterpreter(SizeableInterpreter())
+            it.registerInterpreter(ChestInterpreter())
+            it.registerInterpreter(DispenserInterpreter())
+            it.registerInterpreter(FurnaceInterpreter())
+            it.registerInterpreter(WorkbenchInterpreter())
+            it.registerInterpreter(EnchantingInterpreter())
+            it.registerInterpreter(AnvilInterpreter())
+        }
     }
 
     /**

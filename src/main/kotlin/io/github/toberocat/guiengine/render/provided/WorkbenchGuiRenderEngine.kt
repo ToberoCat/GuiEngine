@@ -16,14 +16,14 @@ import org.bukkit.inventory.Inventory
  * Created: 04/02/2023
  * Author: Tobias Madlberger (Tobias)
  */
-class ChestGuiRenderEngine : GuiRenderEngine {
+class WorkbenchGuiRenderEngine : GuiRenderEngine {
     override val guiViewManager = GuiEngineApiPlugin.plugin.getGuiViewManager()
     override fun createInventory(
         context: GuiContext, viewer: Player,
         placeholders: Map<String, String>
     ): Inventory? = (context as? TitleContext)
-        ?.let { Bukkit.createInventory(viewer, InventoryType.CHEST, it.title) }
+        ?.let { Bukkit.createInventory(viewer, InventoryType.WORKBENCH, it.title) }
 
-    override fun width(context: GuiContext) = 9
+    override fun width(context: GuiContext) = 3
     override fun height(context: GuiContext) = 3
 }

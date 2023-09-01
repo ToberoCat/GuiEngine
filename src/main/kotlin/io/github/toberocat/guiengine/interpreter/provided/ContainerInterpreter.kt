@@ -13,8 +13,6 @@ import org.bukkit.entity.Player
 
 interface ContainerInterpreter : GuiInterpreter {
 
-    fun createContext(api: GuiEngineApi, viewer: Player, xmlGui: XmlGui): GuiContext
-
     override fun loadContent(api: GuiEngineApi, viewer: Player, xmlGui: XmlGui): GuiContext {
         val context = createContext(api, viewer, xmlGui)
         context.setViewer(viewer)
