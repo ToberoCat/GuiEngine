@@ -8,7 +8,7 @@ import java.io.IOException
 /**
  * Builder class for creating instances of [ToggleItemComponent].
  */
-class ToggleItemComponentBuilder : AbstractGuiComponentBuilder<ToggleItemComponentBuilder?>() {
+class ToggleItemComponentBuilder : AbstractGuiComponentBuilder<ToggleItemComponentBuilder>() {
     private var options: ParserContext? = null
     private var selected = 0
 
