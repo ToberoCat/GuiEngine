@@ -142,7 +142,6 @@ class GuiEngineApi(
      * @throws GuiNotFoundRuntimeException If the specified GUI ID does not correspond to an existing GUI.
      * @throws GuiIORuntimeException       If there is an I/O error while loading or rendering the GUI.
      */
-    @JvmOverloads
     @Throws(GuiNotFoundRuntimeException::class, GuiIORuntimeException::class)
     fun openGui(
         player: Player, guiId: String, placeholders: Map<String, String> = getGuiPlaceholders(player)
