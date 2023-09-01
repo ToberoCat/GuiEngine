@@ -171,8 +171,10 @@ class GuiEngineApi(
         val gui = File(guiFolder, "$guiId.gui")
         if (!gui.exists()) throw GuiNotFoundRuntimeException(guiId)
         return try {
-            val content = Files.readString(gui.toPath())
-            xmlMapper.readValue(StringSubstitutor.replace(content, placeholders, "%", "%"), XmlGui::class.java)
+            var content = Files.readString(gui.toPath())
+            content = StringSubstitutor.replace(content, placeholders, "%", "%")
+            content = content.replace("<gui", "<gui api='$id'")
+            xmlMapper.readValue(content, XmlGui::class.java)
         } catch (e: JsonParseException) {
             throw InvalidGuiFileException("Couldn't parse $guiId.gui. Caused by: ${e.message}. Check your guis syntax and validate that it isn't empty")
         } catch (e: IOException) {

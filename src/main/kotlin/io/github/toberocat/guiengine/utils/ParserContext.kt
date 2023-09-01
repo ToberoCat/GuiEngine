@@ -25,7 +25,11 @@ data class ParserContext(
      * @param field The field name of the child node to retrieve.
      * @return A ParserContext representing the child node if found, or null if not present.
      */
-    operator fun get(field: String?): ParserContext? = node.get(field)?.let { ParserContext(it, context, api) }
+    operator fun get(field: String): ParserContext? = when {
+        node.has(field) -> ParserContext(node.get(field), context, api)
+        else -> null
+    }
+
 
     /**
      * Get an optional child node of the current node based on the specified field name.
@@ -113,8 +117,9 @@ data class ParserContext(
      * @return An Optional containing the String value if found,
      * or an empty Optional if not present.
      */
-    fun getOptionalString(field: String): Optional<String> = getOptionalNode(field).map { it.node.asText() }
-        .map { x -> api?.let { context?.let { applyFunctions(api, context, x) } } }
+    fun getOptionalString(field: String): Optional<String> = getOptionalNode(field)
+        .map { it.node.asText() }
+        .map { x -> api?.let { context?.let { applyFunctions(api, context, x) } } ?: x }
 
     /**
      * Get an optional UUID value from the child node of the current node

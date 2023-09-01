@@ -49,6 +49,7 @@ interface GuiRenderEngine : GuiVirtualizer {
         val inventory = createInventory(context, viewer, placeholders) ?: throw InvalidGuiFileException(
             "The gui renderer wasn't able to create a inventory. " + "Probably incompatible gui contexts"
         )
+        context.setInventory(inventory)
         context.componentsDescending().forEach { it?.onViewInit(placeholders) }
         context.render()
         guiViewManager.registerGui(viewer.uniqueId, GuiView(inventory, context))

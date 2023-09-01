@@ -40,7 +40,7 @@ class VirtualInventory(private val height: Int, private val reload: Runnable) : 
     }
 
     override fun getContents(): Array<ItemStack> {
-        return Array(54) { ItemStack(Material.GRASS) }
+        return Array(54) { ItemStack(Material.AIR) }
     }
 
     @Throws(IllegalArgumentException::class)
@@ -49,7 +49,7 @@ class VirtualInventory(private val height: Int, private val reload: Runnable) : 
     }
 
     override fun getStorageContents(): Array<ItemStack> {
-        return Array(0) { ItemStack(Material.GRASS) }
+        return Array(0) { ItemStack(Material.AIR) }
     }
 
     @Throws(IllegalArgumentException::class)

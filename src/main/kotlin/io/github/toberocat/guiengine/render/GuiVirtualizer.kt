@@ -9,6 +9,6 @@ interface GuiVirtualizer {
     fun height(context: GuiContext): Int
 
     fun createBuffer(context: GuiContext): Array<Array<ItemStack>> = Array(height(context)) {
-        Array(width(context)) { ItemStack(Material.GRASS) }
+        Array(width(context)) { ItemStack(Material.AIR) }
     }
 }

@@ -2,8 +2,6 @@ package io.github.toberocat.guiengine.xml
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import java.util.*
 
 /**
@@ -16,15 +14,32 @@ import java.util.*
  * @author Tobias Madlberger (Tobias)
  */
 @JsonDeserialize(using = XmlGuiDeserializer::class)
-data class XmlGui(val interpreter: String, val fields: Map<String, JsonNode>) {
+data class XmlGui(
+    val interpreter: String,
+    val components: Array<XmlComponent>,
+    val fields: Map<String, JsonNode>
+) {
     operator fun get(fieldName: String): Optional<JsonNode> {
         return Optional.ofNullable(fields[fieldName])
     }
 
-    /**
-     * An array of XmlComponent objects that define the components present in the GUI.
-     */
-    @JacksonXmlProperty(localName = "component")
-    @JacksonXmlElementWrapper(useWrapping = false)
-    var components: Array<XmlComponent> = emptyArray()
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as XmlGui
+
+        if (interpreter != other.interpreter) return false
+        if (!components.contentEquals(other.components)) return false
+        if (fields != other.fields) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = interpreter.hashCode()
+        result = 31 * result + components.contentHashCode()
+        result = 31 * result + fields.hashCode()
+        return result
+    }
 }

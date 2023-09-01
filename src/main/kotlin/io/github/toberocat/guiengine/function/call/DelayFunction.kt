@@ -17,8 +17,6 @@ import java.util.concurrent.TimeUnit
 data class DelayFunction(val unit: TimeUnit, val duration: Int) : GuiFunction {
     override val type = TYPE
     override fun call(api: GuiEngineApi, context: GuiContext) {
-        println("Sleep")
-        println(unit.toMillis(duration.toLong()))
         try {
             Thread.sleep(unit.toMillis(duration.toLong()))
         } catch (e: InterruptedException) {
