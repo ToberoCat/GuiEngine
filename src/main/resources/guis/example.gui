@@ -1,8 +1,24 @@
 <gui title="§eName" width="9" height="3">
-    <component type="item" x="4" y="1"
-               material="EMERALD_BLOCK"
-               name="§aClick me!">
-        <on-click type="action">[message] You clicked me!</on-click>
+    <component type="paged" pattern="5">
+        <page>
+            <component type="item" x="4" y="1"
+                       material="EMERALD_BLOCK"
+                       name="§aClick me!">
+                <on-click type="action">[message] You clicked me!</on-click>
+            </component>
+        </page>
+        <page>
+            <component type="item" x="5" y="2"
+                       material="GOLD_BLOCK"
+                       name="§aClick me!">
+                <on-click type="action">[message] You clicked me!</on-click>
+            </component>
+        </page>
+        <component type="item"
+                   material="DIRT"
+                   name="§aClick me!">
+            <on-click type="action">[message] You clicked me!</on-click>
+        </component>
     </component>
 </gui>
 

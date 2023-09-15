@@ -1,29 +1,25 @@
 package io.github.toberocat.guiengine.components.provided.paged
 
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.node.IntNode
+import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.action.NextPageAction
 import io.github.toberocat.guiengine.action.PreviousPageAction
 import io.github.toberocat.guiengine.components.GuiComponent
-import io.github.toberocat.guiengine.components.container.ContextContainer
-import io.github.toberocat.guiengine.components.container.GuiComponentContainer
+import io.github.toberocat.guiengine.components.container.tab.Page
+import io.github.toberocat.guiengine.components.container.tab.PagedContainer
 import io.github.toberocat.guiengine.components.provided.embedded.EmbeddedGuiComponent
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
 import io.github.toberocat.guiengine.utils.GeneratorContext
-import io.github.toberocat.guiengine.utils.JsonUtils.getOptionalNode
 import io.github.toberocat.guiengine.utils.JsonUtils.writeArray
 import io.github.toberocat.guiengine.utils.ParserContext
 import io.github.toberocat.guiengine.utils.Utils.translateFromSlot
-import io.github.toberocat.guiengine.utils.orElseThrow
 import io.github.toberocat.guiengine.xml.XmlGui
 import io.github.toberocat.toberocore.action.Action
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.io.IOException
-import java.util.function.Consumer
 import kotlin.math.min
 
 /**
@@ -36,8 +32,7 @@ import kotlin.math.min
  *
  * @author Tobias Madlberger (Tobias)
  */
-// ToDo: Clean up paged component
-class PagedComponent(
+open class PagedComponent(
     offsetX: Int,
     offsetY: Int,
     width: Int,
@@ -51,8 +46,8 @@ class PagedComponent(
     targetGui: String,
     copyAir: Boolean,
     interactions: Boolean,
-    protected val parent: ParserContext,
-    protected val pattern: IntArray,
+    private val parent: ParserContext,
+    private val pattern: IntArray,
     protected var showedPage: Int
 ) : EmbeddedGuiComponent(
     offsetX,
@@ -68,14 +63,61 @@ class PagedComponent(
     targetGui,
     copyAir,
     interactions
-), GuiComponentContainer, ContextContainer {
-    private val pages: MutableList<GuiContext> = mutableListOf()
+), PagedContainer {
+    private var pages: MutableList<PatternPage> = mutableListOf()
     private var emptyFill: GuiComponent? = null
-    private var currentPatternIndex = 0
+    private var pageParser: PageParser? = null
 
     override val type = TYPE
 
-    @Throws(IOException::class)
+    override val availablePages: Int
+        get() = pages.size
+
+    override var page: Int
+        get() = showedPage
+        set(value) {
+            require(!(0 > value || value >= pages.size)) { "Page not in valid bounds" }
+            showedPage = value
+            updateEmbedded()
+            context?.render()
+        }
+
+    override fun addPage(context: GuiContext) = addPage(context, pages.size - 1)
+
+    override fun addPage(context: GuiContext, position: Int) {
+        api?.let { pages.add(position, PatternPage(it, pattern, context)) }
+    }
+
+    override fun createEmptyPage() = pageParser?.createEmptyPage()
+
+    override fun addComponent(component: GuiComponent) {
+        if (pages.last().insert(component))
+            return
+        createEmptyPage()?.let { pages.add(it) }
+    }
+
+    override fun clearContainer() {
+        pages.clear()
+        createEmptyPage()?.let { pages.add(it) }
+    }
+
+
+    override fun onViewInit(placeholders: Map<String, String>) {
+        pageParser = createParser()
+        pages = pageParser?.parse(parent) ?: pages
+        updateEmbedded()
+    }
+
+    override fun render(viewer: Player, inventory: Array<Array<ItemStack>>) {
+        renderEmptyFill(viewer, inventory)
+        super.render(viewer, inventory)
+    }
+
+    override fun addActions(actions: MutableSet<Action>) {
+        actions.add(NextPageAction(this))
+        actions.add(PreviousPageAction(this))
+    }
+
     override fun serialize(gen: GeneratorContext, serializers: SerializerProvider) {
         super.serialize(gen, serializers)
         writeArray(gen, "pattern", pattern)
@@ -83,210 +125,109 @@ class PagedComponent(
         gen.writeRaw(parent.node.toString())
     }
 
-    override fun onViewInit(placeholders: Map<String, String>) {
-        addEmptyPage()
-        try {
-            parseComponents(parent) { this.addComponent(it) }
-        } catch (e: JsonProcessingException) {
-            throw RuntimeException(e)
-        }
-        val pages = parent.getOptionalFieldList("page").orElse(ArrayList())
-        for (page in pages) createPage(page)
-
-        assert(null != context)
-        assert(null != api)
-        emptyFill = getOptionalNode(parent, "fill-empty").map { x: ParserContext ->
-            try {
-                return@map context!!.interpreter()
-                    .createComponent(context!!.interpreter().xmlComponent(x.node, api!!), api!!, context!!)
-            } catch (e: JsonProcessingException) {
-                throw RuntimeException(e)
-            }
-        }.orElse(null)
-        embedded = this.pages[showedPage]
+    private fun updateEmbedded() {
+        embedded = pages[min(showedPage.toDouble(), (pages.size - 1).toDouble()).toInt()].pageContext
     }
 
-    /**
-     * Adds a new page to the paged component.
-     *
-     * @param page The new page to add.
-     */
-    fun addPage(page: GuiContext) {
-        pages.add(page)
-    }
-
-    /**
-     * Adds a new page to the paged component at the specified position.
-     *
-     * @param page     The new page to add.
-     * @param position The position at which to add the page.
-     */
-    fun addPage(page: GuiContext, position: Int) = pages.add(position, page)
-
-    /**
-     * Adds a new component to the current page.
-     *
-     * @param component The component to add.
-     */
-    override fun addComponent(component: GuiComponent) {
-        assert(null != api)
-        if (currentPatternIndex >= pattern.size) {
-            currentPatternIndex = 0
-            createEmptyPage()?.let { addPage(it) }
-        }
-        val page = pages[pages.size - 1]
-        val slot = pattern[currentPatternIndex]
-        currentPatternIndex++
-        val (x, y) = translateFromSlot(slot)
-        component.setX(x)
-        component.setY(y)
-        page.add(api!!, component)
-        embedded = pages[min(showedPage.toDouble(), (pages.size - 1).toDouble()).toInt()]
-    }
-
-    override fun clearContainer() {
-        pages.clear()
-        resetPatternOnPage()
-        addEmptyPage()
-    }
-
-    override fun addContext(context: GuiContext) = addPage(context)
-
-    /**
-     * Creates an empty page for the paged component.
-     *
-     * @return The created empty page.
-     */
-    private fun createEmptyPage(): GuiContext? {
-        if (context == null || api == null || context!!.viewer() == null)
-            return null
-        val context = context!!
-        val page = context.interpreter().createContext(
-            api!!, context.viewer()!!, XmlGui(
-                context.interpreter().interpreterId,
-                emptyArray(),
-                mapOf(
-                    "width" to IntNode(width()),
-                    "height" to IntNode(height())
+    private fun createParser() = api?.let { api ->
+        context?.let { context ->
+            context.viewer()?.let {
+                PageParser(
+                    api,
+                    context, it, width(), height(), pattern
                 )
-            )
-        )
-        page.setInventory(context.inventory())
-        page.setViewer(context.viewer())
-        return page
+            }
+        }
     }
 
-    override fun render(viewer: Player, inventory: Array<Array<ItemStack>>) {
-        if (null != emptyFill) {
+    private fun renderEmptyFill(viewer: Player, buffer: Array<Array<ItemStack>>) {
+        emptyFill?.let {
             for (slot in pattern) {
                 val (x, y) = translateFromSlot(slot)
-                emptyFill!!.setX(offsetX + x)
-                emptyFill!!.setY(offsetY + y)
-                emptyFill!!.render(viewer, inventory)
+                it.setX(offsetX + x)
+                it.setY(offsetY + y)
+                it.render(viewer, buffer)
             }
         }
-        super.render(viewer, inventory)
-    }
-
-    override fun addActions(actions: MutableSet<Action>) {
-        if (null == context || null == api) return
-        actions.add(NextPageAction(this))
-        actions.add(PreviousPageAction(this))
-    }
-
-    /**
-     * Sets the currently showing page index of the paged component.
-     *
-     * @param page The index of the page to show.
-     * @throws IllegalArgumentException If the specified page is not within the valid bounds.
-     */
-    fun setShowingPage(page: Int) {
-        require(!(0 > page || page >= pages.size)) { "Page not in valid bounds" }
-        showedPage = page
-        embedded = pages[showedPage]
-        if (null == context) return
-        context!!.render()
-    }
-
-    /**
-     * Gets the index of the currently showing page of the paged component.
-     *
-     * @return The index of the currently showing page.
-     */
-    fun getShowingPage(): Int {
-        return showedPage
-    }
-
-    val page: Int
-        /**
-         * Gets the current page number of the paged component.
-         *
-         * @return The current page number (1-based index).
-         */
-        get() = showedPage + 1
-    val availablePages: Int
-        /**
-         * Gets the total number of available pages in the paged component.
-         *
-         * @return The total number of available pages.
-         */
-        get() = pages.size
-
-    /**
-     * Creates a new empty page
-     */
-    fun addEmptyPage() {
-        createEmptyPage()?.let { addPage(it) }
-    }
-
-    /**
-     * Resets the pattern. This will break stuff with the automated paging if used wrong
-     */
-    fun resetPatternOnPage() {
-        currentPatternIndex = 0
-    }
-
-    /**
-     * Parses the components from the parent parser context and adds them to the specified consumer.
-     *
-     * @param parent    The parent parser context containing the components.
-     * @param addToPage The consumer function to add the components to the page.
-     * @throws JsonProcessingException If there is an error while processing the JSON data.
-     */
-    @Throws(JsonProcessingException::class)
-    private fun parseComponents(parent: ParserContext, addToPage: Consumer<GuiComponent>) {
-        assert(null != context)
-        assert(null != api)
-        val components = parent.getOptionalFieldList("component").orElse(ArrayList())
-        for (component in components) {
-            val xml = context!!.interpreter().xmlComponent(component.node, api!!)
-            val guiComponent = context!!.interpreter().createComponent(xml, api!!, context!!)
-            addToPage.accept(guiComponent)
-        }
-    }
-
-    /**
-     * Creates a new page for the paged component based on the specified parser context.
-     *
-     * @param pageNode The parser context representing the page data.
-     */
-    private fun createPage(pageNode: ParserContext) {
-        assert(null != api)
-        val position = pageNode.getOptionalInt("position").orElse(pages.size - 1)
-        val page = createEmptyPage().orElseThrow("No gui component got created")
-        try {
-            parseComponents(pageNode) { component: GuiComponent? ->
-                page.add(
-                    api!!, component!!
-                )
-            }
-        } catch (e: JsonProcessingException) {
-            throw RuntimeException(e)
-        }
-        addPage(page, position)
     }
 
     companion object {
         const val TYPE = "paged"
+    }
+}
+
+class PageParser(
+    private val api: GuiEngineApi,
+    private val context: GuiContext,
+    private val viewer: Player,
+    private val width: Int,
+    private val height: Int,
+    private val pattern: IntArray
+) {
+    fun parse(node: ParserContext): MutableList<PatternPage> {
+        val pages = mutableListOf(createEmptyPage())
+        parseNode(node).forEach {
+            if (pages.last().insert(it))
+                return@forEach
+            pages.add(createEmptyPage())
+        }
+
+
+        node.getOptionalFieldList("page")
+            .orElse(emptyList())
+            .forEach {
+                val (page, preferredPosition) = parsePage(it)
+                pages.add(preferredPosition ?: (pages.size - 1), page)
+            }
+        return pages
+        //embedded = this.pages[showedPage]
+    }
+
+    fun createEmptyPage(): PatternPage = PatternPage(api, pattern, context
+        .interpreter()
+        .createContext(
+            api, viewer, XmlGui(
+                context.interpreter().interpreterId, emptyArray(), mapOf(
+                    "width" to IntNode(width), "height" to IntNode(height)
+                )
+            )
+        ).also {
+            it.setInventory(context.inventory())
+            it.setViewer(viewer)
+        })
+
+    private fun parseNode(node: ParserContext): List<GuiComponent> {
+        val interpreter = context.interpreter()
+        return node.getOptionalFieldList("component")
+            .orElse(ArrayList())
+            .map {
+                return@map interpreter.createComponent(
+                    interpreter.xmlComponent(it.node, api),
+                    api,
+                    context
+                )
+            }
+    }
+
+    private fun parsePage(node: ParserContext): Pair<PatternPage, Int?> =
+        createEmptyPage().also { page -> parseNode(node).forEach { page.insert(it) } } to
+                node.getOptionalInt("position").orElse(null)
+}
+
+class PatternPage(
+    val api: GuiEngineApi,
+    val pattern: IntArray,
+    override val pageContext: GuiContext
+) : Page {
+    private var current: Int = 0
+    override fun insert(component: GuiComponent): Boolean {
+        if (current >= pattern.size) return false
+
+        val slot = pattern[current++]
+        val (x, y) = translateFromSlot(slot)
+        component.setX(x)
+        component.setY(y)
+        pageContext.add(api, component)
+        return true
     }
 }

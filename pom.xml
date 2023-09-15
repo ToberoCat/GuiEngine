@@ -23,7 +23,8 @@
         <toberocore.version>0f2d094899</toberocore.version>
 
         <!-- Server Location -->
-        <server.location>H:\Development\Minecraft\Spigot\Server1.19\plugins</server.location>
+        <server.location>/media/tobias/Data/Development/Minecraft/Spigot/Projects/JumpAndRun/server/plugins
+        </server.location>
     </properties>
 
     <repositories>

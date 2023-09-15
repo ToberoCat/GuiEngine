@@ -30,8 +30,8 @@ class NextPageAction(private val pagedComponent: PagedComponent) : GuiEngineActi
      * @param player The player who triggered the action.
      */
     override fun run(player: Player) {
-        val value = pagedComponent.getShowingPage() + 1
+        val value = pagedComponent.page + 1
         if (value >= pagedComponent.availablePages) return
-        pagedComponent.setShowingPage(value)
+        pagedComponent.page = value
     }
 }
