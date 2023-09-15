@@ -141,6 +141,10 @@
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>io.github.toberocat.guiengine.org.bstats</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>kotlin</pattern>
+                                    <shadedPattern>io.github.toberocat.guiengine.kotlin</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
