@@ -101,6 +101,7 @@ class VirtualPlayer : Player {
 
     override fun getBoundingBox(): BoundingBox = BoundingBox()
 
+    @Deprecated("Deprecated in Java")
     override fun isOnGround(): Boolean {
         return false
     }
@@ -185,10 +186,13 @@ class VirtualPlayer : Player {
     }
 
     override fun setPersistent(persistent: Boolean) {}
+
+    @Deprecated("Deprecated in Java")
     override fun getPassenger(): Entity? {
         return null
     }
 
+    @Deprecated("Deprecated in Java")
     override fun setPassenger(passenger: Entity): Boolean {
         return false
     }
@@ -432,7 +436,11 @@ class VirtualPlayer : Player {
     override fun setStatistic(statistic: Statistic, entityType: EntityType, newValue: Int) {}
     override fun setBedSpawnLocation(location: Location?) {}
     override fun setBedSpawnLocation(location: Location?, force: Boolean) {}
-    override fun playNote(loc: Location, instrument: Byte, note: Byte) {}
+
+    @Deprecated("Deprecated in Java")
+    override fun playNote(loc: Location, instrument: Byte, note: Byte) {
+    }
+
     override fun playNote(loc: Location, instrument: Instrument, note: Note) {}
     override fun playSound(location: Location, sound: Sound, volume: Float, pitch: Float) {}
     override fun playSound(location: Location, sound: String, volume: Float, pitch: Float) {}
@@ -445,13 +453,20 @@ class VirtualPlayer : Player {
     override fun stopSound(sound: Sound, category: SoundCategory?) {}
     override fun stopSound(sound: String, category: SoundCategory?) {}
     override fun stopAllSounds() {}
-    override fun playEffect(loc: Location, effect: Effect, data: Int) {}
+
+    @Deprecated("Deprecated in Java")
+    override fun playEffect(loc: Location, effect: Effect, data: Int) {
+    }
+
     override fun <T> playEffect(loc: Location, effect: Effect, data: T?) {}
     override fun breakBlock(block: Block): Boolean {
         return false
     }
 
-    override fun sendBlockChange(loc: Location, material: Material, data: Byte) {}
+    @Deprecated("Deprecated in Java")
+    override fun sendBlockChange(loc: Location, material: Material, data: Byte) {
+    }
+
     override fun sendBlockChange(loc: Location, block: BlockData) {}
     override fun sendBlockDamage(location: Location, v: Float) {}
     override fun sendEquipmentChange(livingEntity: LivingEntity, equipmentSlot: EquipmentSlot, itemStack: ItemStack) {}
@@ -548,16 +563,31 @@ class VirtualPlayer : Player {
     }
 
     override fun setAllowFlight(flight: Boolean) {}
-    override fun hidePlayer(player: Player) {}
+
+    @Deprecated("Deprecated in Java")
+    override fun hidePlayer(player: Player) {
+    }
+
     override fun hidePlayer(plugin: Plugin, player: Player) {}
-    override fun showPlayer(player: Player) {}
+
+    @Deprecated("Deprecated in Java")
+    override fun showPlayer(player: Player) {
+    }
+
     override fun showPlayer(plugin: Plugin, player: Player) {}
     override fun canSee(player: Player): Boolean {
         return false
     }
 
-    override fun hideEntity(plugin: Plugin, entity: Entity) {}
-    override fun showEntity(plugin: Plugin, entity: Entity) {}
+    @Deprecated("Deprecated in Java")
+    override fun hideEntity(plugin: Plugin, entity: Entity) {
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun showEntity(plugin: Plugin, entity: Entity) {
+    }
+
+    @Deprecated("Deprecated in Java")
     override fun canSee(entity: Entity): Boolean {
         return false
     }
@@ -584,7 +614,10 @@ class VirtualPlayer : Player {
         return 0f
     }
 
-    override fun setTexturePack(url: String) {}
+    @Deprecated("Deprecated in Java")
+    override fun setTexturePack(url: String) {
+    }
+
     override fun setResourcePack(url: String) {}
     override fun setResourcePack(url: String, hash: ByteArray) {}
     override fun setResourcePack(s: String, bytes: ByteArray, s1: String?) {}
@@ -617,7 +650,11 @@ class VirtualPlayer : Player {
     }
 
     override fun setSpectatorTarget(entity: Entity?) {}
-    override fun sendTitle(title: String?, subtitle: String?) {}
+
+    @Deprecated("Deprecated in Java")
+    override fun sendTitle(title: String?, subtitle: String?) {
+    }
+
     override fun sendTitle(title: String?, subtitle: String?, fadeIn: Int, stay: Int, fadeOut: Int) {}
     override fun resetTitle() {}
     override fun spawnParticle(particle: Particle, location: Location, count: Int) {}
@@ -798,11 +835,16 @@ class VirtualPlayer : Player {
     }
 
     override fun closeInventory() {}
+
+    @Deprecated("Deprecated in Java")
     override fun getItemInHand(): ItemStack {
         return null!!
     }
 
-    override fun setItemInHand(item: ItemStack?) {}
+    @Deprecated("Deprecated in Java")
+    override fun setItemInHand(item: ItemStack?) {
+    }
+
     override fun getItemOnCursor(): ItemStack {
         return null!!
     }
@@ -879,16 +921,24 @@ class VirtualPlayer : Player {
         return null!!
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getShoulderEntityLeft(): Entity? {
         return null
     }
 
-    override fun setShoulderEntityLeft(entity: Entity?) {}
+    @Deprecated("Deprecated in Java")
+    override fun setShoulderEntityLeft(entity: Entity?) {
+    }
+
+    @Deprecated("Deprecated in Java")
     override fun getShoulderEntityRight(): Entity? {
         return null
     }
 
-    override fun setShoulderEntityRight(entity: Entity?) {}
+    @Deprecated("Deprecated in Java")
+    override fun setShoulderEntityRight(entity: Entity?) {
+    }
+
     override fun dropItem(b: Boolean): Boolean {
         return false
     }
@@ -976,6 +1026,7 @@ class VirtualPlayer : Player {
         return false
     }
 
+    @Deprecated("Deprecated in Java")
     override fun addPotionEffect(effect: PotionEffect, force: Boolean): Boolean {
         return false
     }
@@ -1097,12 +1148,20 @@ class VirtualPlayer : Player {
     }
 
     override fun setAbsorptionAmount(amount: Double) {}
+
+    @Deprecated("Deprecated in Java")
     override fun getMaxHealth(): Double {
         return 0.0
     }
 
-    override fun setMaxHealth(health: Double) {}
-    override fun resetMaxHealth() {}
+    @Deprecated("Deprecated in Java")
+    override fun setMaxHealth(health: Double) {
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun resetMaxHealth() {
+    }
+
     override fun getCustomName(): String? {
         return null
     }
@@ -1170,11 +1229,11 @@ class VirtualPlayer : Player {
         return null!!
     }
 
-    override fun <T : Projectile?> launchProjectile(projectile: Class<out T?>): T {
+    override fun <T : Projectile?> launchProjectile(projectile: Class<out T?>): T & Any {
         return null!!
     }
 
-    override fun <T : Projectile?> launchProjectile(projectile: Class<out T?>, velocity: Vector?): T {
+    override fun <T : Projectile?> launchProjectile(projectile: Class<out T?>, velocity: Vector?): T & Any {
         return null!!
     }
 }
