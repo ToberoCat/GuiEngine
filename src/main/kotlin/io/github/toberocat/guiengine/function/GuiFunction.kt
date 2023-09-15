@@ -1,7 +1,9 @@
 package io.github.toberocat.guiengine.function
 
 import io.github.toberocat.guiengine.GuiEngineApi
+import io.github.toberocat.guiengine.GuiEngineApiPlugin
 import io.github.toberocat.guiengine.context.GuiContext
+import org.bukkit.Bukkit
 import java.util.function.BiConsumer
 
 /**
@@ -23,13 +25,21 @@ interface GuiFunction {
     fun call(api: GuiEngineApi, context: GuiContext)
 
     companion object {
-        fun anonymous(method: BiConsumer<GuiEngineApi, GuiContext>): GuiFunction {
-            return object : GuiFunction {
-                override val type = "anonymous"
+        fun anonymous(method: BiConsumer<GuiEngineApi, GuiContext>): GuiFunction = object : GuiFunction {
+            override val type = "anonymous"
 
-                override fun call(api: GuiEngineApi, context: GuiContext) {
+            override fun call(api: GuiEngineApi, context: GuiContext) {
+                method.accept(api, context)
+            }
+        }
+
+        fun anonymousSync(method: BiConsumer<GuiEngineApi, GuiContext>): GuiFunction = object : GuiFunction {
+            override val type = "anonymousSync"
+
+            override fun call(api: GuiEngineApi, context: GuiContext) {
+                Bukkit.getScheduler().runTask(GuiEngineApiPlugin.plugin, Runnable {
                     method.accept(api, context)
-                }
+                })
             }
         }
     }
