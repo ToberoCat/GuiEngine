@@ -22,9 +22,8 @@
         <spigot.api.version>1.18.1-R0.1-SNAPSHOT</spigot.api.version>
         <toberocore.version>0f2d094899</toberocore.version>
 
-        <!-- Server Location -->
-        <server.location>/media/tobias/Data/Development/Minecraft/Spigot/Projects/JumpAndRun/server/plugins
-        </server.location>
+        <!-- Server Location. Set as run arg -->
+        <server.location>.</server.location>
     </properties>
 
     <repositories>
@@ -133,6 +132,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <outputFile>${server.location}/GuiEngine-${project.version}.jar</outputFile>
                             <relocations>
                                 <relocation>
                                     <pattern>com.fasterxml.jackson</pattern>
