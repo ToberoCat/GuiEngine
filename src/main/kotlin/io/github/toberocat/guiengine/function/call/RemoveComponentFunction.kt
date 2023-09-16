@@ -1,13 +1,10 @@
 package io.github.toberocat.guiengine.function.call
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
+import io.github.toberocat.guiengine.function.GuiFunctionFactory
 import io.github.toberocat.guiengine.xml.parsing.ParserContext
-import java.io.IOException
 
 /**
  * Custom GUI function to remove a component from the GUI.
@@ -32,12 +29,9 @@ data class RemoveComponentFunction(val target: String) : GuiFunction {
     /**
      * Custom deserializer to convert JSON data into a `RemoveComponentFunction` instance.
      */
-    class Deserializer : JsonDeserializer<RemoveComponentFunction>() {
-        @Throws(IOException::class)
-        override fun deserialize(p: JsonParser, ctxt: DeserializationContext): RemoveComponentFunction {
-            val context = ParserContext.empty(p.codec.readTree(p))
-            return RemoveComponentFunction(context.string("v").require(TYPE, javaClass))
-        }
+    class Deserializer : GuiFunctionFactory<RemoveComponentFunction>() {
+        override fun build(node: ParserContext): RemoveComponentFunction =
+            RemoveComponentFunction(node.string("target").require(TYPE, javaClass))
     }
 
     companion object {

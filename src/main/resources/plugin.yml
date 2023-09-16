@@ -17,3 +17,5 @@ permissions:
     default: op
   guiengine.give:
     default: op
+  guiengine.updatechecker:
+    default: op

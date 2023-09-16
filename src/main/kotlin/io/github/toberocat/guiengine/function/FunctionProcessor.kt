@@ -1,7 +1,6 @@
 package io.github.toberocat.guiengine.function
 
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -23,7 +22,7 @@ import java.util.regex.Pattern
  */
 object FunctionProcessor {
     private val pattern = Pattern.compile("\\{([^}]*)}", Pattern.MULTILINE)
-    private val FUNCTIONS: MutableMap<String, Class<out GuiFunction>> = HashMap()
+    private val FUNCTIONS: MutableMap<String, GuiFunctionFactory<*>> = HashMap()
     private val COMPUTE_FUNCTIONS: MutableSet<ComputeFunction> = HashSet()
     private val OBJECT_MAPPER: ObjectMapper = XmlMapper().registerKotlinModule()
 
@@ -31,10 +30,10 @@ object FunctionProcessor {
      * Registers a custom GUI function.
      *
      * @param id    The ID of the function.
-     * @param clazz The class implementing the custom GUI function.
+     * @param factory The class implementing the custom GUI function.
      */
-    fun registerFunction(id: String, clazz: Class<out GuiFunction>) {
-        FUNCTIONS[id] = clazz
+    fun registerFunction(id: String, factory: GuiFunctionFactory<*>) {
+        FUNCTIONS[id] = factory
     }
 
     /**
@@ -54,18 +53,18 @@ object FunctionProcessor {
      * @throws JsonProcessingException If there is an issue with processing the JSON node.
      */
     @Throws(JsonProcessingException::class)
-    fun createFunction(node: JsonNode): GuiFunction {
-        val id = ParserContext.empty(node)
+    fun createFunction(node: ParserContext): GuiFunction {
+        val id = node
             .string("type")
             .require { GuiFunctionException("A gui function is missing a type") }
-        return OBJECT_MAPPER.treeToValue(node, FUNCTIONS[id])
+        return FUNCTIONS[id]?.build(node) ?: throw GuiFunctionException("'$id' not known as a gui function")
     }
 
-    fun createFunctions(node: JsonNode): List<GuiFunction> {
+    fun createFunctions(node: ParserContext): List<GuiFunction> {
         try {
             val functions: MutableList<GuiFunction> = LinkedList()
-            if (node.isArray) {
-                for (function in node) functions.add(createFunction(function!!))
+            if (node.node.isArray) {
+                for (function in node) functions.add(createFunction(function))
             } else {
                 functions.add(createFunction(node))
             }

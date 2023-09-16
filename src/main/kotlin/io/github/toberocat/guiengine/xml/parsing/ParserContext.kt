@@ -10,12 +10,12 @@ import org.bukkit.Material
 import java.util.*
 import java.util.function.Consumer
 
-data class ParserContext(
+open class ParserContext(
     val node: JsonNode,
-    private val computables: MutableMap<String, String>,
-    private val context: GuiContext?,
-    private val api: GuiEngineApi?
-) {
+    internal val computables: MutableMap<String, String>,
+    internal val context: GuiContext?,
+    internal val api: GuiEngineApi?
+) : Iterable<ParserContext> {
     companion object {
         fun empty(node: JsonNode) = ParserContext(node, mutableMapOf(), null, null)
     }
@@ -26,7 +26,7 @@ data class ParserContext(
      * @param field The field name of the child node to retrieve.
      * @return A ParserContext representing the child node if found, or null if not present.
      */
-    operator fun get(field: String): ParserContext? = when {
+    open operator fun get(field: String): ParserContext? = when {
         node.has(field) -> ParserContext(node.get(field), computables, context, api)
         else -> null
     }
@@ -189,9 +189,9 @@ data class ParserContext(
      * @return An Optional containing the list of GuiFunction objects if found,
      * or an empty Optional if not present.
      */
-    fun functions(field: String) = node(field).map { FunctionProcessor.createFunctions(it.node) }
+    fun functions(field: String) = node(field).map { FunctionProcessor.createFunctions(it) }
 
-    private fun asText(field: String, node: JsonNode): String = node.asText().let { raw ->
+    protected open fun asText(field: String, node: JsonNode): String = node.asText().let { raw ->
         context?.let {
             val processed = FunctionProcessor.applyFunctions(it, raw)
             if (raw != processed)
@@ -199,4 +199,7 @@ data class ParserContext(
             processed
         } ?: raw
     }
+
+    override fun iterator(): Iterator<ParserContext> =
+        node.map { ParserContext(it, computables, context, api) }.iterator()
 }

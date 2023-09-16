@@ -1,16 +1,13 @@
 package io.github.toberocat.guiengine.function.call
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.github.toberocat.guiengine.GuiEngineApiPlugin.Companion.plugin
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
+import io.github.toberocat.guiengine.function.GuiFunctionFactory
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import io.github.toberocat.toberocore.action.Actions
 import org.bukkit.Bukkit
-import java.io.IOException
 
 /**
  * Custom GUI function to call an action when triggered.
@@ -42,12 +39,10 @@ data class ActionFunction(val action: String) : GuiFunction {
     /**
      * Custom deserializer to convert JSON data into an `ActionFunction` instance.
      */
-    class Deserializer : JsonDeserializer<ActionFunction>() {
-        @Throws(IOException::class)
-        override fun deserialize(p: JsonParser, ctxt: DeserializationContext): ActionFunction {
-            val node = p.codec.readTree<JsonNode>(p)
-            return ActionFunction(node[""].textValue())
-        }
+    class Deserializer : GuiFunctionFactory<ActionFunction>() {
+        override fun build(node: ParserContext): ActionFunction = ActionFunction(
+            node.string("").require(TYPE, javaClass)
+        )
     }
 
     companion object {

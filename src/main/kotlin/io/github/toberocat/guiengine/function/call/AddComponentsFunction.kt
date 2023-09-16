@@ -1,14 +1,12 @@
 package io.github.toberocat.guiengine.function.call
 
-import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
-import java.io.IOException
+import io.github.toberocat.guiengine.function.GuiFunctionFactory
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 
 /**
  * Custom GUI function to add components to the GUI.
@@ -18,7 +16,7 @@ import java.io.IOException
  * Author: Tobias Madlberger (Tobias)
  */
 @JsonDeserialize(using = AddComponentsFunction.Deserializer::class)
-data class AddComponentsFunction(val root: JsonNode) : GuiFunction {
+data class AddComponentsFunction(val root: ParserContext) : GuiFunction {
     override val type = TYPE
 
     /**
@@ -28,7 +26,7 @@ data class AddComponentsFunction(val root: JsonNode) : GuiFunction {
      */
     override fun call(context: GuiContext) {
         try {
-            addComponents(context, root["component"])
+            addComponents(context, root.node["component"])
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)
         }
@@ -53,11 +51,8 @@ data class AddComponentsFunction(val root: JsonNode) : GuiFunction {
     /**
      * Custom deserializer to convert JSON data into an `AddComponentsFunction` instance.
      */
-    class Deserializer : JsonDeserializer<AddComponentsFunction>() {
-        @Throws(IOException::class)
-        override fun deserialize(p: JsonParser, ctxt: DeserializationContext): AddComponentsFunction {
-            return AddComponentsFunction(p.codec.readTree(p))
-        }
+    class Deserializer : GuiFunctionFactory<AddComponentsFunction>() {
+        override fun build(node: ParserContext) = AddComponentsFunction(node)
     }
 
     companion object {

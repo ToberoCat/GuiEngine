@@ -1,5 +1,8 @@
 package io.github.toberocat.guiengine
 
+import com.jeff_media.updatechecker.UpdateCheckSource
+import com.jeff_media.updatechecker.UpdateChecker
+import com.jeff_media.updatechecker.UserAgentBuilder
 import io.github.toberocat.guiengine.action.OpenGuiAction
 import io.github.toberocat.guiengine.commands.GuiCommands
 import io.github.toberocat.guiengine.components.provided.embedded.EmbeddedGuiComponent
@@ -13,6 +16,7 @@ import io.github.toberocat.guiengine.components.provided.toggle.ToggleItemCompon
 import io.github.toberocat.guiengine.exception.GuiIORuntimeException
 import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.function.call.*
+import io.github.toberocat.guiengine.function.call.input.InputFunction
 import io.github.toberocat.guiengine.function.compute.DateFunction
 import io.github.toberocat.guiengine.function.compute.GuiComponentPropertyFunction
 import io.github.toberocat.guiengine.function.compute.HasNotPermissionFunction
@@ -23,16 +27,14 @@ import io.github.toberocat.guiengine.item.GuiItemManager
 import io.github.toberocat.guiengine.listeners.ItemClickListener
 import io.github.toberocat.guiengine.listeners.PlayerJoinListener
 import io.github.toberocat.guiengine.utils.BStatsCollector
-import io.github.toberocat.guiengine.utils.UpdateChecker
 import io.github.toberocat.guiengine.utils.Utils
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager
 import io.github.toberocat.toberocore.action.ActionCore
-import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
+
+const val SPIGOT_RESOURCE_ID = 109983
 
 /**
  * This class represents the main plugin class for the GuiEngineApi plugin.
@@ -96,8 +98,7 @@ class GuiEngineApiPlugin : JavaPlugin() {
         Utils.threadPool.shutdown()
         try {
             if (Utils.threadPool.awaitTermination(
-                    10,
-                    TimeUnit.SECONDS
+                    10, TimeUnit.SECONDS
                 )
             ) logger.info("All threads have been stopped. Continuing with server shutdown") else logger.warning("Shutting down the threads took longer than 10 seconds. Skipping shutdown. Might need a server restart")
         } catch (e: InterruptedException) {
@@ -138,24 +139,16 @@ class GuiEngineApiPlugin : JavaPlugin() {
      */
     private fun registerComponents() {
         GuiEngineApi.registerSharedFactory(
-            SimpleItemComponent.TYPE,
-            SimpleItemComponent::class.java,
-            SimpleItemComponentBuilder::class.java
+            SimpleItemComponent.TYPE, SimpleItemComponent::class.java, SimpleItemComponentBuilder::class.java
         )
         GuiEngineApi.registerSharedFactory(
-            EmbeddedGuiComponent.TYPE,
-            EmbeddedGuiComponent::class.java,
-            EmbeddedGuiComponentBuilder::class.java
+            EmbeddedGuiComponent.TYPE, EmbeddedGuiComponent::class.java, EmbeddedGuiComponentBuilder::class.java
         )
         GuiEngineApi.registerSharedFactory(
-            ToggleItemComponent.TYPE,
-            ToggleItemComponent::class.java,
-            ToggleItemComponentBuilder::class.java
+            ToggleItemComponent.TYPE, ToggleItemComponent::class.java, ToggleItemComponentBuilder::class.java
         )
         GuiEngineApi.registerSharedFactory(
-            PagedComponent.TYPE,
-            PagedComponent::class.java,
-            PagedComponentBuilder::class.java
+            PagedComponent.TYPE, PagedComponent::class.java, PagedComponentBuilder::class.java
         )
     }
 
@@ -164,22 +157,23 @@ class GuiEngineApiPlugin : JavaPlugin() {
      */
     private fun checkForUpdate() {
         if (!config.getBoolean("update-checker")) return
-        val pattern = Pattern.compile("[^0-9]")
-        val checker = UpdateChecker(this, 109983)
-        checker.getVersion { version: String? ->
-            val latest = version?.let { pattern.matcher(it).replaceAll("") }
-            val current = pattern.matcher(description.version).replaceAll("")
-            if (latest == current) return@getVersion
-            LATEST_VERSION = false
-            Bukkit.getOnlinePlayers().forEach { player: Player? -> PlayerJoinListener.send(player!!) }
-            Bukkit.getConsoleSender().sendMessage(
-                String.format(
-                    "§bA newer version of §eGuiEngine§b is available on §espigotmc.org§b. §e%s §b-> §e%s",
-                    description.version,
-                    version
-                )
+
+        UpdateChecker(this, UpdateCheckSource.SPIGOT, SPIGOT_RESOURCE_ID.toString())
+            .setDownloadLink(SPIGOT_RESOURCE_ID)
+            .setDonationLink("https://www.paypal.com/donate/?hosted_button_id=QVJDUKN2VJ6BE")
+            .setChangelogLink(SPIGOT_RESOURCE_ID)
+            .setNotifyOpsOnJoin(true)
+            .setColoredConsoleOutput(true)
+            .setSupportLink("https://discord.com/invite/yJYyNRfk39")
+            .setNotifyByPermissionOnJoin("guiengine.updatechecker")
+            .setUserAgent(
+                UserAgentBuilder()
+                    .addServerVersion()
+                    .addBukkitVersion()
+                    .addPluginNameAndVersion()
             )
-        }
+            .checkEveryXHours(24.0)
+            .checkNow()
     }
 
     /**
@@ -188,11 +182,12 @@ class GuiEngineApiPlugin : JavaPlugin() {
      * Additionally, it registers default compute functions for evaluating GUI component properties and permissions.
      */
     private fun registerFunctions() {
-        FunctionProcessor.registerFunction(AddComponentsFunction.TYPE, AddComponentsFunction::class.java)
-        FunctionProcessor.registerFunction(EditComponentFunction.TYPE, EditComponentFunction::class.java)
-        FunctionProcessor.registerFunction(RemoveComponentFunction.TYPE, RemoveComponentFunction::class.java)
-        FunctionProcessor.registerFunction(ActionFunction.TYPE, ActionFunction::class.java)
-        FunctionProcessor.registerFunction(DelayFunction.TYPE, DelayFunction::class.java)
+        FunctionProcessor.registerFunction(AddComponentsFunction.TYPE, AddComponentsFunction.Deserializer())
+        FunctionProcessor.registerFunction(EditComponentFunction.TYPE, EditComponentFunction.Deserializer())
+        FunctionProcessor.registerFunction(RemoveComponentFunction.TYPE, RemoveComponentFunction.Deserializer())
+        FunctionProcessor.registerFunction(ActionFunction.TYPE, ActionFunction.Deserializer())
+        FunctionProcessor.registerFunction(DelayFunction.TYPE, DelayFunction.Deserializer())
+        FunctionProcessor.registerFunction(InputFunction.TYPE, InputFunction.Deserializer())
         FunctionProcessor.registerComputeFunction(GuiComponentPropertyFunction())
         FunctionProcessor.registerComputeFunction(HasPermissionFunction())
         FunctionProcessor.registerComputeFunction(HasNotPermissionFunction())
