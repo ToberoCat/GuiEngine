@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 object FunctionProcessor {
     private val pattern = Pattern.compile("\\{([^}]*)}", Pattern.MULTILINE)
     private val FUNCTIONS: MutableMap<String, GuiFunctionFactory<*>> = HashMap()
-    private val COMPUTE_FUNCTIONS: MutableSet<ComputeFunction> = HashSet()
+    private val COMPUTE_FUNCTIONS: MutableSet<GuiComputeFunction> = HashSet()
     private val OBJECT_MAPPER: ObjectMapper = XmlMapper().registerKotlinModule()
 
     /**
@@ -39,10 +39,10 @@ object FunctionProcessor {
     /**
      * Registers a custom compute function.
      *
-     * @param computeFunction The custom compute function to register.
+     * @param guiComputeFunction The custom compute function to register.
      */
-    fun registerComputeFunction(computeFunction: ComputeFunction) {
-        COMPUTE_FUNCTIONS.add(computeFunction)
+    fun registerComputeFunction(guiComputeFunction: GuiComputeFunction) {
+        COMPUTE_FUNCTIONS.add(guiComputeFunction)
     }
 
     /**

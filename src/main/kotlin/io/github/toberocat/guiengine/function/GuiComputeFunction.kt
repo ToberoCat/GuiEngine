@@ -9,7 +9,7 @@ import io.github.toberocat.guiengine.context.GuiContext
  * Created: 30.04.2023
  * Author: Tobias Madlberger (Tobias)
  */
-interface ComputeFunction {
+interface GuiComputeFunction {
     /**
      * Computes the value of the provided placeholder.
      *

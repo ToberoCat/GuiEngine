@@ -8,6 +8,7 @@ import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.function.GuiFunctionFactory
 import io.github.toberocat.guiengine.xml.parsing.ParserContext
+import io.github.toberocat.guiengine.xml.parsing.PlaceholderParserContext
 import io.github.toberocat.guiengine.xml.parsing.PlaceholderParserContext.Companion.toPlaceholderContext
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -21,9 +22,7 @@ data class InputFunction(val inputType: InputType, val variable: String, val par
             Bukkit.getScheduler().runTask(GuiEngineApiPlugin.plugin, Runnable {
                 inputType.takeInput(viewer, parser) {
                     runBody(
-                        viewer,
-                        context,
-                        it
+                        viewer, context, it
                     )
                 }
             })
@@ -31,8 +30,14 @@ data class InputFunction(val inputType: InputType, val variable: String, val par
     }
 
     private fun runBody(viewer: Player, context: GuiContext, input: String) {
-        val functions = parser.toPlaceholderContext(mapOf("%$variable%" to input))
-            .functions("function")
+        println(parser.node)
+
+        val placeholders: MutableMap<String, String> = when (parser) {
+            is PlaceholderParserContext -> parser.placeholders
+            else -> mutableMapOf()
+        }
+        placeholders["%$variable%"] = input
+        val functions = parser.toPlaceholderContext(placeholders).functions("function")
             .require { GuiFunctionException("Input function must have at least a single function") }
         FunctionProcessor.callFunctions(functions, context)
         Bukkit.getScheduler().runTask(GuiEngineApiPlugin.plugin, Runnable {
@@ -42,7 +47,6 @@ data class InputFunction(val inputType: InputType, val variable: String, val par
     }
 
     class Deserializer : GuiFunctionFactory<InputFunction>() {
-
         override fun build(node: ParserContext) = InputFunction(
             node.enum(InputType::class.java, "input-type").require(TYPE, javaClass),
             node.string("variable").require(TYPE, javaClass),

@@ -1,7 +1,7 @@
 package io.github.toberocat.guiengine.function.compute
 
 import io.github.toberocat.guiengine.context.GuiContext
-import io.github.toberocat.guiengine.function.ComputeFunction
+import io.github.toberocat.guiengine.function.GuiComputeFunction
 import java.lang.reflect.InvocationTargetException
 
 /**
@@ -11,7 +11,7 @@ import java.lang.reflect.InvocationTargetException
  * Created: 30.04.2023
  * Author: Tobias Madlberger (Tobias)
  */
-class GuiComponentPropertyFunction : ComputeFunction {
+class GuiComponentPropertyFunction : GuiComputeFunction {
 
     override fun compute(context: GuiContext, value: String): String {
         val without = value.replace(PREFIX, "")

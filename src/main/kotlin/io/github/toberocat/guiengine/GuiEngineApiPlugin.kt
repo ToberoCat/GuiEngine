@@ -17,10 +17,7 @@ import io.github.toberocat.guiengine.exception.GuiIORuntimeException
 import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.function.call.*
 import io.github.toberocat.guiengine.function.call.input.InputFunction
-import io.github.toberocat.guiengine.function.compute.DateFunction
-import io.github.toberocat.guiengine.function.compute.GuiComponentPropertyFunction
-import io.github.toberocat.guiengine.function.compute.HasNotPermissionFunction
-import io.github.toberocat.guiengine.function.compute.HasPermissionFunction
+import io.github.toberocat.guiengine.function.compute.*
 import io.github.toberocat.guiengine.interpreter.InterpreterManager
 import io.github.toberocat.guiengine.interpreter.provided.*
 import io.github.toberocat.guiengine.item.GuiItemManager
@@ -30,6 +27,7 @@ import io.github.toberocat.guiengine.utils.BStatsCollector
 import io.github.toberocat.guiengine.utils.Utils
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager
 import io.github.toberocat.toberocore.action.ActionCore
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -192,6 +190,12 @@ class GuiEngineApiPlugin : JavaPlugin() {
         FunctionProcessor.registerComputeFunction(HasPermissionFunction())
         FunctionProcessor.registerComputeFunction(HasNotPermissionFunction())
         FunctionProcessor.registerComputeFunction(DateFunction())
+
+        Bukkit.getPluginManager().getPlugin("PlaceholderAPI")?.let {
+            logger.info("Papi found. Registering papi placeholder function")
+            FunctionProcessor.registerComputeFunction(PapiFunction())
+        }
+
     }
 
     /**

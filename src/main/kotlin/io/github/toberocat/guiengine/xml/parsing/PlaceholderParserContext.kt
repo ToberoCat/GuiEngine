@@ -6,13 +6,13 @@ import io.github.toberocat.guiengine.context.GuiContext
 
 class PlaceholderParserContext(
     node: JsonNode,
-    private val placeholders: Map<String, String>,
+    val placeholders: MutableMap<String, String>,
     computables: MutableMap<String, String>,
     context: GuiContext?,
     api: GuiEngineApi?
 ) : ParserContext(node, computables, context, api) {
     companion object {
-        fun ParserContext.toPlaceholderContext(placeholders: Map<String, String>): PlaceholderParserContext =
+        fun ParserContext.toPlaceholderContext(placeholders: MutableMap<String, String>): PlaceholderParserContext =
             PlaceholderParserContext(node, placeholders, computables, context, api)
 
     }

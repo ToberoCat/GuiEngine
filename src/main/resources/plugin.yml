@@ -3,6 +3,7 @@ version: '${project.version}'
 main: io.github.toberocat.guiengine.GuiEngineApiPlugin
 api-version: 1.16
 authors: [ Tobero ]
+softdepend: [ PlaceholderAPI ]
 commands:
   guiengine:
     description: View your guis

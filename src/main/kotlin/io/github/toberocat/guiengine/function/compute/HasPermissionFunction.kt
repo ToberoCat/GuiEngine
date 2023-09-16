@@ -1,7 +1,7 @@
 package io.github.toberocat.guiengine.function.compute
 
 import io.github.toberocat.guiengine.context.GuiContext
-import io.github.toberocat.guiengine.function.ComputeFunction
+import io.github.toberocat.guiengine.function.GuiComputeFunction
 
 /**
  * Custom compute function to check if a player has a specific permission.
@@ -10,7 +10,7 @@ import io.github.toberocat.guiengine.function.ComputeFunction
  * Created: 14.07.2023
  * Author: Tobias Madlberger (Tobias)
  */
-class HasPermissionFunction : ComputeFunction {
+class HasPermissionFunction : GuiComputeFunction {
 
     override fun compute(context: GuiContext, value: String): String {
         val permission = value.replace(PREFIX, "")
