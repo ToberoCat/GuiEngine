@@ -4,7 +4,7 @@ import io.github.toberocat.guiengine.GuiEngineApiPlugin
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.context.provided.SizeableGuiContext
 import io.github.toberocat.guiengine.render.GuiRenderEngine
-import io.github.toberocat.guiengine.utils.orElseThrow
+import io.github.toberocat.guiengine.utils.nullCheck
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -20,8 +20,8 @@ class SizeableGuiRenderEngine : GuiRenderEngine {
         ?.let { Bukkit.createInventory(viewer, 9 * it.height, it.title) }
 
     override fun width(context: GuiContext) = (context as? SizeableGuiContext)?.width
-        .orElseThrow("Incompatible guicontext provided")
+        .nullCheck("Incompatible guicontext provided")
 
     override fun height(context: GuiContext) = (context as? SizeableGuiContext)?.height
-        .orElseThrow("Incompatible guicontext provided")
+        .nullCheck("Incompatible guicontext provided")
 }

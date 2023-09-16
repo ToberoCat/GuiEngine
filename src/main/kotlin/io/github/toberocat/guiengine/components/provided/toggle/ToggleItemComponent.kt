@@ -7,8 +7,8 @@ import io.github.toberocat.guiengine.components.GuiComponent
 import io.github.toberocat.guiengine.components.container.Selectable
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
-import io.github.toberocat.guiengine.utils.GeneratorContext
-import io.github.toberocat.guiengine.utils.ParserContext
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
@@ -80,13 +80,13 @@ class ToggleItemComponent(
         if (null == context || null == api)
             return emptyArray()
 
-        val nodes = options.getFieldList()
+        val nodes = options.fieldList()
         val components: MutableList<GuiComponent> = ArrayList()
         val selectionModel: MutableList<String> = ArrayList()
 
         try {
             for (node in nodes) {
-                selectionModel.add(node.getOptionalString("value").orElseThrow())
+                selectionModel.add(node.string("value").require(id, javaClass))
                 val xmlComponent = context!!.interpreter().xmlComponent(node.node, api!!)
                 val component = context!!.interpreter().createComponent(xmlComponent, api!!, context!!)
                 components.add(component)

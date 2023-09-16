@@ -1,8 +1,7 @@
 package io.github.toberocat.guiengine.components.provided.toggle
 
 import io.github.toberocat.guiengine.components.AbstractGuiComponentBuilder
-import io.github.toberocat.guiengine.exception.MissingRequiredParamException
-import io.github.toberocat.guiengine.utils.ParserContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 
 /**
@@ -69,7 +68,7 @@ class ToggleItemComponentBuilder : AbstractGuiComponentBuilder<ToggleItemCompone
     @Throws(IOException::class)
     override fun deserialize(node: ParserContext) {
         super.deserialize(node)
-        setOptions(node.getOptionalNode("option").orElseThrow { MissingRequiredParamException(this, "option") })
-        setSelected(node.getOptionalInt("selected").orElseThrow { MissingRequiredParamException(this, "selected") })
+        setOptions(node.node("option").require(this))
+        setSelected(node.int("selected").require(this))
     }
 }

@@ -1,7 +1,7 @@
 package io.github.toberocat.guiengine.components.provided.paged
 
 import io.github.toberocat.guiengine.components.provided.embedded.EmbeddedGuiComponentBuilder
-import io.github.toberocat.guiengine.utils.ParserContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 import java.util.*
 
@@ -77,12 +77,12 @@ class PagedComponentBuilder : EmbeddedGuiComponentBuilder<PagedComponentBuilder>
     @Throws(IOException::class)
     override fun deserialize(node: ParserContext) {
         deserialize(node, false)
-        setShowingPage(node.getOptionalInt("showing-page").orElse(0))
+        setShowingPage(node.int("showing-page").optional(0))
         setParent(node)
-        setPattern(node.getOptionalString("pattern").map { x: String ->
+        setPattern(node.string("pattern").map { x: String ->
             Arrays.stream(x.split(",".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray())
                 .mapToInt { s: String -> s.toInt() }.toArray()
-        }.orElse(IntArray(0)))
+        }.optional(IntArray(0)))
     }
 }

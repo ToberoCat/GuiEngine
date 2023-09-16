@@ -1,8 +1,7 @@
 package io.github.toberocat.guiengine.components.provided.item
 
 import io.github.toberocat.guiengine.components.AbstractGuiComponentBuilder
-import io.github.toberocat.guiengine.utils.ParserContext
-import io.github.toberocat.guiengine.utils.orElseThrow
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import io.github.toberocat.toberocore.util.ItemUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -105,21 +104,18 @@ open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>>
     @Throws(IOException::class)
     override fun deserialize(node: ParserContext) {
         super.deserialize(node)
-        setName(node.getOptionalString("name").orElse(" "))
-        setLore(node.getOptionalStringArray("lore").orElse(emptyArray()))
-        val texture = node.getOptionalString("head-texture")
+        setName(node.string("name").optional(" "))
+        setLore(node.stringArray("lore").optional(emptyArray()))
+        val texture = node.string("head-texture")
             .map { obj: String -> obj.trim { it <= ' ' } }
-            .orElse(null)
-        val headOwner = node.getOptionalUUID("head-owner")
-            .orElse(null)
+            .nullable(null)
+        val headOwner = node.uuid("head-owner")
+            .nullable(null)
         if (null != texture || null != headOwner) {
             setOwner(headOwner)
             setTextureId(texture)
         } else {
-            setMaterial(
-                node.getOptionalMaterial("material")
-                    .orElseThrow(this, "material")
-            )
+            setMaterial(node.material("material").require(this))
         }
     }
 }

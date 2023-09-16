@@ -1,8 +1,7 @@
 package io.github.toberocat.guiengine.components.provided.embedded
 
 import io.github.toberocat.guiengine.components.AbstractGuiComponentBuilder
-import io.github.toberocat.guiengine.utils.ParserContext
-import io.github.toberocat.guiengine.utils.orElseThrow
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 
 /**
@@ -100,14 +99,14 @@ open class EmbeddedGuiComponentBuilder<B : EmbeddedGuiComponentBuilder<B>> : Abs
     @Throws(IOException::class)
     protected fun deserialize(node: ParserContext, forceTarget: Boolean) {
         super.deserialize(node)
-        setCopyAir(node.getOptionalBoolean("copy-air").orElse(true))
-        setInteractions(node.getOptionalBoolean("interactions").orElse(true))
-        setWidth(node.getOptionalInt("width").orElseThrow(this, "width"))
-        setHeight(node.getOptionalInt("height").orElseThrow(this, "height"))
-        setTargetGui(node.getOptionalString("target-gui").let {
+        setCopyAir(node.boolean("copy-air").optional(true))
+        setInteractions(node.boolean("interactions").optional(true))
+        setWidth(node.int("width").require(this))
+        setHeight(node.int("height").require(this))
+        setTargetGui(node.string("target-gui").let {
             when {
-                !forceTarget -> it.orElse("")
-                else -> it.orElseThrow(this, "target-gui")
+                !forceTarget -> it.optional("")
+                else -> it.require(this)
             }
         })
     }

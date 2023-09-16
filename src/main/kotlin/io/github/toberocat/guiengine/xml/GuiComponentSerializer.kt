@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import io.github.toberocat.guiengine.components.GuiComponent
-import io.github.toberocat.guiengine.utils.GeneratorContext
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
 import java.io.IOException
 
 /**

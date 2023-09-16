@@ -5,9 +5,9 @@ import io.github.toberocat.guiengine.components.AbstractGuiComponent
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
-import io.github.toberocat.guiengine.utils.GeneratorContext
 import io.github.toberocat.guiengine.utils.Utils.translateToSlot
 import io.github.toberocat.guiengine.utils.VirtualInventory
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent

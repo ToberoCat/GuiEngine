@@ -1,6 +1,6 @@
 package io.github.toberocat.guiengine.components
 
-import io.github.toberocat.guiengine.utils.ParserContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 
 /**

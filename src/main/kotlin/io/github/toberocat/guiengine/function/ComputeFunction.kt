@@ -1,6 +1,5 @@
 package io.github.toberocat.guiengine.function
 
-import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.context.GuiContext
 
 /**
@@ -14,12 +13,11 @@ interface ComputeFunction {
     /**
      * Computes the value of the provided placeholder.
      *
-     * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param context The `GuiContext` instance representing the GUI context for which the computation is performed.
      * @param value   The input value containing the placeholder to compute.
      * @return The computed value of the placeholder.
      */
-    fun compute(api: GuiEngineApi, context: GuiContext, value: String): String
+    fun compute(context: GuiContext, value: String): String
 
     /**
      * Checks if the provided value contains the function to be computed.

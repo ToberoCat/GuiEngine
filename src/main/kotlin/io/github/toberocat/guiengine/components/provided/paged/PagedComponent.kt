@@ -12,11 +12,11 @@ import io.github.toberocat.guiengine.components.provided.embedded.EmbeddedGuiCom
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
-import io.github.toberocat.guiengine.utils.GeneratorContext
 import io.github.toberocat.guiengine.utils.JsonUtils.writeArray
-import io.github.toberocat.guiengine.utils.ParserContext
 import io.github.toberocat.guiengine.utils.Utils.translateFromSlot
 import io.github.toberocat.guiengine.xml.XmlGui
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import io.github.toberocat.toberocore.action.Action
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -122,7 +122,7 @@ open class PagedComponent(
         super.serialize(gen, serializers)
         writeArray(gen, "pattern", pattern)
         gen.writeNumberField("showing-page", showedPage)
-        gen.writeRaw(parent.node.toString())
+        gen.writePOJOField("page", pages.map { it.pageContext.components })
     }
 
     private fun updateEmbedded() {
@@ -173,8 +173,8 @@ class PageParser(
         }
 
 
-        node.getOptionalFieldList("page")
-            .orElse(emptyList())
+        node.fieldList("page")
+            .optional(emptyList())
             .forEach {
                 val (page, preferredPosition) = parsePage(it)
                 pages.add(preferredPosition ?: (pages.size - 1), page)
@@ -194,12 +194,14 @@ class PageParser(
         ).also {
             it.setInventory(context.inventory())
             it.setViewer(viewer)
+            it.domEvents.onRender.addAll(context.domEvents.onRender)
+            it.computableFunctionProcessor.copy(context.computableFunctionProcessor)
         })
 
     private fun parseNode(node: ParserContext): List<GuiComponent> {
         val interpreter = context.interpreter()
-        return node.getOptionalFieldList("component")
-            .orElse(ArrayList())
+        return node.fieldList("component")
+            .optional(ArrayList())
             .map {
                 return@map interpreter.createComponent(
                     interpreter.xmlComponent(it.node, api),
@@ -211,7 +213,7 @@ class PageParser(
 
     private fun parsePage(node: ParserContext): Pair<PatternPage, Int?> =
         createEmptyPage().also { page -> parseNode(node).forEach { page.insert(it) } } to
-                node.getOptionalInt("position").orElse(null)
+                node.int("position").nullable(null)
 }
 
 class PatternPage(
@@ -227,7 +229,7 @@ class PatternPage(
         val (x, y) = translateFromSlot(slot)
         component.setX(x)
         component.setY(y)
-        pageContext.add(api, component)
+        pageContext.add(component)
         return true
     }
 }

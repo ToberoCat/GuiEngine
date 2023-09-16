@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.GuiEngineApiPlugin.Companion.plugin
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
@@ -27,10 +26,9 @@ data class ActionFunction(val action: String) : GuiFunction {
     /**
      * Calls the specified action using the provided API and context.
      *
-     * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param context The `GuiContext` instance representing the GUI context for which the action is called.
      */
-    override fun call(api: GuiEngineApi, context: GuiContext) {
+    override fun call(context: GuiContext) {
         val viewer = context.viewer() ?: return
         Bukkit.getScheduler().runTask(plugin, Runnable {
             Actions(

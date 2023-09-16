@@ -1,5 +1,6 @@
 package io.github.toberocat.guiengine.xml
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.util.*
@@ -17,7 +18,8 @@ import java.util.*
 data class XmlGui(
     val interpreter: String,
     val components: Array<XmlComponent>,
-    val fields: Map<String, JsonNode>
+    val fields: Map<String, JsonNode>,
+    @JsonIgnore var guiId: String = ""
 ) {
     operator fun get(fieldName: String): Optional<JsonNode> {
         return Optional.ofNullable(fields[fieldName])

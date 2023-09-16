@@ -173,7 +173,9 @@ class GuiEngineApi(
             var content = Files.readString(gui.toPath())
             content = StringSubstitutor.replace(content, placeholders, "%", "%")
             content = content.replace("<gui", "<gui api='$id'")
-            xmlMapper.readValue(content, XmlGui::class.java)
+            val xml = xmlMapper.readValue(content, XmlGui::class.java)
+            xml.guiId = guiId
+            xml
         } catch (e: JsonParseException) {
             throw InvalidGuiFileException("Couldn't parse $guiId.gui. Caused by: ${e.message}. Check your guis syntax and validate that it isn't empty")
         } catch (e: IOException) {

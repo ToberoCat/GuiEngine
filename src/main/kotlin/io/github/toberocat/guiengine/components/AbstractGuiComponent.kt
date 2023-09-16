@@ -6,7 +6,7 @@ import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.FunctionProcessor.callFunctions
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
-import io.github.toberocat.guiengine.utils.GeneratorContext
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
@@ -30,7 +30,7 @@ abstract class AbstractGuiComponent protected constructor(
     private var hidden: Boolean
 ) : GuiComponent {
     var context: GuiContext? = null
-    var api: GuiEngineApi? = null
+    override var api: GuiEngineApi? = null
     /**
      * Get the list of click functions for the GUI component.
      *
@@ -58,44 +58,29 @@ abstract class AbstractGuiComponent protected constructor(
 
     override fun clickedComponent(event: InventoryClickEvent) {
         event.isCancelled = true
-        if (null == context || null == api) return
-        callFunctions(clickFunctions, api!!, context!!)
+        context?.let { callFunctions(clickFunctions, it) }
     }
 
     override fun draggedComponent(event: InventoryDragEvent) {
         event.isCancelled = true
-        if (null == context || null == api) return
-        callFunctions(dragFunctions, api!!, context!!)
-        context!!.render()
+        context?.let { callFunctions(dragFunctions, it) }
     }
 
     override fun closedComponent(event: InventoryCloseEvent) {
-        if (null == context || null == api) return
-        callFunctions(closeFunctions, api!!, context!!)
-        context!!.render()
+        context?.let { callFunctions(closeFunctions, it) }
     }
 
-    override fun renderPriority(): RenderPriority {
-        return priority
-    }
+    override fun renderPriority() = priority
 
-    override fun offsetX(): Int = offsetX
+    override fun offsetX() = offsetX
 
-    override fun offsetY(): Int {
-        return offsetY
-    }
+    override fun offsetY() = offsetY
 
-    override fun width(): Int {
-        return width
-    }
+    override fun width() = width
 
-    override fun height(): Int {
-        return height
-    }
+    override fun height() = height
 
-    override fun hidden(): Boolean {
-        return hidden
-    }
+    override fun hidden() = hidden
 
     override fun setX(x: Int) {
         offsetX = x
@@ -107,10 +92,6 @@ abstract class AbstractGuiComponent protected constructor(
 
     override fun setHidden(hidden: Boolean) {
         this.hidden = hidden
-    }
-
-    override fun setGuiApi(api: GuiEngineApi) {
-        this.api = api
     }
 
     override fun setGuiContext(context: GuiContext) {

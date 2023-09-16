@@ -68,9 +68,8 @@ interface GuiInterpreter : GuiEvents {
     /**
      * Converts a `GuiComponent` instance into its XML representation.
      *
-     * @param api       The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param component The `GuiComponent` instance to be converted.
      * @return The `XmlComponent` instance representing the XML representation of the GUI component.
      */
-    fun componentToXml(api: GuiEngineApi, component: GuiComponent): XmlComponent
+    fun componentToXml(component: GuiComponent): XmlComponent
 }

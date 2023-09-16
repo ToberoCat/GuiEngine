@@ -7,7 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.components.GuiComponent
 import io.github.toberocat.guiengine.components.GuiComponentBuilder
-import io.github.toberocat.guiengine.utils.ParserContext
+import io.github.toberocat.guiengine.exception.GuiException
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 import java.util.*
@@ -23,7 +24,7 @@ import java.util.*
  * Created: 10.07.2023
  * Author: Tobias Madlberger (Tobias)
 </B></C> */
-class GuiComponentDeserializer<C : GuiComponent?, B : GuiComponentBuilder?>(private val builderClazz: Class<B>) :
+class GuiComponentDeserializer<C : GuiComponent, B : GuiComponentBuilder?>(private val builderClazz: Class<B>) :
     JsonDeserializer<C>() {
 
     /**
@@ -51,8 +52,22 @@ class GuiComponentDeserializer<C : GuiComponent?, B : GuiComponentBuilder?>(priv
         val apiId = node["__:api:__"].asText()
         val contextId = UUID.fromString(node["__:ctx:__"].asText())
         val api = GuiEngineApi.APIS[apiId]
+            ?: throw GuiException("Couldn't parse component. Interpreter didn't specify '__:api:__' to a correct api id")
         val context = GuiEngineApi.LOADED_CONTEXTS[contextId]
-        builder!!.deserialize(ParserContext(node, context!!, api!!))
-        return builder.createComponent() as C
+            ?: throw GuiException("Couldn't parse component. Interpreter didn't specify '__:context:__' to a correct context id")
+
+        val computables: MutableMap<String, String> = mutableMapOf()
+        builder!!.deserialize(ParserContext(node, computables, context, api))
+
+        val component = builder.createComponent() as C
+        computables.forEach { (field, value) ->
+            context.computableFunctionProcessor.markAsComputed(
+                component,
+                field,
+                value
+            )
+        }
+
+        return component
     }
 }

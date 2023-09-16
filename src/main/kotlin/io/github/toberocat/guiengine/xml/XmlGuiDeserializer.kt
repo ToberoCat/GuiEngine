@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.toberocat.guiengine.GuiEngineApi
-import io.github.toberocat.guiengine.utils.orElseThrow
+import io.github.toberocat.guiengine.utils.nullCheck
 import java.io.IOException
 
 class XmlGuiDeserializer : JsonDeserializer<XmlGui>() {
@@ -17,7 +17,7 @@ class XmlGuiDeserializer : JsonDeserializer<XmlGui>() {
         val node = p.codec.readTree<JsonNode>(p)
         val fields = node.fieldNames()
         val mapper = GuiEngineApi.APIS[node["api"].asText()]?.xmlMapper
-            .orElseThrow("API field not set")
+            .nullCheck("API field not set")
         val interpreter = when {
             node.has("interpreter") -> node["interpreter"].asText()
             else -> "default"

@@ -2,7 +2,7 @@ package io.github.toberocat.guiengine.components
 
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
-import io.github.toberocat.guiengine.utils.ParserContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 import java.util.*
 
@@ -131,14 +131,14 @@ abstract class AbstractGuiComponentBuilder<B : AbstractGuiComponentBuilder<B>> :
      */
     @Throws(IOException::class)
     override fun deserialize(node: ParserContext) {
-        setPriority(node.getOptionalRenderPriority("priority").orElse(RenderPriority.NORMAL))
-        setId(node.getOptionalString("id").orElse(id))
-        setClickFunctions(node.getFunctions("on-click").orElse(ArrayList()))
-        setDragFunctions(node.getFunctions("on-drag").orElse(ArrayList()))
-        setCloseFunctions(node.getFunctions("on-close").orElse(ArrayList()))
-        setX(node.getOptionalInt("x").orElse(0))
-        setY(node.getOptionalInt("y").orElse(0))
-        setHidden(node.getOptionalBoolean("hidden").orElse(false))
+        setPriority(node.renderPriority("priority").optional(RenderPriority.NORMAL))
+        setId(node.string("id").optional(id))
+        setClickFunctions(node.functions("on-click").optional(ArrayList()))
+        setDragFunctions(node.functions("on-drag").optional(ArrayList()))
+        setCloseFunctions(node.functions("on-close").optional(ArrayList()))
+        setX(node.int("x").optional(0))
+        setY(node.int("y").optional(0))
+        setHidden(node.boolean("hidden").optional(false))
     }
 
     /**

@@ -1,5 +1,7 @@
 package io.github.toberocat.guiengine.utils
 
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 import java.util.*
 

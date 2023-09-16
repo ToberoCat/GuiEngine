@@ -3,12 +3,10 @@ package io.github.toberocat.guiengine.function.call
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
-import io.github.toberocat.guiengine.utils.ParserContext
+import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 
 /**
@@ -25,10 +23,9 @@ data class RemoveComponentFunction(val target: String) : GuiFunction {
     /**
      * Calls the `removeById` method using the provided API and context to remove a component from the GUI.
      *
-     * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param context The `GuiContext` instance representing the GUI context from which to remove the component.
      */
-    override fun call(api: GuiEngineApi, context: GuiContext) {
+    override fun call(context: GuiContext) {
         context.removeById(target)
     }
 
@@ -38,11 +35,8 @@ data class RemoveComponentFunction(val target: String) : GuiFunction {
     class Deserializer : JsonDeserializer<RemoveComponentFunction>() {
         @Throws(IOException::class)
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext): RemoveComponentFunction {
-            val node = p.codec.readTree<JsonNode>(p)
-            return RemoveComponentFunction(
-                ParserContext(node, null, null)
-                    .getOptionalString("v").orElseThrow()
-            )
+            val context = ParserContext.empty(p.codec.readTree(p))
+            return RemoveComponentFunction(context.string("v").require(TYPE, javaClass))
         }
     }
 

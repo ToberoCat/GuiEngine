@@ -2,6 +2,7 @@ package io.github.toberocat.guiengine.render
 
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.exception.InvalidGuiFileException
+import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.view.GuiView
 import io.github.toberocat.guiengine.view.GuiViewManager
 import org.bukkit.entity.Player
@@ -51,6 +52,7 @@ interface GuiRenderEngine : GuiVirtualizer {
         )
         context.setInventory(inventory)
         context.componentsDescending().forEach { it?.onViewInit(placeholders) }
+        FunctionProcessor.callFunctions(context.domEvents.onLoad, context)
         context.render()
         guiViewManager.registerGui(viewer.uniqueId, GuiView(inventory, context))
         viewer.openInventory(inventory)

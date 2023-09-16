@@ -4,14 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.github.toberocat.guiengine.GuiEngineApi
+import io.github.toberocat.guiengine.action.RenderGuiAction
 import io.github.toberocat.guiengine.components.GuiComponent
+import io.github.toberocat.guiengine.event.GuiDomEvents
 import io.github.toberocat.guiengine.event.GuiEventListener
 import io.github.toberocat.guiengine.event.GuiEvents
 import io.github.toberocat.guiengine.event.spigot.GuiCloseEvent
 import io.github.toberocat.guiengine.event.spigot.GuiComponentClickEvent
 import io.github.toberocat.guiengine.event.spigot.GuiComponentDragEvent
+import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter
 import io.github.toberocat.guiengine.xml.XmlComponent
+import io.github.toberocat.guiengine.xml.XmlGui
 import io.github.toberocat.toberocore.action.Action
 import io.github.toberocat.toberocore.util.StreamUtils
 import org.apache.commons.lang.builder.EqualsBuilder
@@ -36,7 +40,13 @@ import java.util.stream.Stream
  * @author Tobias Madlberger (Tobias)
  * @since 04/02/2023
  */
-open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiEventListener {
+open class GuiContext(
+    val interpreter: GuiInterpreter,
+    val api: GuiEngineApi,
+    val xmlGui: XmlGui,
+    private val contextType: ContextType
+) : GuiEvents,
+    GuiEventListener {
     val components: MutableList<GuiComponent>
 
     /**
@@ -52,13 +62,16 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
      * @return The unique identifier.
      */
     val contextId: UUID
+    val domEvents: GuiDomEvents
+    val computableFunctionProcessor: RenderComputableFunctionProcessor = RenderComputableFunctionProcessor()
     private var inventory: Inventory? = null
     private var viewer: Player? = null
 
     init {
         components = ArrayList()
-        localActions = HashSet()
         contextId = UUID.randomUUID()
+        domEvents = GuiDomEvents(xmlGui)
+        localActions = mutableSetOf(RenderGuiAction(this))
         GuiEngineApi.LOADED_CONTEXTS[contextId] = this
     }
 
@@ -67,19 +80,16 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
      *
      * @return A stream of GUI components in ascending order of their render priority.
      */
-    fun componentsAscending(): Stream<GuiComponent> {
-        return components.stream().sorted(Comparator.comparingInt { x: GuiComponent? -> x!!.renderPriority().ordinal })
-    }
+    fun componentsAscending(): Stream<GuiComponent> =
+        components.stream().sorted(Comparator.comparingInt { x: GuiComponent? -> x!!.renderPriority().ordinal })
 
     /**
      * Returns a stream of GUI components in descending order of their render priority.
      *
      * @return A stream of GUI components in descending order of their render priority.
      */
-    fun componentsDescending(): Stream<GuiComponent> {
-        return components.stream().sorted { x, y ->
-            -x.renderPriority().compareTo(y.renderPriority())
-        }
+    fun componentsDescending(): Stream<GuiComponent> = components.stream().sorted { x, y ->
+        -x.renderPriority().compareTo(y.renderPriority())
     }
 
     /**
@@ -88,9 +98,8 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
      * @param id The ID of the GUI component to find.
      * @return The GUI component with the specified ID, or null if not found.
      */
-    fun findComponentById(id: String): GuiComponent? {
-        return StreamUtils.find(components) { x: GuiComponent? -> x!!.id == id }
-    }
+    fun findComponentById(id: String): GuiComponent? =
+        StreamUtils.find(components) { x: GuiComponent? -> x!!.id == id }
 
     /**
      * Finds a GUI component with the specified ID and class type.
@@ -117,16 +126,15 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
     /**
      * Edits an XML component by ID with the specified edit callback.
      *
-     * @param api          The `GuiEngineApi` associated with the XML component.
      * @param id           The ID of the XML component to edit.
      * @param editCallback The callback function to edit the XML component.
      */
-    fun editXmlComponentById(api: GuiEngineApi, id: String, editCallback: Consumer<XmlComponent>) {
+    fun editXmlComponentById(id: String, editCallback: Consumer<XmlComponent>) {
         val component = findComponentById(id)
         val index = components.indexOf(component)
         if (null == component || 0 > index) return
 
-        val xml = interpreter().componentToXml(api, component)
+        val xml = interpreter().componentToXml(component)
         editCallback.accept(xml)
         val newComponent = interpreter().createComponent(xml, api, this)
         components[index] = newComponent
@@ -135,30 +143,27 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
     /**
      * Adds a GUI component to this context.
      *
-     * @param api       The `GuiEngineApi` associated with the GUI component.
      * @param component The GUI component to add.
      */
-    fun add(api: GuiEngineApi, component: GuiComponent) {
+    fun add(component: GuiComponent) {
         components.add(interpreter().bindComponent(component, api, this))
     }
 
     /**
      * Adds an XML component to this context.
      *
-     * @param api       The `GuiEngineApi` associated with the XML component.
      * @param component The XML component to add.
      */
-    fun add(api: GuiEngineApi, component: XmlComponent) {
+    fun add(component: XmlComponent) {
         components.add(interpreter().createComponent(component, api, this))
     }
 
     /**
      * Adds multiple XML components to this context.
      *
-     * @param api        The `GuiEngineApi` associated with the XML components.
      * @param components The XML components to add.
      */
-    fun add(api: GuiEngineApi, vararg components: XmlComponent) {
+    fun add(vararg components: XmlComponent) {
         for (component in components) {
             this.components.add(interpreter().createComponent(component, api, this))
         }
@@ -171,10 +176,7 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
      */
     override fun clickedComponent(event: InventoryClickEvent) {
         interpreter().clickedComponent(event)
-        componentsDescending()
-            .filter { it.isInComponent(event.slot) }
-            .filter { !it.hidden() }
-            .findFirst()
+        componentsDescending().filter { it.isInComponent(event.slot) }.filter { !it.hidden() }.findFirst()
             .ifPresentOrElse({
                 Bukkit.getPluginManager().callEvent(GuiComponentClickEvent(this, event, it))
                 it.clickedComponent(event)
@@ -261,6 +263,8 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
      * Renders the GUI context by updating the inventory with the components' content.
      */
     fun render() {
+        FunctionProcessor.callFunctions(context.domEvents.onRender, context).get()
+
         val buffer = interpreter.renderEngine.createBuffer(this)
         interpreter().renderEngine.renderGui(buffer, this, viewer!!)
         val flatContent = inventory!!.contents
@@ -307,12 +311,9 @@ open class GuiContext(private val interpreter: GuiInterpreter) : GuiEvents, GuiE
             val mapper = ObjectMapper().registerKotlinModule().registerModules(GuiEngineApi.SHARED_MODULES)
             StringJoiner(", ", GuiContext::class.java.getSimpleName() + "[", "]").add("contextId=$contextId")
                 .add("interpreter=" + interpreter.interpreterId)
-                .add("components=" + mapper.writeValueAsString(components))
-                .add("localActions=$localActions")
-                .add("inventory=" + inventory?.size)
-                .add("viewerName=" + viewer?.displayName)
-                .add("viewerID=" + viewer?.uniqueId)
-                .add("inventoryContent=" + inventory?.contents?.contentToString())
+                .add("components=" + mapper.writeValueAsString(components)).add("localActions=$localActions")
+                .add("inventory=" + inventory?.size).add("viewerName=" + viewer?.displayName)
+                .add("viewerID=" + viewer?.uniqueId).add("inventoryContent=" + inventory?.contents?.contentToString())
                 .toString()
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)

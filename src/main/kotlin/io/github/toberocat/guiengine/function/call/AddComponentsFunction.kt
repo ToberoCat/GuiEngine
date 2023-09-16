@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
 import java.io.IOException
@@ -25,12 +24,11 @@ data class AddComponentsFunction(val root: JsonNode) : GuiFunction {
     /**
      * Calls the `addComponents` method using the provided API and context to add components to the GUI.
      *
-     * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param context The `GuiContext` instance representing the GUI context to which components will be added.
      */
-    override fun call(api: GuiEngineApi, context: GuiContext) {
+    override fun call(context: GuiContext) {
         try {
-            addComponents(api, context, root["component"])
+            addComponents(context, root["component"])
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)
         }
@@ -39,18 +37,17 @@ data class AddComponentsFunction(val root: JsonNode) : GuiFunction {
     /**
      * Recursive method to add components to the GUI from the JSON node.
      *
-     * @param api     The `GuiEngineApi` instance used to interact with the GUI engine.
      * @param context The `GuiContext` instance representing the GUI context to which components will be added.
      * @param root    The JSON node representing the root component or an array of components to be added.
      * @throws JsonProcessingException If there is an issue processing the JSON data.
      */
     @Throws(JsonProcessingException::class)
-    private fun addComponents(api: GuiEngineApi, context: GuiContext, root: JsonNode) {
+    private fun addComponents(context: GuiContext, root: JsonNode) {
         if (root.isArray) {
-            for (node in root) context.add(api, context.interpreter().xmlComponent(node, api))
+            for (node in root) context.add(context.interpreter().xmlComponent(node, context.api))
             return
         }
-        context.add(api, context.interpreter().xmlComponent(root, api))
+        context.add(context.interpreter().xmlComponent(root, context.api))
     }
 
     /**

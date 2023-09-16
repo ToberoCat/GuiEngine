@@ -1,6 +1,7 @@
 package io.github.toberocat.guiengine.interpreter.provided
 
 import io.github.toberocat.guiengine.GuiEngineApi
+import io.github.toberocat.guiengine.context.ContextType
 import io.github.toberocat.guiengine.context.provided.TitleContext
 import io.github.toberocat.guiengine.render.provided.ChestGuiRenderEngine
 import io.github.toberocat.guiengine.xml.XmlGui
@@ -17,7 +18,7 @@ import org.bukkit.entity.Player
 class ChestInterpreter : ContainerInterpreter {
     override val interpreterId = "chest"
     override val renderEngine = ChestGuiRenderEngine()
-    override fun createContext(api: GuiEngineApi, viewer: Player, xmlGui: XmlGui) = TitleContext(
-        this, xmlGui["title"].map { it.asText() }.orElse("GuiEngine Gui")
+    override fun containerContext(api: GuiEngineApi, viewer: Player, xmlGui: XmlGui) = TitleContext(
+        this, xmlGui, api, xmlGui["title"].map { it.asText() }.orElse("GuiEngine Gui"), ContextType.STATIC
     )
 }

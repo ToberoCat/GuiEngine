@@ -5,8 +5,8 @@ import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.event.GuiEvents
 import io.github.toberocat.guiengine.render.RenderPriority
-import io.github.toberocat.guiengine.utils.GeneratorContext
 import io.github.toberocat.guiengine.utils.Utils.translateFromSlot
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
 import io.github.toberocat.toberocore.action.Action
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -34,6 +34,8 @@ interface GuiComponent : GuiEvents {
      * @return The type of the GUI component.
      */
     val type: String
+
+    var api: GuiEngineApi?
 
     /**
      * Get the rendering priority of the GUI component.
@@ -89,12 +91,6 @@ interface GuiComponent : GuiEvents {
      */
     fun render(viewer: Player, inventory: Array<Array<ItemStack>>)
 
-    /**
-     * Set the GUI Engine API for the component.
-     *
-     * @param api The GuiEngineApi to set.
-     */
-    fun setGuiApi(api: GuiEngineApi)
 
     /**
      * Set the GUI context for the component.

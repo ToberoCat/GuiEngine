@@ -13,6 +13,7 @@ import io.github.toberocat.guiengine.components.provided.toggle.ToggleItemCompon
 import io.github.toberocat.guiengine.exception.GuiIORuntimeException
 import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.function.call.*
+import io.github.toberocat.guiengine.function.compute.DateFunction
 import io.github.toberocat.guiengine.function.compute.GuiComponentPropertyFunction
 import io.github.toberocat.guiengine.function.compute.HasNotPermissionFunction
 import io.github.toberocat.guiengine.function.compute.HasPermissionFunction
@@ -195,6 +196,7 @@ class GuiEngineApiPlugin : JavaPlugin() {
         FunctionProcessor.registerComputeFunction(GuiComponentPropertyFunction())
         FunctionProcessor.registerComputeFunction(HasPermissionFunction())
         FunctionProcessor.registerComputeFunction(HasNotPermissionFunction())
+        FunctionProcessor.registerComputeFunction(DateFunction())
     }
 
     /**
