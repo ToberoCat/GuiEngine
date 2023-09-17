@@ -1,26 +1,16 @@
 <gui title="§eName" width="9" height="3">
     <on-load type="action">[message] The gui has been opened</on-load>
-    <component type="paged" pattern="5">
-        <page>
-            <component type="item" x="4" y="1"
-                       material="EMERALD_BLOCK"
-                       name="§aClick me!">
-                <on-click type="action">[message] You clicked me!</on-click>
-                <on-click type="action">[rerender]</on-click>
-            </component>
-        </page>
-        <page>
-            <component type="item" x="5" y="2"
-                       material="GOLD_BLOCK"
-                       name="§aClick me!">
-                <on-click type="action">[message] You clicked me!</on-click>
-            </component>
-        </page>
-        <component type="item"
-                   material="DIRT"
-                   name="§aClick me!">
-            <on-click type="action">[message] You clicked me!</on-click>
-        </component>
+    <component type="item"
+               material="DIRT"
+               name="§aClick me!">
+        <on-click type="random">
+            <group>
+                <function type="action">[message] teleport 0 0 0</function>
+                <function type="action">[message] You got teleported to the best spawn</function>
+            </group>
+            <function type="action">[message] teleport 10 10 10</function>
+            <function type="action">[message] teleport -2000 -2000 -2000</function>
+        </on-click>
     </component>
 </gui>
 

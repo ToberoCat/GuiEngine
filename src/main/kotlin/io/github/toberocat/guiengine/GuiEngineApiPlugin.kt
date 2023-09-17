@@ -13,7 +13,6 @@ import io.github.toberocat.guiengine.components.provided.paged.PagedComponent
 import io.github.toberocat.guiengine.components.provided.paged.PagedComponentBuilder
 import io.github.toberocat.guiengine.components.provided.toggle.ToggleItemComponent
 import io.github.toberocat.guiengine.components.provided.toggle.ToggleItemComponentBuilder
-import io.github.toberocat.guiengine.exception.GuiIORuntimeException
 import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.function.call.*
 import io.github.toberocat.guiengine.function.call.input.InputFunction
@@ -25,6 +24,7 @@ import io.github.toberocat.guiengine.listeners.ItemClickListener
 import io.github.toberocat.guiengine.listeners.PlayerJoinListener
 import io.github.toberocat.guiengine.utils.BStatsCollector
 import io.github.toberocat.guiengine.utils.Utils
+import io.github.toberocat.guiengine.utils.logger.PluginLogger
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager
 import io.github.toberocat.toberocore.action.ActionCore
 import org.bukkit.Bukkit
@@ -183,9 +183,11 @@ class GuiEngineApiPlugin : JavaPlugin() {
         FunctionProcessor.registerFunction(AddComponentsFunction.TYPE, AddComponentsFunction.Deserializer())
         FunctionProcessor.registerFunction(EditComponentFunction.TYPE, EditComponentFunction.Deserializer())
         FunctionProcessor.registerFunction(RemoveComponentFunction.TYPE, RemoveComponentFunction.Deserializer())
+        FunctionProcessor.registerFunction(RandomFunction.TYPE, RandomFunction.Deserializer())
         FunctionProcessor.registerFunction(ActionFunction.TYPE, ActionFunction.Deserializer())
         FunctionProcessor.registerFunction(DelayFunction.TYPE, DelayFunction.Deserializer())
         FunctionProcessor.registerFunction(InputFunction.TYPE, InputFunction.Deserializer())
+
         FunctionProcessor.registerComputeFunction(GuiComponentPropertyFunction())
         FunctionProcessor.registerComputeFunction(HasPermissionFunction())
         FunctionProcessor.registerComputeFunction(HasNotPermissionFunction())
@@ -212,11 +214,7 @@ class GuiEngineApiPlugin : JavaPlugin() {
      */
     private fun addDefaultApi() {
         guiApi = GuiEngineApi("default", File(dataFolder, "guis"))
-        try {
-            guiApi!!.reload()
-        } catch (ignored: GuiIORuntimeException) {
-            // Ignored if an exception occurs while reloading the API.
-        }
+        guiApi!!.reload(PluginLogger(logger))
     }
 
     /**

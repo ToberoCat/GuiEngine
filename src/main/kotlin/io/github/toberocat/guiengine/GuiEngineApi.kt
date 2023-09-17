@@ -16,6 +16,7 @@ import io.github.toberocat.guiengine.interpreter.InterpreterManager
 import io.github.toberocat.guiengine.utils.FileUtils
 import io.github.toberocat.guiengine.utils.VirtualInventory
 import io.github.toberocat.guiengine.utils.VirtualPlayer
+import io.github.toberocat.guiengine.utils.logger.GuiLogger
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager
 import io.github.toberocat.guiengine.xml.GuiComponentDeserializer
 import io.github.toberocat.guiengine.xml.GuiComponentSerializer
@@ -32,7 +33,6 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import java.util.logging.Level
 import java.util.regex.Pattern
 import java.util.stream.Collectors
 import kotlin.math.sqrt
@@ -110,14 +110,14 @@ class GuiEngineApi(
      * @throws GuiIORuntimeException If there is an I/O error while loading or validating GUIs.
      */
     @Throws(GuiIORuntimeException::class)
-    fun reload() {
+    fun reload(logger: GuiLogger) {
         availableGuis =
             listGuis(guiFolder).stream().map { file: File -> guiIdFromFile(file) }.collect(Collectors.toSet())
 
         val totals = LongArray(availableGuis.size)
         val guisCopy = ArrayList(availableGuis)
 
-        for (i in guisCopy.indices) totals[i] = validateGui(guisCopy[i])
+        for (i in guisCopy.indices) totals[i] = validateGui(logger, guisCopy[i])
 
         val avg = Arrays.stream(totals).average().orElse(Double.NaN)
         val sumSquaredDifferences =
@@ -226,24 +226,23 @@ class GuiEngineApi(
     }
 
     @Throws(GuiIORuntimeException::class)
-    private fun validateGui(gui: String): Long {
+    private fun validateGui(logger: GuiLogger, gui: String): Long {
         var total: Long = 0
         var delta: Long
-        val logger = GuiEngineApiPlugin.plugin.logger
         try {
-            logger.log(Level.FINE, "Validating $gui.gui")
+            logger.debug("Validating $gui.gui")
             val virtualPlayer = VirtualPlayer()
             var now = System.currentTimeMillis()
             val xmlGui = loadXmlGui(getGuiPlaceholders(virtualPlayer), gui)
             delta = System.currentTimeMillis() - now
-            logger.log(Level.FINE, "Took %dms parsing %s", arrayOf<Any>(delta, gui))
+            logger.debug("Took ${delta}ms parsing $gui")
             total += delta
             now = System.currentTimeMillis()
             val interpreter = plugin.getInterpreterManager().getInterpreter(xmlGui.interpreter)
                 ?: throw GuiIORuntimeException("No interpreter found for " + xmlGui.interpreter)
             val context = interpreter.loadContent(this, virtualPlayer, xmlGui)
             delta = System.currentTimeMillis() - now
-            logger.log(Level.FINE, "Took %dms creating a context for %s", arrayOf<Any>(delta, gui))
+            logger.debug("Took ${delta}ms creating a context for $gui")
             total += delta
             now = System.currentTimeMillis()
             val renderTask = CompletableFuture.supplyAsync<Exception?> {
@@ -263,30 +262,28 @@ class GuiEngineApi(
                 val exception = renderTask[1, TimeUnit.SECONDS]
                 if (null != exception) throw exception
                 delta = System.currentTimeMillis() - now
-                logger.log(Level.FINE, "Took %dms rendering to a virtual player %s", arrayOf<Any>(delta, gui))
+                logger.debug("Took ${delta}ms rendering to a virtual player $gui")
             } catch (e: TimeoutException) {
                 renderTask.cancel(true)
-                plugin.logger.severe("Stopped rendering gui to virtual " + "player. The render process is very likely to render an infinite long period")
+                logger.error("Stopped rendering gui to virtual " + "player. The render process is very likely to render an infinite long period")
                 throw e
             } catch (e: StackOverflowError) {
                 renderTask.cancel(true)
-                plugin.logger.severe("Stopped rendering gui to virtual " + "player. The render process is very likely to render an infinite long period")
+                logger.error("Stopped rendering gui to virtual " + "player. The render process is very likely to render an infinite long period")
                 throw e
             }
             total += delta
-            logger.log(
-                Level.FINE, "§aTook in total %dms§a to get %s displayed to the virtual player", arrayOf<Any>(delta, gui)
-            )
+            logger.debug("§aTook in total ${delta}ms§a to get $gui displayed to the virtual player")
         } catch (e: InvalidGuiComponentException) {
             availableGuis.remove(gui)
-            plugin.logger.severe(String.format("%s.gui has a invalid component. %s", gui, e.message))
+            logger.error(String.format("%s.gui has a invalid component. %s", gui, e.message))
         } catch (e: InvalidGuiFileException) {
             availableGuis.remove(gui)
-            plugin.logger.severe(e.message)
+            logger.error(e.message)
         } catch (e: Throwable) {
             availableGuis.remove(gui)
             e.printStackTrace()
-            plugin.logger.severe("The gui couldn't get rendered to an " + "virtual player. Please take a look at it")
+            logger.error("The gui couldn't get rendered to an " + "virtual player. Please take a look at it")
             throw GuiIORuntimeException(e)
         }
         return total

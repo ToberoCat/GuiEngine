@@ -5,7 +5,10 @@ import io.github.toberocat.guiengine.exception.GuiException
 import io.github.toberocat.guiengine.exception.MissingRequiredParamException
 
 
-data class ParsingOptional<T>(private val fieldName: String, private val value: T?) {
+data class ParsingOptional<T>(
+    private val fieldName: String,
+    private val value: T?
+) {
 
     fun optional(def: T): T = value ?: def
     fun nullable(def: T?): T? = value ?: def
@@ -18,7 +21,7 @@ data class ParsingOptional<T>(private val fieldName: String, private val value: 
 
     fun require(supplier: () -> GuiException): T = value ?: throw supplier.invoke()
     fun <R> map(callback: (value: T) -> R?): ParsingOptional<R> =
-        value?.let { ParsingOptional(fieldName, callback(it)) } ?: ParsingOptional(fieldName, null)
+        ParsingOptional(fieldName, value?.let { callback(it) })
 
     fun <R> mapSafe(callback: (value: T) -> R?): ParsingOptional<R> = map {
         return@map try {
@@ -36,4 +39,6 @@ data class ParsingOptional<T>(private val fieldName: String, private val value: 
                 throw exceptionSupplier.invoke(it)
             }
         }
+
+    fun present() = value != null
 }

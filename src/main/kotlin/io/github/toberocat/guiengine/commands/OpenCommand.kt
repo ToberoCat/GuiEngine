@@ -1,8 +1,6 @@
 package io.github.toberocat.guiengine.commands
 
 import io.github.toberocat.guiengine.GuiEngineApi
-import io.github.toberocat.guiengine.exception.GuiIORuntimeException
-import io.github.toberocat.guiengine.exception.GuiNotFoundRuntimeException
 import io.github.toberocat.toberocore.command.PlayerSubCommand
 import io.github.toberocat.toberocore.command.arguments.Argument
 import io.github.toberocat.toberocore.command.exceptions.CommandException
@@ -49,9 +47,7 @@ open class OpenCommand
                 return false
             }
             api.openGui(player, guiId)
-        } catch (e: GuiNotFoundRuntimeException) {
-            throw CommandException(e.message, HashMap())
-        } catch (e: GuiIORuntimeException) {
+        } catch (e: Exception) {
             throw CommandException(e.message, HashMap())
         }
         return true

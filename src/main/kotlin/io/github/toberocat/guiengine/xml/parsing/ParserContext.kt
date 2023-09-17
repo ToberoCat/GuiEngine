@@ -3,8 +3,10 @@ package io.github.toberocat.guiengine.xml.parsing
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.context.GuiContext
+import io.github.toberocat.guiengine.exception.GuiIORuntimeException
 import io.github.toberocat.guiengine.exception.InvalidGuiComponentException
 import io.github.toberocat.guiengine.function.FunctionProcessor
+import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
 import org.bukkit.Material
 import java.util.*
@@ -48,7 +50,7 @@ open class ParserContext(
      * @return A list of ParserContext objects representing the node's children.
      */
     fun fieldList(): List<ParserContext> {
-        val children: MutableList<ParserContext> = ArrayList()
+        val children = mutableListOf<ParserContext>()
         if (node.isArray) {
             for (n in node) children.add(ParserContext(n!!, computables, context, api))
         } else {
@@ -91,8 +93,7 @@ open class ParserContext(
     inline fun <reified T : Enum<T>> enum(clazz: Class<T>, field: String): ParsingOptional<T> =
         string(field).mapSafe({ enumValueOf<T>(it) }, {
             InvalidGuiComponentException(
-                "The provided ${clazz.simpleName} '$it' doesn't match any possible values. " +
-                        "Values allowed: ${clazz.enumConstants.joinToString { value -> value.name }}"
+                "The provided ${clazz.simpleName} '$it' doesn't match any possible values. " + "Values allowed: ${clazz.enumConstants.joinToString { value -> value.name }}"
             )
         })
 
@@ -182,20 +183,45 @@ open class ParserContext(
     }
 
     /**
-     * Get an optional list of GuiFunction objects from the child node of the current node
-     * based on the specified field name.
-     *
-     * @param field The field name of the optional functions.
-     * @return An Optional containing the list of GuiFunction objects if found,
-     * or an empty Optional if not present.
+     * Parses only single functions, like: <on-click type="action">...</on-click>
      */
     fun functions(field: String) = node(field).map { FunctionProcessor.createFunctions(it) }
+
+    /**
+     * Parses single functions and function groups from the current node.
+     * Example:
+     *        <on-click type="random">
+     *            <group>
+     *              <function type="action">[player] teleport 0 0 0</function>
+     *              <function type="action">[message] You teleported to the best spawn</function>
+     *            </group>
+     *             <function type="action">[player] teleport 10 10 10</function>
+     *             <function type="action">[player] teleport -2000 -2000 -2000</function>
+     *         </on-click>
+     */
+    fun groupableFunctions(
+        functionsFieldName: String = "function", groupFieldName: String = "group"
+    ): List<GuiFunction> {
+        val functions = functions(functionsFieldName).map { it.toMutableList() }.optional(mutableListOf())
+        functions.addAll(fieldList(groupFieldName).map { groups ->
+            groups.map {
+                it.functions(functionsFieldName)
+                    .require { GuiIORuntimeException("Function groups aren't allowed to be empty") }
+            }
+        }.map { groups ->
+            groups.map { functions ->
+                GuiFunction.anonymous {
+                    FunctionProcessor.callFunctions(functions, it).get()
+                }
+            }
+        }.optional(emptyList()))
+        return functions
+    }
 
     protected open fun asText(field: String, node: JsonNode): String = node.asText().let { raw ->
         context?.let {
             val processed = FunctionProcessor.applyFunctions(it, raw)
-            if (raw != processed)
-                computables[field] = raw
+            if (raw != processed) computables[field] = raw
             processed
         } ?: raw
     }

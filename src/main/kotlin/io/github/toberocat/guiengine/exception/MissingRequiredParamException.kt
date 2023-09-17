@@ -9,10 +9,5 @@ package io.github.toberocat.guiengine.exception
  */
 class MissingRequiredParamException(id: String, clazz: Class<*>, parameterName: String) :
     InvalidGuiComponentException(
-        String.format(
-            "Element %s, being generated with %s is missing the required argument '%s'",
-            id,
-            clazz.getSimpleName(),
-            parameterName
-        )
+        "Element $id, being generated with ${clazz.simpleName} is missing the required argument $parameterName"
     )

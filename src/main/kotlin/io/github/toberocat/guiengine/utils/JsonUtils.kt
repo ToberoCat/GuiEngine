@@ -1,9 +1,10 @@
 package io.github.toberocat.guiengine.utils
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
-import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import java.io.IOException
 import java.util.*
+
 
 /**
  * Created: 07.04.2023
@@ -43,30 +44,35 @@ object JsonUtils {
         generator.writeEndArray()
     }
 
-    /**
-     * Write a List of Objects into a JSON array field.
-     *
-     * @param gen   The generator context to write JSON data.
-     * @param field The field name of the JSON array.
-     * @param array The List of Objects to write into the JSON array.
-     * @throws IOException If an I/O error occurs during the writing process.
-     */
-    @Throws(IOException::class)
-    fun writeArray(gen: GeneratorContext, field: String, array: List<Any?>) {
-        val generator = gen.generator
-        generator.writeArrayFieldStart(field)
-        for (element in array) generator.writeObject(element)
-        generator.writeEndArray()
+
+    fun findNodePath(currentNode: JsonNode?, targetFieldName: String): String {
+        if (currentNode == null) return ""
+
+        if (currentNode.isObject) {
+            val targetNode = currentNode[targetFieldName]
+            if (targetNode != null) return "/$targetFieldName"
+        }
+
+        when {
+            currentNode.isArray -> {
+                for (i in 0 until currentNode.size()) {
+                    val arrayElement = currentNode[i]
+                    val path = findNodePath(arrayElement, targetFieldName)
+                    if (path.isNotEmpty()) return "[$i]$path"
+                }
+            }
+
+            currentNode.isObject -> {
+                val fieldNames = currentNode.fieldNames()
+                while (fieldNames.hasNext()) {
+                    val fieldName = fieldNames.next()
+                    val fieldNode = currentNode[fieldName]
+                    val path = findNodePath(fieldNode, targetFieldName)
+                    if (path.isNotEmpty()) return "/$fieldName$path"
+                }
+            }
+        }
+        return ""
     }
 
-    /**
-     * Get an optional node from the given parent node based on the specified field name.
-     *
-     * @param node  The parent node to retrieve the optional node from.
-     * @param field The field name of the optional node.
-     * @return An Optional containing the node if found, or an empty Optional if not present.
-     */
-    fun getOptionalNode(node: ParserContext, field: String): Optional<ParserContext> {
-        return Optional.ofNullable(node[field])
-    }
 }

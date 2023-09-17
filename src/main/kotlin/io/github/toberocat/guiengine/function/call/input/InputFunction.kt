@@ -30,8 +30,6 @@ data class InputFunction(val inputType: InputType, val variable: String, val par
     }
 
     private fun runBody(viewer: Player, context: GuiContext, input: String) {
-        println(parser.node)
-
         val placeholders: MutableMap<String, String> = when (parser) {
             is PlaceholderParserContext -> parser.placeholders
             else -> mutableMapOf()

@@ -39,6 +39,8 @@ import java.util.*
  *
  * @author Tobias Madlberger (Tobias)
  */
+val virtualPlayerUUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+
 class VirtualPlayer : Player {
     override fun getDisplayName(): String = ""
 
@@ -228,7 +230,7 @@ class VirtualPlayer : Player {
     }
 
     override fun getUniqueId(): UUID {
-        return UUID.fromString("00000000-0000-0000-0000-000000000000")
+        return virtualPlayerUUID
     }
 
     override fun getPlayerProfile(): PlayerProfile {

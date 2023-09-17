@@ -2,7 +2,7 @@ package io.github.toberocat.guiengine.commands
 
 import io.github.toberocat.guiengine.GuiEngineApi
 import io.github.toberocat.guiengine.GuiEngineApiPlugin.Companion.plugin
-import io.github.toberocat.guiengine.exception.GuiIORuntimeException
+import io.github.toberocat.guiengine.utils.logger.CommandSenderLogger
 import io.github.toberocat.toberocore.command.SubCommand
 import io.github.toberocat.toberocore.command.arguments.Argument
 import io.github.toberocat.toberocore.command.exceptions.CommandException
@@ -18,9 +18,10 @@ class ReloadCommand : SubCommand("reload") {
     override fun handleCommand(sender: CommandSender, strings: Array<String>): Boolean {
         try {
             plugin.reloadConfig()
-            for (api in GuiEngineApi.APIS.values) api.reload()
+            val logger = CommandSenderLogger(sender)
+            for (api in GuiEngineApi.APIS.values) api.reload(logger)
             sender.sendMessage("§aReloaded GUI APIs.")
-        } catch (e: GuiIORuntimeException) {
+        } catch (e: Exception) {
             sender.sendMessage(e.message)
         }
         return true

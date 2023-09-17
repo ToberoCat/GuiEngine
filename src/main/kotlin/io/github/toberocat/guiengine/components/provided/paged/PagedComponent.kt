@@ -20,6 +20,7 @@ import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import io.github.toberocat.toberocore.action.Action
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -91,8 +92,7 @@ open class PagedComponent(
     override fun createEmptyPage() = pageParser?.createEmptyPage()
 
     override fun addComponent(component: GuiComponent) {
-        if (pages.last().insert(component))
-            return
+        if (pages.last().insert(component)) return
         createEmptyPage()?.let { pages.add(it) }
     }
 
@@ -133,8 +133,7 @@ open class PagedComponent(
         context?.let { context ->
             context.viewer()?.let {
                 PageParser(
-                    api,
-                    context, it, width(), height(), pattern
+                    api, context, it, width(), height(), pattern
                 )
             }
         }
@@ -165,61 +164,53 @@ class PageParser(
     private val pattern: IntArray
 ) {
     fun parse(node: ParserContext): MutableList<PatternPage> {
-        val pages = mutableListOf(createEmptyPage())
-        parseNode(node).forEach {
-            if (pages.last().insert(it))
-                return@forEach
+        val pages = mutableListOf<PatternPage>()
+        node.fieldList("page").optional(emptyList()).forEach {
+            val (page, preferredPosition) = parsePage(it)
+            pages.add(preferredPosition ?: (max(pages.size - 1, 0)), page)
+        }
+        if (pages.isEmpty()) pages.add(createEmptyPage())
+
+        parseNode(node).forEach { (_, component) ->
+            if (pages.last().insert(component)) return@forEach
             pages.add(createEmptyPage())
         }
-
-
-        node.fieldList("page")
-            .optional(emptyList())
-            .forEach {
-                val (page, preferredPosition) = parsePage(it)
-                pages.add(preferredPosition ?: (pages.size - 1), page)
-            }
         return pages
-        //embedded = this.pages[showedPage]
     }
 
-    fun createEmptyPage(): PatternPage = PatternPage(api, pattern, context
-        .interpreter()
-        .createContext(
-            api, viewer, XmlGui(
-                context.interpreter().interpreterId, emptyArray(), mapOf(
-                    "width" to IntNode(width), "height" to IntNode(height)
-                )
+    fun createEmptyPage(): PatternPage = PatternPage(api, pattern, context.interpreter().createContext(
+        api, viewer, XmlGui(
+            context.interpreter().interpreterId, emptyArray(), mapOf(
+                "width" to IntNode(width), "height" to IntNode(height)
             )
-        ).also {
-            it.setInventory(context.inventory())
-            it.setViewer(viewer)
-            it.domEvents.onRender.addAll(context.domEvents.onRender)
-            it.computableFunctionProcessor.copy(context.computableFunctionProcessor)
-        })
+        )
+    ).also {
+        it.setInventory(context.inventory())
+        it.setViewer(viewer)
+        it.domEvents.onRender.addAll(context.domEvents.onRender)
+        it.computableFunctionProcessor.copy(context.computableFunctionProcessor)
+    })
 
-    private fun parseNode(node: ParserContext): List<GuiComponent> {
+    private fun parseNode(node: ParserContext): List<Pair<Boolean, GuiComponent>> {
         val interpreter = context.interpreter()
-        return node.fieldList("component")
-            .optional(ArrayList())
-            .map {
-                return@map interpreter.createComponent(
-                    interpreter.xmlComponent(it.node, api),
-                    api,
-                    context
-                )
-            }
+        return node.fieldList("component").optional(ArrayList()).map {
+            return@map (it.node("x").present() || it.node("y").present()) to interpreter.createComponent(
+                interpreter.xmlComponent(it.node, api), api, context
+            )
+        }
     }
 
-    private fun parsePage(node: ParserContext): Pair<PatternPage, Int?> =
-        createEmptyPage().also { page -> parseNode(node).forEach { page.insert(it) } } to
-                node.int("position").nullable(null)
+    private fun parsePage(node: ParserContext): Pair<PatternPage, Int?> = createEmptyPage().also { page ->
+        parseNode(node).forEach { (positioned, component) ->
+            if (positioned) page.pageContext.add(component) else page.insert(
+                component
+            )
+        }
+    } to node.int("position").nullable(null)
 }
 
 class PatternPage(
-    val api: GuiEngineApi,
-    val pattern: IntArray,
-    override val pageContext: GuiContext
+    val api: GuiEngineApi, private val pattern: IntArray, override val pageContext: GuiContext
 ) : Page {
     private var current: Int = 0
     override fun insert(component: GuiComponent): Boolean {
@@ -232,4 +223,10 @@ class PatternPage(
         pageContext.add(component)
         return true
     }
+
+    override fun toString(): String {
+        return "PatternPage(pageContext=$pageContext, current=$current)"
+    }
+
+
 }

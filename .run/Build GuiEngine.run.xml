@@ -12,7 +12,7 @@
           <option name="goals">
             <list>
               <option value="install" />
-              <option value="-Dserver.location=$PROJECT_DIR$/../../JumpAndRun/server/plugins" />
+              <option value="-Dserver.location=./server/plugins" />
             </list>
           </option>
           <option name="pomFileName" value="pom.xml" />
