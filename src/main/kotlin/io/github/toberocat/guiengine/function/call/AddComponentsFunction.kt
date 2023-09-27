@@ -30,6 +30,7 @@ data class AddComponentsFunction(val root: ParserContext) : GuiFunction {
         } catch (e: JsonProcessingException) {
             throw RuntimeException(e)
         }
+        context.render()
     }
 
     /**

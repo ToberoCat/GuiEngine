@@ -23,10 +23,6 @@ class NextPageAction(private val pagedComponent: PagedComponent) : GuiEngineActi
      */
     override fun label() = pagedComponent.id + ":next"
 
-    init {
-        println(pagedComponent.id + ":next")
-    }
-
     /**
      * Performs the action of navigating to the next page of the associated `PagedComponent`
      * for the specified player.
@@ -35,8 +31,6 @@ class NextPageAction(private val pagedComponent: PagedComponent) : GuiEngineActi
      */
     override fun run(player: Player) {
         val value = pagedComponent.page + 1
-        println(value)
-        println(pagedComponent.availablePages)
         if (value >= pagedComponent.availablePages) return
         pagedComponent.page = value
     }

@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 object FunctionProcessor {
     private val pattern = Pattern.compile("\\{([^}]*)}", Pattern.MULTILINE)
     private val FUNCTIONS: MutableMap<String, GuiFunctionFactory<*>> = HashMap()
-    private val COMPUTE_FUNCTIONS: MutableSet<GuiComputeFunction> = HashSet()
+    private val COMPUTE_FUNCTIONS: MutableList<GuiComputeFunction> = ArrayList()
     private val OBJECT_MAPPER: ObjectMapper = XmlMapper().registerKotlinModule()
 
     /**
@@ -54,9 +54,7 @@ object FunctionProcessor {
      */
     @Throws(JsonProcessingException::class)
     fun createFunction(node: ParserContext): GuiFunction {
-        val id = node
-            .string("type")
-            .require { GuiFunctionException("A gui function is missing a type") }
+        val id = node.string("type").require { GuiFunctionException("A gui function is missing a type") }
         return FUNCTIONS[id]?.build(node) ?: throw GuiFunctionException("'$id' not known as a gui function")
     }
 
@@ -81,8 +79,7 @@ object FunctionProcessor {
      * @param context   The `GuiContext` instance representing the GUI context on which the functions are called.
      */
     fun callFunctions(
-        functions: Collection<GuiFunction>,
-        context: GuiContext
+        functions: Collection<GuiFunction>, context: GuiContext
     ): Future<*> = Utils.threadPool.submit { for (function in functions) function.call(context) }
 
     /**
@@ -98,9 +95,18 @@ object FunctionProcessor {
         while (matcher.find()) {
             val group = matcher.group(1)
             for (function in COMPUTE_FUNCTIONS) {
-                if (!function.checkForFunction(group)) continue
+                val nonNegatedGroup = group.replace("!", "")
+                if (!function.checkForFunction(nonNegatedGroup)) continue
 
-                matcher.appendReplacement(buffer, Matcher.quoteReplacement(function.compute(context, group)))
+                val result = Matcher.quoteReplacement(function.compute(context, nonNegatedGroup))
+                if (!group.startsWith("!")) {
+                    matcher.appendReplacement(buffer, result)
+                    break
+                }
+
+                matcher.appendReplacement(
+                    buffer,
+                    result.let { (!(it.toBooleanStrictOrNull() ?: return@let it)).toString() })
                 break
             }
         }

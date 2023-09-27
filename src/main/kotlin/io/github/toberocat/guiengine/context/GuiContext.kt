@@ -41,12 +41,8 @@ import java.util.stream.Stream
  * @since 04/02/2023
  */
 open class GuiContext(
-    val interpreter: GuiInterpreter,
-    val api: GuiEngineApi,
-    val xmlGui: XmlGui,
-    private val contextType: ContextType
-) : GuiEvents,
-    GuiEventListener {
+    val interpreter: GuiInterpreter, val api: GuiEngineApi, val xmlGui: XmlGui, private val contextType: ContextType
+) : GuiEvents, GuiEventListener {
     val components: MutableList<GuiComponent>
 
     /**
@@ -98,21 +94,9 @@ open class GuiContext(
      * @param id The ID of the GUI component to find.
      * @return The GUI component with the specified ID, or null if not found.
      */
-    fun findComponentById(id: String): GuiComponent? =
-        StreamUtils.find(components) { x: GuiComponent? -> x!!.id == id }
+    fun findComponentById(id: String): GuiComponent? = StreamUtils.find(components) { x: GuiComponent? -> x!!.id == id }
 
-    /**
-     * Finds a GUI component with the specified ID and class type.
-     *
-     * @param id    The ID of the GUI component to find.
-     * @param clazz The class type of the GUI component.
-     * @param <T>   The type of the GUI component.
-     * @return The GUI component with the specified ID and class type, or null if not found or the class type does not match.
-    </T> */
-    fun <T : GuiComponent?> findComponentById(id: String, clazz: Class<T>): T? {
-        val component = StreamUtils.find(components) { x: GuiComponent? -> x!!.id == id }
-        return if (component!!.javaClass != clazz) null else clazz.cast(component)
-    }
+    inline fun <reified T : GuiComponent> findComponentByClass() = components.firstOrNull { it is T }.let { it as? T }
 
     /**
      * Removes a GUI component with the specified ID.
@@ -155,6 +139,7 @@ open class GuiContext(
      * @param component The XML component to add.
      */
     fun add(component: XmlComponent) {
+        println(component.javaClass.simpleName)
         components.add(interpreter().createComponent(component, api, this))
     }
 

@@ -16,7 +16,10 @@ import io.github.toberocat.guiengine.components.provided.toggle.ToggleItemCompon
 import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.function.call.*
 import io.github.toberocat.guiengine.function.call.input.InputFunction
-import io.github.toberocat.guiengine.function.compute.*
+import io.github.toberocat.guiengine.function.compute.DateFunction
+import io.github.toberocat.guiengine.function.compute.GuiComponentPropertyFunction
+import io.github.toberocat.guiengine.function.compute.HasPermissionFunction
+import io.github.toberocat.guiengine.function.compute.PapiFunction
 import io.github.toberocat.guiengine.interpreter.InterpreterManager
 import io.github.toberocat.guiengine.interpreter.provided.*
 import io.github.toberocat.guiengine.item.GuiItemManager
@@ -190,7 +193,6 @@ class GuiEngineApiPlugin : JavaPlugin() {
 
         FunctionProcessor.registerComputeFunction(GuiComponentPropertyFunction())
         FunctionProcessor.registerComputeFunction(HasPermissionFunction())
-        FunctionProcessor.registerComputeFunction(HasNotPermissionFunction())
         FunctionProcessor.registerComputeFunction(DateFunction())
 
         Bukkit.getPluginManager().getPlugin("PlaceholderAPI")?.let {

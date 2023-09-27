@@ -22,6 +22,7 @@ class PlaceholderParserContext(
 
     override fun get(field: String): PlaceholderParserContext? = when {
         node.has(field) -> PlaceholderParserContext(node.get(field), placeholders, computables, context, api)
+        field.isBlank() -> PlaceholderParserContext(node, placeholders, computables, context, api)
         else -> null
     }
 

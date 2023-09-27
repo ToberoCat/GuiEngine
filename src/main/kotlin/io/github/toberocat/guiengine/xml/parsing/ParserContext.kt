@@ -10,7 +10,6 @@ import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
 import org.bukkit.Material
 import java.util.*
-import java.util.function.Consumer
 
 open class ParserContext(
     val node: JsonNode,
@@ -30,6 +29,7 @@ open class ParserContext(
      */
     open operator fun get(field: String): ParserContext? = when {
         node.has(field) -> ParserContext(node.get(field), computables, context, api)
+        field.isBlank() -> ParserContext(node, computables, context, api)
         else -> null
     }
 
@@ -78,6 +78,7 @@ open class ParserContext(
             children
         }
     }
+
 
     /**
      * Get an optional Material enum value from the child node of the current node
@@ -155,13 +156,16 @@ open class ParserContext(
      * @return An Optional containing the array of Strings if found,
      * or an empty Optional if not present.
      */
-    fun stringArray(field: String) = node(field).map { node: ParserContext ->
-        val array: MutableList<String> = ArrayList()
-        when {
-            !node.node.isArray -> array.add(node.asText(field, node.node))
-            else -> node.node.forEach(Consumer { array.add(asText(field, it)) })
+    fun stringList(field: String) = list(field) { it.asText(field, it.node) }
+
+    fun <T> list(field: String, mapper: (context: ParserContext) -> T): ParsingOptional<List<T>> {
+        return node(field).map { node ->
+            when {
+                node.node.isEmpty -> emptyList()
+                !node.node.isArray -> mutableListOf(mapper(node))
+                else -> node.map { mapper(it) }
+            }
         }
-        array.toTypedArray()
     }
 
     /**

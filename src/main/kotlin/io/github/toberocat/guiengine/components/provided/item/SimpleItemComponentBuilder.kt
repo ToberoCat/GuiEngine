@@ -5,6 +5,7 @@ import io.github.toberocat.guiengine.xml.parsing.ParserContext
 import io.github.toberocat.toberocore.util.ItemUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import java.io.IOException
 import java.util.*
@@ -15,13 +16,13 @@ import java.util.*
  *
  * @param <B> The type of the builder, used for method chaining.
 </B> */
-open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>>
-    : AbstractGuiComponentBuilder<B>() {
+open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>> : AbstractGuiComponentBuilder<B>() {
     protected var name = ""
     protected var material: Material? = null
     protected var lore = arrayOf<String>()
     protected var textureId: String? = null
     protected var owner: UUID? = null
+    protected var flags = ItemFlag.entries.toList()
 
     /**
      * Set the texture ID for the item (only applicable to PLAYER_HEAD or SKULL items).
@@ -31,6 +32,11 @@ open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>>
      */
     fun setTextureId(textureId: String?): B {
         this.textureId = textureId
+        return self()
+    }
+
+    fun setFlags(flags: List<ItemFlag>): B {
+        this.flags = flags
         return self()
     }
 
@@ -80,21 +86,14 @@ open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>>
 
     protected val itemStack: ItemStack
         get() {
-            if (null != material) return ItemUtils.createItem(material!!, name, 1, *lore)
-            return if (textureId != null) ItemUtils.createHead(
-                textureId!!,
-                name,
-                1,
-                *lore
-            ) else if (owner != null) ItemUtils.createSkull(
-                Bukkit.getOfflinePlayer(
-                    owner!!
-                ), 1, name, lore
-            ) else ItemUtils.createItem(
-                Material.BARRIER,
-                "§cInvalid texture / ownerID",
-                1
-            )
+            val item = when {
+                material != null -> ItemUtils.createItem(material!!, name, 1, *lore)
+                textureId != null -> ItemUtils.createHead(textureId!!, name, 1, *lore)
+                owner != null -> ItemUtils.createSkull(Bukkit.getOfflinePlayer(owner!!), 1, name, lore)
+                else -> ItemUtils.createItem(Material.BARRIER, "§cInvalid texture / ownerID", 1)
+            }
+            ItemUtils.editMeta(item) { it.addItemFlags(*flags.toTypedArray()) }
+            return item
         }
 
     override fun createComponent(): SimpleItemComponent {
@@ -105,12 +104,11 @@ open class SimpleItemComponentBuilder<B : SimpleItemComponentBuilder<B>>
     override fun deserialize(node: ParserContext) {
         super.deserialize(node)
         setName(node.string("name").optional(" "))
-        setLore(node.stringArray("lore").optional(emptyArray()))
-        val texture = node.string("head-texture")
-            .map { obj: String -> obj.trim { it <= ' ' } }
-            .nullable(null)
-        val headOwner = node.uuid("head-owner")
-            .nullable(null)
+        setLore(node.stringList("lore").optional(emptyList()).toTypedArray())
+        setFlags(node.list("flag") { it.enum(ItemFlag::class.java, "").require(id, javaClass) }
+            .optional(flags))
+        val texture = node.string("head-texture").map { obj: String -> obj.trim { it <= ' ' } }.nullable(null)
+        val headOwner = node.uuid("head-owner").nullable(null)
         if (null != texture || null != headOwner) {
             setOwner(headOwner)
             setTextureId(texture)

@@ -7,7 +7,7 @@ import io.github.toberocat.guiengine.function.GuiComputeFunction
 class DateFunction : GuiComputeFunction {
 
     override fun compute(context: GuiContext, value: String): String {
-        return "" + System.currentTimeMillis()
+        return System.currentTimeMillis().toString()
     }
 
     override fun checkForFunction(value: String) = value == PREFIX
