@@ -10,4 +10,7 @@ interface PagedContainer : LayoutContainer {
     fun addPage(context: GuiContext)
     fun addPage(context: GuiContext, position: Int)
     fun createEmptyPage(): PatternPage?
+
+    fun showNext() = page != availablePages - 1
+    fun showPrevious() = page != 0
 }

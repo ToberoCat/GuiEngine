@@ -54,7 +54,7 @@ class GuiComponentDeserializer<C : GuiComponent, B : GuiComponentBuilder?>(priva
         val api = GuiEngineApi.APIS[apiId]
             ?: throw GuiException("Couldn't parse component. Interpreter didn't specify '__:api:__' to a correct api id")
         val context = GuiEngineApi.LOADED_CONTEXTS[contextId]
-            ?: throw GuiException("Couldn't parse component. Interpreter didn't specify '__:context:__' to a correct context id")
+            ?: throw GuiException("Couldn't parse component. Value received: $contextId. Interpreter didn't specify '__:ctx:__' to a correct context id")
 
         val computables: MutableMap<String, String> = mutableMapOf()
         builder!!.deserialize(ParserContext(node, computables, context, api))

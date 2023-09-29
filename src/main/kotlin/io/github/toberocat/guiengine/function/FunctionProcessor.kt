@@ -1,9 +1,6 @@
 package io.github.toberocat.guiengine.function
 
 import com.fasterxml.jackson.core.JsonProcessingException
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.exception.GuiFunctionException
 import io.github.toberocat.guiengine.utils.Utils
@@ -24,7 +21,6 @@ object FunctionProcessor {
     private val pattern = Pattern.compile("\\{([^}]*)}", Pattern.MULTILINE)
     private val FUNCTIONS: MutableMap<String, GuiFunctionFactory<*>> = HashMap()
     private val COMPUTE_FUNCTIONS: MutableList<GuiComputeFunction> = ArrayList()
-    private val OBJECT_MAPPER: ObjectMapper = XmlMapper().registerKotlinModule()
 
     /**
      * Registers a custom GUI function.

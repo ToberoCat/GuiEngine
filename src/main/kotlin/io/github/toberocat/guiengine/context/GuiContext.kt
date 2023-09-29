@@ -15,6 +15,7 @@ import io.github.toberocat.guiengine.event.spigot.GuiComponentClickEvent
 import io.github.toberocat.guiengine.event.spigot.GuiComponentDragEvent
 import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter
+import io.github.toberocat.guiengine.utils.VirtualView
 import io.github.toberocat.guiengine.xml.XmlComponent
 import io.github.toberocat.guiengine.xml.XmlGui
 import io.github.toberocat.toberocore.util.StreamUtils
@@ -41,7 +42,10 @@ import java.util.stream.Stream
  * @since 04/02/2023
  */
 open class GuiContext(
-    val interpreter: GuiInterpreter, val api: GuiEngineApi, val xmlGui: XmlGui, private val contextType: ContextType
+    val interpreter: GuiInterpreter,
+    val api: GuiEngineApi,
+    val xmlGui: XmlGui,
+    private val contextType: ContextType
 ) : GuiEvents, GuiEventListener {
     val components: MutableList<GuiComponent>
 
@@ -60,17 +64,17 @@ open class GuiContext(
      *
      * @return The unique identifier.
      */
-    val contextId: UUID
+    val contextId: UUID = UUID.randomUUID()
     val domEvents: GuiDomEvents
     val computableFunctionProcessor: RenderComputableFunctionProcessor = RenderComputableFunctionProcessor()
+    var propagateClose = true
     private var inventory: Inventory? = null
     private var viewer: Player? = null
 
     init {
-        components = ArrayList()
-        contextId = UUID.randomUUID()
-        domEvents = GuiDomEvents(xmlGui)
         GuiEngineApi.LOADED_CONTEXTS[contextId] = this
+        components = ArrayList()
+        domEvents = GuiDomEvents(xmlGui)
     }
 
     /**
@@ -123,6 +127,8 @@ open class GuiContext(
         val xml = interpreter().componentToXml(component)
         editCallback.accept(xml)
         val newComponent = interpreter().createComponent(xml, api, this)
+
+        components[index].closedComponent(InventoryCloseEvent(VirtualView(viewer)))
         components[index] = newComponent
     }
 
@@ -198,6 +204,8 @@ open class GuiContext(
      * @param event The `InventoryCloseEvent` representing the close event.
      */
     override fun closedComponent(event: InventoryCloseEvent) {
+        if (!propagateClose)
+            return
         componentsDescending().filter { x: GuiComponent? -> !x!!.hidden() }
             .forEachOrdered { x: GuiComponent? -> x!!.closedComponent(event) }
         Bukkit.getPluginManager().callEvent(GuiCloseEvent(this, event))

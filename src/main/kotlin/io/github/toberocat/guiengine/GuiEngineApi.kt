@@ -15,6 +15,7 @@ import io.github.toberocat.guiengine.interpreter.InterpreterManager
 import io.github.toberocat.guiengine.utils.FileUtils
 import io.github.toberocat.guiengine.utils.VirtualInventory
 import io.github.toberocat.guiengine.utils.VirtualPlayer
+import io.github.toberocat.guiengine.utils.VirtualView
 import io.github.toberocat.guiengine.utils.logger.GuiLogger
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager
 import io.github.toberocat.guiengine.xml.GuiComponentDeserializer
@@ -23,6 +24,7 @@ import io.github.toberocat.guiengine.xml.XmlGui
 import org.apache.commons.text.StringSubstitutor
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.io.FileFilter
@@ -77,7 +79,7 @@ class GuiEngineApi(
         xmlMapper.registerModules(SHARED_MODULES)
         xmlMapper.registerModule(kotlinModule())
         xmlMapper.factory.xmlTextElementName = "$"
-        
+
         this.id = GUI_ID_REGEX.matcher(id).replaceAll("")
         when {
             !guiFolder.exists() && !guiFolder.mkdirs() -> Bukkit.getLogger()
@@ -248,10 +250,11 @@ class GuiEngineApi(
             total += delta
             now = System.currentTimeMillis()
             val renderTask = CompletableFuture.supplyAsync<Exception?> {
-
+                val virtualInventory = VirtualInventory(interpreter.renderEngine.height(context)) {}
                 val virtualBuffer = interpreter.renderEngine.createBuffer(context)
                 context.setViewer(virtualPlayer)
-                context.setInventory(VirtualInventory(interpreter.renderEngine.height(context)) {})
+                context.setInventory(virtualInventory)
+
                 try {
                     context.componentsDescending().forEach { it?.onViewInit(HashMap()) }
                     interpreter.renderEngine.renderGui(virtualBuffer, context, virtualPlayer)
@@ -260,6 +263,7 @@ class GuiEngineApi(
                 }
                 null
             }
+
             try {
                 val exception = renderTask[1, TimeUnit.SECONDS]
                 if (null != exception) throw exception
@@ -276,6 +280,7 @@ class GuiEngineApi(
             }
             total += delta
             logger.debug("§aTook in total ${delta}ms§a to get $gui displayed to the virtual player")
+            context.closedComponent(InventoryCloseEvent(VirtualView(virtualPlayer)))
         } catch (e: InvalidGuiComponentException) {
             availableGuis.remove(gui)
             logger.error(String.format("%s.gui has a invalid component. %s", gui, e.message))
@@ -285,7 +290,7 @@ class GuiEngineApi(
         } catch (e: Throwable) {
             availableGuis.remove(gui)
             e.printStackTrace()
-            logger.error("The gui couldn't get rendered to an " + "virtual player. Please take a look at it")
+            logger.error("The gui couldn't get rendered to an virtual player. Please take a look at it")
             throw GuiIORuntimeException(e)
         }
         return total
