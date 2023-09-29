@@ -105,6 +105,10 @@ open class PagedComponent(
     override fun onViewInit(placeholders: Map<String, String>) {
         pageParser = createParser()
         pages = pageParser?.parse(parent) ?: pages
+        emptyFill = parent.node("empty-fill").map {
+            context!!.interpreter()
+                .createComponent(context!!.interpreter().xmlComponent(it.node, api!!), api!!, context!!)
+        }.nullable(null)
         updateEmbedded()
     }
 

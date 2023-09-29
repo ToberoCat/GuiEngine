@@ -29,6 +29,7 @@ import io.github.toberocat.guiengine.utils.BStatsCollector
 import io.github.toberocat.guiengine.utils.Utils
 import io.github.toberocat.guiengine.utils.logger.PluginLogger
 import io.github.toberocat.guiengine.view.DefaultGuiViewManager
+import io.github.toberocat.guiengine.webeditor.WebEditorServer
 import io.github.toberocat.toberocore.action.ActionCore
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -92,6 +93,8 @@ class GuiEngineApiPlugin : JavaPlugin() {
         registerCommands()
         checkForUpdate()
         BStatsCollector(this)
+
+        WebEditorServer(4567)
     }
 
     override fun onDisable() {

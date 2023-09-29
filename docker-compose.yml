@@ -9,3 +9,4 @@ services:
       - ./server:/data
     ports:
       - "25565:25565"
+      - "4567:4567"

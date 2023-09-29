@@ -12,4 +12,5 @@ items:
     lore:
       - ""
       - "§7Click me! I can't get eaten"
+webeditor-port: 4657
 update-checker: true

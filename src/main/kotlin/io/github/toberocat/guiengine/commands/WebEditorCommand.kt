@@ -1,5 +1,7 @@
 package io.github.toberocat.guiengine.commands
 
+import io.github.toberocat.guiengine.GuiEngineApiPlugin
+import io.github.toberocat.guiengine.webeditor.WebEditorServer
 import io.github.toberocat.toberocore.command.SubCommand
 import io.github.toberocat.toberocore.command.arguments.Argument
 import io.github.toberocat.toberocore.command.exceptions.CommandException
@@ -16,7 +18,11 @@ class WebEditorCommand : SubCommand("webeditor") {
         sender: CommandSender,
         strings: Array<String>
     ): Boolean {
-        sender.sendMessage("§6The Gui web editor is only available for gui engine premium users")
+        sender.sendMessage("§6The webeditor is starting...")
+
+        val port = GuiEngineApiPlugin.plugin.config.getInt("webeditor-port", 4567)
+        WebEditorServer(port)
+        sender.sendMessage("§7The webeditor is available to you at port §6localhost:$port")
         return true
     }
 }

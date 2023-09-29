@@ -21,7 +21,8 @@
         <spigot.api.version>1.18.1-R0.1-SNAPSHOT</spigot.api.version>
         <toberocore.version>0f2d094899</toberocore.version>
         <kotlin.version>1.9.10</kotlin.version>
-
+        <org.slf4j.version>1.7.5</org.slf4j.version>
+        
         <!-- Server Location. Set as run arg -->
         <server.location>.</server.location>
     </properties>
@@ -111,6 +112,29 @@
             <artifactId>SpigotUpdateChecker</artifactId>
             <version>3.0.3</version> <!-- Check on GitHub for the latest version -->
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-kotlin</artifactId>
+            <version>1.0.0-alpha</version>
+        </dependency>
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${org.slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${org.slf4j.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${org.slf4j.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
