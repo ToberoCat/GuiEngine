@@ -1,10 +1,9 @@
 package io.github.toberocat.guiengine
 
 import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.fasterxml.jackson.module.kotlin.kotlinModule
 import io.github.toberocat.guiengine.components.GuiComponent
 import io.github.toberocat.guiengine.components.GuiComponentBuilder
 import io.github.toberocat.guiengine.context.GuiContext
@@ -56,7 +55,7 @@ class GuiEngineApi(
      *
      * @return The `ObjectMapper` instance for XML handling.
      */
-    val xmlMapper: ObjectMapper = XmlMapper().registerKotlinModule()
+    val xmlMapper: XmlMapper = XmlMapper()
     private val componentIdMap: MutableMap<String, Class<out GuiComponent>> = HashMap(SHARED_COMPONENT_ID_MAPS)
     private val plugin: GuiEngineApiPlugin = GuiEngineApiPlugin.plugin
     private var availableGuis: MutableSet<String> = mutableSetOf()
@@ -76,6 +75,9 @@ class GuiEngineApi(
     init {
         availableGuis = HashSet()
         xmlMapper.registerModules(SHARED_MODULES)
+        xmlMapper.registerModule(kotlinModule())
+        xmlMapper.factory.xmlTextElementName = "$"
+        
         this.id = GUI_ID_REGEX.matcher(id).replaceAll("")
         when {
             !guiFolder.exists() && !guiFolder.mkdirs() -> Bukkit.getLogger()

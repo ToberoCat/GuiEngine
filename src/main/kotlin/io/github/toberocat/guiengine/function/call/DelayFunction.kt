@@ -1,5 +1,6 @@
 package io.github.toberocat.guiengine.function.call
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.github.toberocat.guiengine.context.GuiContext
 import io.github.toberocat.guiengine.function.GuiFunction
@@ -9,7 +10,7 @@ import org.bukkit.Bukkit
 import java.util.concurrent.TimeUnit
 
 @JsonDeserialize(using = DelayFunction.Deserializer::class)
-data class DelayFunction(val unit: TimeUnit, val duration: Int) : GuiFunction {
+data class DelayFunction(val unit: TimeUnit, @JsonProperty("$") val duration: Int) : GuiFunction {
     override val type = TYPE
     override fun call(context: GuiContext) {
         try {
@@ -31,7 +32,7 @@ data class DelayFunction(val unit: TimeUnit, val duration: Int) : GuiFunction {
     class Deserializer : GuiFunctionFactory<DelayFunction>() {
 
         override fun build(node: ParserContext) = DelayFunction(
-            node.enum(TimeUnit::class.java, "unit").optional(TimeUnit.SECONDS), node.int("").require(TYPE, javaClass)
+            node.enum(TimeUnit::class.java, "unit").optional(TimeUnit.SECONDS), node.int("$").require(TYPE, javaClass)
         )
     }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.github.toberocat.guiengine.GuiEngineApi
+import io.github.toberocat.guiengine.action.ImplicitUpdateAction
 import io.github.toberocat.guiengine.action.RenderGuiAction
 import io.github.toberocat.guiengine.components.GuiComponent
 import io.github.toberocat.guiengine.event.GuiDomEvents
@@ -16,7 +17,6 @@ import io.github.toberocat.guiengine.function.FunctionProcessor
 import io.github.toberocat.guiengine.interpreter.GuiInterpreter
 import io.github.toberocat.guiengine.xml.XmlComponent
 import io.github.toberocat.guiengine.xml.XmlGui
-import io.github.toberocat.toberocore.action.Action
 import io.github.toberocat.toberocore.util.StreamUtils
 import org.apache.commons.lang.builder.EqualsBuilder
 import org.apache.commons.lang.builder.HashCodeBuilder
@@ -50,7 +50,10 @@ open class GuiContext(
      *
      * @return The set of local actions.
      */
-    val localActions: MutableSet<Action>
+    val localActions = mutableSetOf(
+        RenderGuiAction(this),
+        ImplicitUpdateAction(this)
+    )
 
     /**
      * Returns the unique identifier of this `GuiContext`.
@@ -67,7 +70,6 @@ open class GuiContext(
         components = ArrayList()
         contextId = UUID.randomUUID()
         domEvents = GuiDomEvents(xmlGui)
-        localActions = mutableSetOf(RenderGuiAction(this))
         GuiEngineApi.LOADED_CONTEXTS[contextId] = this
     }
 
@@ -139,7 +141,6 @@ open class GuiContext(
      * @param component The XML component to add.
      */
     fun add(component: XmlComponent) {
-        println(component.javaClass.simpleName)
         components.add(interpreter().createComponent(component, api, this))
     }
 

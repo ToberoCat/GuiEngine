@@ -187,7 +187,7 @@ class GuiEngineApiPlugin : JavaPlugin() {
         FunctionProcessor.registerFunction(EditComponentFunction.TYPE, EditComponentFunction.Deserializer())
         FunctionProcessor.registerFunction(RemoveComponentFunction.TYPE, RemoveComponentFunction.Deserializer())
         FunctionProcessor.registerFunction(RandomFunction.TYPE, RandomFunction.Deserializer())
-        FunctionProcessor.registerFunction(ActionFunction.TYPE, ActionFunction.Deserializer())
+        FunctionProcessor.registerFunction(ActionFunction.TYPE, ActionFunction.Factory())
         FunctionProcessor.registerFunction(DelayFunction.TYPE, DelayFunction.Deserializer())
         FunctionProcessor.registerFunction(InputFunction.TYPE, InputFunction.Deserializer())
 

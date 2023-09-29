@@ -1,5 +1,6 @@
 package io.github.toberocat.guiengine.function.call
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.github.toberocat.guiengine.GuiEngineApiPlugin.Companion.plugin
 import io.github.toberocat.guiengine.context.GuiContext
@@ -16,8 +17,8 @@ import org.bukkit.Bukkit
  * Created: 29.04.2023
  * Author: Tobias Madlberger (Tobias)
  */
-@JsonDeserialize(using = ActionFunction.Deserializer::class)
-data class ActionFunction(val action: String) : GuiFunction {
+@JsonDeserialize(using = ActionFunction.Factory::class)
+data class ActionFunction(@JsonProperty("$") val action: String) : GuiFunction {
     override val type = TYPE
 
     /**
@@ -28,9 +29,7 @@ data class ActionFunction(val action: String) : GuiFunction {
     override fun call(context: GuiContext) {
         val viewer = context.viewer() ?: return
         Bukkit.getScheduler().runTask(plugin, Runnable {
-            Actions(
-                action
-            )
+            Actions(action)
                 .localActions(context.localActions)
                 .run(viewer)
         })
@@ -39,9 +38,9 @@ data class ActionFunction(val action: String) : GuiFunction {
     /**
      * Custom deserializer to convert JSON data into an `ActionFunction` instance.
      */
-    class Deserializer : GuiFunctionFactory<ActionFunction>() {
+    class Factory : GuiFunctionFactory<ActionFunction>() {
         override fun build(node: ParserContext): ActionFunction = ActionFunction(
-            node.string("").require(TYPE, javaClass)
+            node.string("$").require(TYPE, javaClass)
         )
     }
 

@@ -106,8 +106,11 @@ data class GeneratorContext(val generator: JsonGenerator) {
     }
 
     @Throws(IOException::class)
-    fun writeFunctionField(fieldName: String, functions: List<GuiFunction?>) {
-        if (functions.size == 1) writePOJOField("on-click", functions[0]) else writePOJOField("on-click", functions)
+    fun writeFunctionField(fieldName: String, functions: List<GuiFunction>) {
+        when (functions.size) {
+            1 -> writePOJOField(fieldName, functions[0])
+            else -> writePOJOField(fieldName, functions)
+        }
     }
 
     /**
