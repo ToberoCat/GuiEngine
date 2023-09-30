@@ -9,7 +9,7 @@ class GuiEngineApiController : Controller {
         getRequest("/guis/:api") { GuiEngineApi.APIS[it.params("api")]?.getAvailableGuis() ?: emptySet() }
         Spark.get("/guis/:api/:gui") { req, res ->
             res.type("application/xml")
-            return@get """<?xml version="1.0" encoding="UTF-8"?>\n${getXmlGui(req.params("api"), req.params("gui"))}"""
+            return@get getXmlGui(req.params("api"), req.params("gui"))
         }
     }
 

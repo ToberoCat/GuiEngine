@@ -6,7 +6,7 @@
 
     <groupId>io.github.toberocat</groupId>
     <artifactId>gui-engine</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -22,7 +22,7 @@
         <toberocore.version>0f2d094899</toberocore.version>
         <kotlin.version>1.9.10</kotlin.version>
         <org.slf4j.version>1.7.5</org.slf4j.version>
-        
+
         <!-- Server Location. Set as run arg -->
         <server.location>.</server.location>
     </properties>
