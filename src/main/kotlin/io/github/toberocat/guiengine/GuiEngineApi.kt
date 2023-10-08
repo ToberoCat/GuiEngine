@@ -114,14 +114,15 @@ class GuiEngineApi(
      * @throws GuiIORuntimeException If there is an I/O error while loading or validating GUIs.
      */
     @Throws(GuiIORuntimeException::class)
-    fun reload(logger: GuiLogger) {
+    fun reload(logger: GuiLogger, guiPlaceholders: Map<String, Map<String, String>> = mapOf()) {
         availableGuis =
             listGuis(guiFolder).stream().map { file: File -> guiIdFromFile(file) }.collect(Collectors.toSet())
 
         val totals = LongArray(availableGuis.size)
         val guisCopy = ArrayList(availableGuis)
 
-        for (i in guisCopy.indices) totals[i] = validateGui(logger, guisCopy[i])
+        for (i in guisCopy.indices) totals[i] =
+            validateGui(logger, guisCopy[i], guiPlaceholders[guisCopy[i]] ?: emptyMap())
 
         val avg = Arrays.stream(totals).average().orElse(Double.NaN)
         val sumSquaredDifferences =
@@ -230,14 +231,17 @@ class GuiEngineApi(
     }
 
     @Throws(GuiIORuntimeException::class)
-    private fun validateGui(logger: GuiLogger, gui: String): Long {
+    private fun validateGui(logger: GuiLogger, gui: String, placeholders: Map<String, String>): Long {
         var total: Long = 0
         var delta: Long
         try {
             logger.debug("Validating $gui.gui")
             val virtualPlayer = VirtualPlayer()
             var now = System.currentTimeMillis()
-            val xmlGui = loadXmlGui(getGuiPlaceholders(virtualPlayer), gui)
+            val xmlGui = loadXmlGui(
+                getGuiPlaceholders(virtualPlayer).toMutableMap().also { it.putAll(placeholders) },
+                gui
+            )
             delta = System.currentTimeMillis() - now
             logger.debug("Took ${delta}ms parsing $gui")
             total += delta

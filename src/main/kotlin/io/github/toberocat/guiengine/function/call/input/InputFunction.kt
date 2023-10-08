@@ -58,7 +58,6 @@ data class InputFunction(
 
     class Factory : GuiFunctionFactory<InputFunction>() {
         override fun build(node: ParserContext): InputFunction {
-            println(node.node)
             return InputFunction(
                 node.enum(InputType::class.java, "input-type").require(TYPE, javaClass),
                 node.string("variable").require(TYPE, javaClass),

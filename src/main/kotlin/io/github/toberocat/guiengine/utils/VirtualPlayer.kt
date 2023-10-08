@@ -791,9 +791,7 @@ class VirtualPlayer : Player {
         return null!!
     }
 
-    override fun getName(): String {
-        return null!!
-    }
+    override fun getName() = "Tobero"
 
     override fun getInventory(): PlayerInventory {
         return null!!

@@ -19,7 +19,7 @@
         <commons.text.version>1.10.0</commons.text.version>
         <jetbrains.annotations.version>23.0.0</jetbrains.annotations.version>
         <spigot.api.version>1.18.1-R0.1-SNAPSHOT</spigot.api.version>
-        <toberocore.version>0f2d094899</toberocore.version>
+        <toberocore.version>d5978b5eec</toberocore.version>
         <kotlin.version>1.9.10</kotlin.version>
         <org.slf4j.version>1.7.5</org.slf4j.version>
 
