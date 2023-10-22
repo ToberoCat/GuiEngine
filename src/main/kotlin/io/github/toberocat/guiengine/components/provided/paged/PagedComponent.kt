@@ -84,6 +84,8 @@ open class PagedComponent(
         }
 
     override fun addPage(context: GuiContext) = addPage(context, pages.size - 1)
+    override fun addPage(patternPage: PatternPage) = addPage(patternPage, pages.size - 1)
+    override fun addPage(patternPage: PatternPage, position: Int) = pages.add(position, patternPage)
 
     override fun addPage(context: GuiContext, position: Int) {
         api?.let { pages.add(position, PatternPage(it, pattern, context)) }

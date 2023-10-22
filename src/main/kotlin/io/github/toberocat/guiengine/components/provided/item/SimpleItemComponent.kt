@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import io.github.toberocat.guiengine.components.AbstractGuiComponent
 import io.github.toberocat.guiengine.function.GuiFunction
 import io.github.toberocat.guiengine.render.RenderPriority
-import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
 import io.github.toberocat.guiengine.utils.JsonUtils.writeArray
+import io.github.toberocat.guiengine.xml.parsing.GeneratorContext
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta

@@ -99,8 +99,9 @@ class ToggleItemComponent(
     }
 
     override fun clickedComponent(event: InventoryClickEvent) {
-        super<AbstractGuiComponent>.clickedComponent(event)
         selected = (selected + 1) % componentSelectionModel.size
+        super<AbstractGuiComponent>.clickedComponent(event)
+        
         if (null == context) return
         context!!.render()
     }
