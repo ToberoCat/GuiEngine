@@ -24,7 +24,7 @@ You can view our [beginner guide](https://github.com/ToberoCat/GuiEngine/wiki/Us
 If you're intrested in using it in your plugin, you can take look at the [developer docs](https://github.com/ToberoCat/GuiEngine/wiki/Developer-Docs). This is a documentation of the most essential things you might want to do with this framework.
 
 ## Comparision
-![grafik](https://github.com/ToberoCat/GuiEngine/assets/67831042/83acb3d3-d142-4ed2-b04e-38e2a47f13fd)
+![Gui Comparision](https://github.com/ToberoCat/GuiEngine/assets/67831042/83acb3d3-d142-4ed2-b04e-38e2a47f13fd)
 
 In the image provided, you can observe the GUI created using two distinct frameworks. On the left side, the RedLibs InventoryGui was used to create the displayed GUI. Meanwhile, on the right side, the GuiEngine was utilized.
 
