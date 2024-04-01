@@ -23,6 +23,9 @@ class GuiComponentDragEvent(
     override fun getHandlers(): HandlerList = handlerList
 
     companion object {
-        val handlerList = HandlerList()
+        private val handlerList = HandlerList()
+
+        @JvmStatic
+        fun getHandlerList(): HandlerList = handlerList
     }
 }

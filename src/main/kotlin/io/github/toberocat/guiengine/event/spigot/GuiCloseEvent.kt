@@ -17,6 +17,9 @@ class GuiCloseEvent(context: GuiContext, val closeEvent: InventoryCloseEvent) : 
     override fun getHandlers(): HandlerList = handlerList
 
     companion object {
-        val handlerList = HandlerList()
+        private val handlerList = HandlerList()
+
+        @JvmStatic
+        fun getHandlerList(): HandlerList = handlerList
     }
 }
