@@ -2,7 +2,6 @@ package io.github.toberocat.guiengine.event.spigot
 
 import io.github.toberocat.guiengine.context.GuiContext
 import org.bukkit.event.Event
-import org.bukkit.event.HandlerList
 
 /**
  * Represents a custom GUI engine event that extends the `Event` class from Bukkit.
@@ -13,10 +12,4 @@ import org.bukkit.event.HandlerList
  * Created: 21.05.2023
  * Author: Tobias Madlberger (Tobias)
  */
-open class GuiEngineEvent(val context: GuiContext) : Event() {
-    override fun getHandlers(): HandlerList = handlerList
-
-    companion object {
-        val handlerList = HandlerList()
-    }
-}
+abstract class GuiEngineEvent(val context: GuiContext) : Event()

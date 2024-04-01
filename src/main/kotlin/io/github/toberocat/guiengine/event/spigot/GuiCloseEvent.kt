@@ -1,6 +1,7 @@
 package io.github.toberocat.guiengine.event.spigot
 
 import io.github.toberocat.guiengine.context.GuiContext
+import org.bukkit.event.HandlerList
 import org.bukkit.event.inventory.InventoryCloseEvent
 
 /**
@@ -12,4 +13,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent
  * Created: 21.05.2023
  * Author: Tobias Madlberger (Tobias)
  */
-class GuiCloseEvent(context: GuiContext, val closeEvent: InventoryCloseEvent) : GuiEngineEvent(context)
+class GuiCloseEvent(context: GuiContext, val closeEvent: InventoryCloseEvent) : GuiEngineEvent(context) {
+    override fun getHandlers(): HandlerList = handlerList
+
+    companion object {
+        val handlerList = HandlerList()
+    }
+}
